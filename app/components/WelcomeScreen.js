@@ -44,7 +44,7 @@ const WelcomeScreen = () => {
   return (
     <View style={styles.container}>
         <FadeInView style={{flex:1}}>
-            <Text style={styles.heading}>THIS IS WELCOME SCREEN! <Text style={{color: 'red'}}>DO NOT REMOVE THIS SCREEN! WE WILL USE IT AS WELL!</Text> HAVE NEW SCREEN? LET'S PUSH IT IN STACK CONTAINER IN APP.JS!</Text>
+            <Text style={styles.heading}>THIS IS WELCOME SCREEN! <Text style={{color: 'red'}}>DO NOT REMOVE THIS SCREEN! WE WILL USE IT AS WELL!</Text> HAVE NEW SCREEN? LET'S PUSH IT IN STACK CONTAINER IN NAVIGATION.JS!</Text>
             <View style={styles.textWrapper}>
                 <Svg style={{position: 'absolute', top: -100 , right: -200}} height="100" width="200">
                     <Path

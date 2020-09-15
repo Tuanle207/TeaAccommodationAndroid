@@ -4,7 +4,7 @@ import {View, Text, Pressable} from 'react-native';
 
 import {doSomething} from '../actions';
 import { COLOR_DARK_BLUE, COLOR_DARK_BROWN, COLOR_LIGHT_BROWN} from './styles/default.value';
-const TestScreen = ({doSomething, test}) => {
+const TestScreen = ({doSomething, test, navigation}) => {
 
     useEffect(() => {
         console.log(`Default! data: \'${test.data}\', error: \'${test.error}\'`);
@@ -42,6 +42,25 @@ const TestScreen = ({doSomething, test}) => {
                     textTransform: 'uppercase',
                     fontSize: 12
                 }}> Touch here to test </Text>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate('Welcome')} 
+                style={{
+                    marginBottom: 'auto',
+                    backgroundColor: COLOR_DARK_BROWN,
+                    width: '60%',
+                    height: 50,
+                    borderRadius: 30,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: 10
+                    }}>
+                <Text style={{
+                    color: '#fff',
+                    textTransform: 'uppercase',
+                    fontSize: 12,
+                    textAlign: 'center'
+                }}> Touch here to navigate to Welcome screen </Text>
             </Pressable>
         </View>
     )
