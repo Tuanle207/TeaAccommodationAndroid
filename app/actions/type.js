@@ -1,0 +1,6 @@
+const ACTION_TYPE = {
+    APP_STARTING: 'APP_STARTING',
+    DO_SOMETHING: 'DO_SOMETHING'
+};
+
+export default ACTION_TYPE;
