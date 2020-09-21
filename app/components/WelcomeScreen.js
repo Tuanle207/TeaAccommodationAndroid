@@ -36,7 +36,7 @@ const FadeInView = (props) => {
         {props.children}
       </Animated.View>
     );
-  }
+}
 
 
 const WelcomeScreen = () => {

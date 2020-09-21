@@ -8,6 +8,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import WelcomeScreen from './WelcomeScreen';
 import TestScreen from './TestScreen';
+import LoginScreen from './LoginScreen';
+import LoginSuccess from './LoginSuccess';
 
 
 const Stack = createStackNavigator();
@@ -17,13 +19,15 @@ const Navigation = () => {
   return (
     <NavigationContainer>
         <Stack.Navigator
-            initialRouteName='Test'
+            initialRouteName='LoginSuccess'
             screenOptions={{
                 headerShown: false
             }}
         >
             <Stack.Screen name='Welcome' component={WelcomeScreen} />
             <Stack.Screen name='Test' component={TestScreen} />
+            <Stack.Screen name='Login' component={LoginScreen} />
+            <Stack.Screen name='LoginSuccess' component={LoginSuccess} />
         </Stack.Navigator>
     </NavigationContainer>
   );

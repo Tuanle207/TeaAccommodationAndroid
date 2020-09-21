@@ -1,4 +1,7 @@
+import accommodationRequest from '../apis/client';
+import {attachToken, catchAsync} from '../utils';
 import ACTION_TYPE from './type';
+
 
 export const doSomething = data => dispatch => {
     console.log('You are doing something...Maybe it involves changing state?');
@@ -9,8 +12,98 @@ export const doSomething = data => dispatch => {
             error: 'no error'
         };
     }
+    console.log('Action: ' + data.email);
     dispatch({
         type: ACTION_TYPE.DO_SOMETHING,
         payload: data
     });
 };
+
+
+export const updateLoginInfo = data => {
+    return (dispatch) => {
+        dispatch({
+            type: ACTION_TYPE.UPDATE_LOGIN_INFO,
+            payload: data
+        });
+    };
+};
+
+export const checkLoggedIn = ({navigation}) => catchAsync(async dispatch => {
+
+    dispatch({
+        type: ACTION_TYPE.FETCHING_DATA,
+        payload: true
+    });
+
+    const response = await accommodationRequest.get('/isLoggedIn');
+    const data = response.data.data;
+  
+    dispatch({
+        type: ACTION_TYPE.USER_LOGGED_IN,
+        payload: {
+            auth: true,
+            data
+        }
+    });
+    dispatch({
+        type: ACTION_TYPE.FETCHING_DATA,
+        payload: false
+    });
+}, (e) => {
+    console.log(e);
+    navigation.navigate('Login');
+});
+
+export const login = ({email, password, navigation}) => catchAsync(async dispatch => {
+    if (!email || !password)
+        return false;
+
+    const response = await accommodationRequest.post('/login', {
+        email, password
+    });
+
+    dispatch({
+        type: ACTION_TYPE.USER_LOGIN,
+        payload: {
+            auth: true,
+            data: response.data.data,
+            token: response.data.token}
+    });
+
+    navigation.navigate('LoginSuccess');
+}, (e) => {
+    console.log('error!');
+    console.log(e);
+});
+
+export const logout = ({navigation}) => catchAsync(async dispatch => {
+
+    await accommodationRequest.get('/logout');
+
+    dispatch({
+        type: ACTION_TYPE.USER_LOGIN,
+        payload: {
+            auth: false,
+            data: null
+        }
+    });
+
+    navigation.navigate('Login');
+
+}, (e) => {
+    console.log('error!');
+    console.log(e);
+});
+
+
+
+
+/**
+ ** UI animation action
+ */
+
+export const toggleFetchingState = ({fetchingData}) => dispatch => dispatch({
+    type: ACTION_TYPE.FETCHING_DATA,
+    payload: fetchingData
+});
