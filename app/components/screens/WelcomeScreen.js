@@ -9,7 +9,7 @@ import {
 
 import {Svg, G, Line, Rect, Path} from 'react-native-svg';
 
-import {COLOR_DARK_BLUE, COLOR_DARK_BROWN, COLOR_LIGHT_BLUE, COLOR_LIGHT_BROWN} from './styles/default.value';
+import {COLOR_DARK_BLUE, COLOR_DARK_BROWN, COLOR_LIGHT_BLUE, COLOR_LIGHT_BROWN} from '../styles/default.value';
 
 
 const FadeInView = (props) => {

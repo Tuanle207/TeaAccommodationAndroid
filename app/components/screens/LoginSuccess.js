@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import {View, Text, Button} from 'react-native';
 import {connect} from 'react-redux';
-import {checkLoggedIn, logout} from '../actions';
+import {checkLoggedIn, logout} from '../../actions';
 
 
 const LoginSuccess = ({checkLoggedIn, logout, navigation, user, fetchingData}) => {

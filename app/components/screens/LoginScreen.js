@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
-import {updateLoginInfo, login} from '../actions';
+import {updateLoginInfo, login} from '../../actions';
 
 const LoginScreen = ({navigation, updateLoginInfo, login, info}) => {
 
