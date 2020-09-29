@@ -1,5 +1,5 @@
 import accommodationRequest from '../apis/client';
-import {attachToken, catchAsync} from '../utils';
+import {catchAsync} from '../utils';
 import ACTION_TYPE from './type';
 
 
@@ -59,10 +59,12 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
     if (!email || !password)
         return false;
 
+    console.log('getting');
     const response = await accommodationRequest.post('/login', {
         email, password
     });
 
+    console.log('success');
     dispatch({
         type: ACTION_TYPE.USER_LOGIN,
         payload: {
@@ -94,6 +96,53 @@ export const logout = ({navigation}) => catchAsync(async dispatch => {
 }, (e) => {
     console.log('error!');
     console.log(e);
+});
+
+export const getApartments = query => catchAsync(async dispatch => {
+    
+    dispatch({
+        type: ACTION_TYPE.FETCHING_DATA,
+        payload: true
+    });
+
+    if (query) {
+        const response = await accommodationRequest.get('/apartments', {
+            params: {
+                limit: 3,
+                page: query.page
+            }
+        });
+
+        dispatch({
+            type: ACTION_TYPE.APARTMENTS_GETTING_NEXT_PAGE,
+            payload: {
+                meta: response.data.meta,
+                data: response.data.data
+            }
+        });
+    } else {
+
+        const response = await accommodationRequest.get('/apartments?limit=3');
+
+        dispatch({
+            type: ACTION_TYPE.APARTMENTS_GETTING,
+            payload: {
+                meta: response.data.meta,
+                data: response.data.data
+            }
+        });
+    }
+    dispatch({
+        type: ACTION_TYPE.FETCHING_DATA,
+        payload: false
+    });
+}, e => {
+    console.log('error');
+    console.log(e);
+    dispatch({
+        type: ACTION_TYPE.FETCHING_DATA,
+        payload: false
+    });
 });
 
 
