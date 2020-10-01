@@ -146,6 +146,19 @@ export const getApartments = query => catchAsync(async dispatch => {
 });
 
 
+export const getApartment = ({id}) => catchAsync(async dispatch => {
+    const response = await accommodationRequest.get(`/apartments/${id}`);
+    
+    dispatch({
+        type: ACTION_TYPE.APARTMENT_GETTING,
+        payload: response.data.data
+    });
+    
+}, e => {
+    console.log(e);
+    console.log('error');
+});
+
 
 
 /**
