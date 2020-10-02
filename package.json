@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "android": "npx react-native run-android",
-    "start": "npm run ipconfig && react-native start",
-    "ipconfig": "powershell -ExecutionPolicy Bypass ./ipconfig.ps1",
+    "start": "react-native start",
     "test": "jest",
     "lint": "eslint ."
   },

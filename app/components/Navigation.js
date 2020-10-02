@@ -9,6 +9,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import LoginSuccess from './screens/LoginSuccess';
+import UserScreen from './screens/UserScreen';
 
 
 const Stack = createStackNavigator();
@@ -26,6 +27,7 @@ const Navigation = () => {
             <Stack.Screen name='Welcome' component={WelcomeScreen} />
             <Stack.Screen name='Login' component={LoginScreen} />
             <Stack.Screen name='LoginSuccess' component={LoginSuccess} />
+            <Stack.Screen name='User' component={UserScreen} />
         </Stack.Navigator>
     </NavigationContainer>
   );

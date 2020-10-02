@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
-import {updateLoginInfo, login} from '../../actions';
+import { updateLoginInfo, login } from '../../actions';
 
-const LoginScreen = ({navigation, updateLoginInfo, login, info}) => {
+const LoginScreen = ({ navigation, updateLoginInfo, login, info }) => {
 
     useEffect(() => {
-    
+
     }, [info]);
 
 
@@ -16,20 +16,20 @@ const LoginScreen = ({navigation, updateLoginInfo, login, info}) => {
                 <View style={styles.login}>
                     <Text style={{ fontSize: 20, fontWeight: "bold", color: '#F9F9F9', marginBottom: 10 }}>Đăng nhập</Text>
                     <Text style={styles.text}>Tên đăng nhập</Text>
-                    <TextInput 
+                    <TextInput
                         style={styles.input}
-                        onChangeText={(e) => updateLoginInfo({email: e.valueOf()})}
+                        onChangeText={(e) => updateLoginInfo({ email: e.valueOf() })}
                         value={info.email}
-                         />
+                    />
                     <Text style={styles.text}>Mật khẩu</Text>
-                    <TextInput 
+                    <TextInput
                         style={styles.input}
-                        onChangeText={(e) => updateLoginInfo({password: e.valueOf()})}
+                        onChangeText={(e) => updateLoginInfo({ password: e.valueOf() })}
                         value={info.password}
-                     />
-                    <View style={{alignItems: "center"}}>
-                        <TouchableOpacity style={styles.button} 
-                            onPress={() => login({...info, navigation})}>
+                    />
+                    <View style={{ alignItems: "center" }}>
+                        <TouchableOpacity style={styles.button}
+                            onPress={() => login({ ...info, navigation })}>
                             <Text style={{ fontWeight: "bold" }}>Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>
@@ -45,9 +45,9 @@ const LoginScreen = ({navigation, updateLoginInfo, login, info}) => {
     );
 }
 
-const mapStateToProps = (state) => ({info: state.loginInfo});
+const mapStateToProps = (state) => ({ info: state.loginInfo });
 
-export default connect(mapStateToProps, {updateLoginInfo, login})(LoginScreen);
+export default connect(mapStateToProps, { updateLoginInfo, login })(LoginScreen);
 
 const styles = StyleSheet.create({
     container: {
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     footer: {
-        height:50,
+        height: 50,
         flexDirection: "row",
         borderTopColor: "#D4CBCB",
         borderTopWidth: 1,

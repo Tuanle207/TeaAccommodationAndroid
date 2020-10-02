@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import {View, Text, Button} from 'react-native';
 import {connect} from 'react-redux';
 import {checkLoggedIn, logout} from '../../actions';
+import axios from 'axios';
 
 
 const LoginSuccess = ({checkLoggedIn, logout, navigation, user, fetchingData}) => {
@@ -30,9 +31,10 @@ const LoginSuccess = ({checkLoggedIn, logout, navigation, user, fetchingData}) =
     )
 };
 
-export default connect(
-    state => ({
+const mapStateToProps = state => {
+    return {
         user: state.user, 
         fetchingData: state.ui.fetchingData
-    }), 
-    {checkLoggedIn, logout})(LoginSuccess);
+    }
+}
+export default connect(mapStateToProps,{checkLoggedIn, logout})(LoginSuccess);
