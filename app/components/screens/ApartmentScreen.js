@@ -5,7 +5,7 @@ import { SERVER_URL } from '@env';
 import { getApartment } from '../../actions';
 import { connect } from 'react-redux';
 import apartmentDetail from '../../reducers/apartmentDetail.reducer';
-
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const testData = [
     '/photo/apartment/1819196029851600082245.jpg',
@@ -60,13 +60,14 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails}) => {
         return (
             <View style={{flex: 1}}>
                 <Swiper style={styles.wrapper} 
-                showsButtons={false} 
-                loop={false}
-                showsPagination={false}
-                index={photoIndex}>
-                {renderPhotos(detail.photos)}
-            </Swiper>
+                    showsButtons={false} 
+                    loop={false}
+                    showsPagination={false}
+                    index={photoIndex}>
+                    {renderPhotos(detail.photos)}
+                </Swiper>
                 <Text>{detail.title}</Text>
+                <Icon name='rocket' size={30} color='#000' />
             </View>
         );
     }

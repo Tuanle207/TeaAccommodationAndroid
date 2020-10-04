@@ -2,11 +2,9 @@ import React from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SERVER_URL } from '@env';
 import { shortenMoneyAmount, shortenText }  from '../../utils';
-import CoinIcon from '../../assets/SVG/coin-dollar.svg';
-import HomeIcon from '../../assets/SVG/home3.svg';
-import LocationIcon from '../../assets/SVG/location.svg';
-import ClockIcon from '../../assets/SVG/clock.svg';
-
+import EntypoIcon from 'react-native-vector-icons/Entypo';
+import FrontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 export default function ApartmentCard({navigation, item}) {
     
@@ -26,21 +24,21 @@ export default function ApartmentCard({navigation, item}) {
                     </Text>
                     <View style={styles.infoDetail}>
                         <View style={styles.detail}>
-                            <CoinIcon width={16} height={16} fill='#e7e7de' />
-                        <Text style={styles.detailText}>{shortenMoneyAmount(item.rent)} triệu/tháng</Text>
+                            <MaterialIcon name='attach-money' size={16} color='#e7e7de' />
+                            <Text style={styles.detailText}>{shortenMoneyAmount(item.rent)} triệu/tháng</Text>
                         </View>
                         <View style={styles.detail}>
-                            <HomeIcon width={16} height={16} fill='#e7e7de' />
+                            <FrontAwesomeIcon name='home' size={16} color='#e7e7de' />
                             <Text style={styles.detailText}>{item.area}㎡</Text>
                         </View>
                     </View>
 
                     <View style={styles.detail}>
-                        <LocationIcon width={16} height={16} fill='#e7e7de' />
+                        <EntypoIcon name='location-pin' size={16} color='#e7e7de' />
                         <Text style={styles.detailText}>{`${item.address.district}, ${item.address.city}`}</Text>
                     </View>
                     <View style={styles.detail}>
-                        <ClockIcon width={16} height={16} fill='#e7e7de' />
+                        <EntypoIcon name='clock' size={16} color='#e7e7de' />
                         <Text style={{...styles.detailText, ...{fontSize: 12}}}>Đăng lúc: {item.postedAt}</Text>
                     </View>
                 </View>
