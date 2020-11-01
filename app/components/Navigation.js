@@ -10,6 +10,7 @@ import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import LoginSuccess from './screens/LoginSuccess';
 import UserScreen from './screens/UserScreen';
+import SignUpScreen from './screens/SignUpScreen';
 
 
 const Stack = createStackNavigator();
@@ -19,7 +20,7 @@ const Navigation = () => {
   return (
     <NavigationContainer>
         <Stack.Navigator
-            initialRouteName='LoginSuccess'
+            initialRouteName='SignUp'
             screenOptions={{
                 headerShown: false
             }}
@@ -28,6 +29,7 @@ const Navigation = () => {
             <Stack.Screen name='Login' component={LoginScreen} />
             <Stack.Screen name='LoginSuccess' component={LoginSuccess} />
             <Stack.Screen name='User' component={UserScreen} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
         </Stack.Navigator>
     </NavigationContainer>
   );

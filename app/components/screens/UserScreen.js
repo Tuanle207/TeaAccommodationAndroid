@@ -14,7 +14,7 @@ export default class UserScreen extends Component {
             info: [{ title: 'Tên đăng nhập', value: 'Thanh Tuấn' },
             { title: 'Số điện thoại', value: '033333333' },
             { title: 'Địa chỉ', value: 'Quảng Ngãi' },
-            { title: 'Email', value: 'thanhtuan2000do@gmail.com' },
+            { title: 'Email', value: 'thanhtuan2000dp@gmail.com' },
             { title: 'Loại tài khoản', value: 'Cho thuê' }
             ]
         }
@@ -30,21 +30,19 @@ export default class UserScreen extends Component {
     render() {
         return (
             <View >
-                <SafeAreaView >
-                    <ScrollView style={{ width: '100%', height: '100%', backgroundColor: '#204051', paddingHorizontal: 20}}>
-                        <Text style={TittleStyle.tittle}>Trang cá nhân</Text>
-                        <Image style={styles.avatar}/>
-                        <FlatList style={styles.list} data={this.state.info} renderItem={this.renderItem}
-                            keyExtractor={item => item.title}
-                        />
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.insideButton}>Chỉnh sửa trang cá nhân</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.insideButton}>Đổi mật khẩu</Text>
-                        </TouchableOpacity>
-                    </ScrollView>
-                </SafeAreaView>
+                <ScrollView style={{ width: '100%', height: '100%', backgroundColor: '#204051', paddingHorizontal: 20 }}>
+                    <Text style={TittleStyle.tittle}>Trang cá nhân</Text>
+                    <Image style={styles.avatar} />
+                    <FlatList style={styles.list} data={this.state.info} renderItem={this.renderItem}
+                        keyExtractor={item => item.title}
+                    />
+                    <TouchableOpacity style={styles.button}>
+                        <Text style={styles.insideButton}>Chỉnh sửa trang cá nhân</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button}>
+                        <Text style={styles.insideButton}>Đổi mật khẩu</Text>
+                    </TouchableOpacity>
+                </ScrollView>
             </View>
         );
     }
@@ -58,7 +56,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: 16,
         backgroundColor: "white",
-        
+
     },
     list: {
         margin: 10,
