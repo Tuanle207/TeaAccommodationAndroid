@@ -1,6 +1,6 @@
 import React from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SERVER_URL } from '@env';
+import { serverApi } from '../../../appsetting';
 import { shortenMoneyAmount, shortenText }  from '../../utils';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import FrontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
@@ -11,13 +11,12 @@ export default function ApartmentCard({navigation, item}) {
     return (
         <Pressable style={styles.listItem}
         onPress={() => navigation.push('Apartment', { id: item.id })}
+        key={item.id}
         >
             <ImageBackground style={styles.image} 
-                source={{
-                    uri: `${SERVER_URL}${item.photos[0]}`,
-                    method: 'GET'
-                }} 
-                resizeMode={'cover'}>
+                source={{uri: `${serverApi}${item.photos[0]}`}}
+                resizeMode={'cover'}
+            >
                 <View style={styles.info}>
                     <Text style={styles.titleText}>
                         {shortenText(item.title)}
@@ -55,7 +54,8 @@ const styles = StyleSheet.create({
         borderBottomColor: 'rgba(0,0,0,0.25)'
     },
     image: {
-        aspectRatio: 1
+        aspectRatio: 1,
+        flex: 1
     },
     info: {
         padding: 10,

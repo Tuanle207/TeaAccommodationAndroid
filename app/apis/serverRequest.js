@@ -1,10 +1,8 @@
 import axios  from 'axios';
-import {SERVER_URL} from '@env';
-
-console.log(`${SERVER_URL}/api`);
+import { serverApi}  from '../../appsetting';
 
 const accommodationRequest = axios.create({
-    baseURL: `${SERVER_URL}/api`
+    baseURL: `${serverApi}/api`
 });
 
 export default accommodationRequest;

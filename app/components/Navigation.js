@@ -9,7 +9,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import LoginSuccess from './screens/LoginSuccess';
-import ApartmentListScreen from './screens/ApartmentListScreen';
+import ApartmentListScreen from './screens/ApartmentListScreen/ApartmentListScreen';
 import ApartmentScreen from './screens/ApartmentScreen';
 
 

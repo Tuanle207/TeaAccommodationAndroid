@@ -4,6 +4,8 @@ import user from './user.reducer';
 import apartments from './apartmentList.reducer';
 import apartmentDetails from './apartmentDetail.reducer';
 import apartmentComments from  './apartmentComment.reducer';
+import parameters from './parameter.reducer';
+import input from './input.reducer';
 import ui from './ui.reducer';
 
 const reducers = combineReducers({
@@ -12,7 +14,9 @@ const reducers = combineReducers({
     loginInfo,
     apartments,
     apartmentDetails,
-    apartmentComments
+    apartmentComments,
+    parameters,
+    input
 });
 
 export default reducers;

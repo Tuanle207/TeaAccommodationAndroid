@@ -5,6 +5,9 @@ export const catchAsync = (fn, exptHandler) => (dispatch) => {
     })
 };
 
+// Check if object or array is empty
+export const isEmpty = obj => Object.keys(obj).length === 0 && obj.constructor === Object;
+
 // Shorten money amount to million dong
 export const shortenMoneyAmount = amount => {
     return amount / 1000000;

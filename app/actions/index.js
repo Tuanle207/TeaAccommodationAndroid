@@ -1,5 +1,6 @@
-import accommodationRequest from '../apis/client';
-import {catchAsync} from '../utils';
+import accommodationRequest from '../apis/serverRequest';
+import addressRequest from '../apis/addressRequest';
+import {catchAsync, isEmpty} from '../utils';
 import ACTION_TYPE from './type';
 
 
@@ -98,21 +99,33 @@ export const logout = ({navigation}) => catchAsync(async dispatch => {
     console.log(e);
 });
 
+/**
+ * Get list of apartments via api requesting
+ * @param {*} query query string for requesting api 
+ */
 export const getApartments = query => catchAsync(async dispatch => {
-    
     dispatch({
         type: ACTION_TYPE.FETCHING_DATA,
         payload: true
     });
-
+    
+    const params = {
+        limit: 3
+    };
     if (query) {
-        const response = await accommodationRequest.get('/apartments', {
-            params: {
-                limit: 3,
-                page: query.page
-            }
-        });
+        if (!isEmpty(query.districts)) params.district = query.districts.join(',');
+        if (query.page) params.page = query.page;
+    }
 
+    accommodationRequest.get('/apartments', {
+        params: params
+    });
+
+    const response = await accommodationRequest.get('/apartments', {
+        params: params
+    });
+    console.log(response.data.data);
+    if (query?.page)
         dispatch({
             type: ACTION_TYPE.APARTMENTS_GETTING_NEXT_PAGE,
             payload: {
@@ -120,10 +133,7 @@ export const getApartments = query => catchAsync(async dispatch => {
                 data: response.data.data
             }
         });
-    } else {
-
-        const response = await accommodationRequest.get('/apartments?limit=3');
-
+    else
         dispatch({
             type: ACTION_TYPE.APARTMENTS_GETTING,
             payload: {
@@ -131,7 +141,7 @@ export const getApartments = query => catchAsync(async dispatch => {
                 data: response.data.data
             }
         });
-    }
+        
     dispatch({
         type: ACTION_TYPE.FETCHING_DATA,
         payload: false
@@ -160,12 +170,36 @@ export const getApartment = ({id}) => catchAsync(async dispatch => {
 });
 
 
+/**
+ * Get list districts in HCM city 
+ */
+export const getDistricts = () => catchAsync(async dispatch => {
+    console.log('alo?');
+    const response = await addressRequest.get('/district?province=79');
+    console.log(response.data.results);
+    dispatch({
+        type: ACTION_TYPE.DISTRICTS_GETTING,
+        payload: response.data.results
+    });
+}, e => {
+    console.log(e);
+    console.log('error');
+});
+
+export const filterApartment = data => dispatch => {
+    const districts = [];
+    Object.keys(data).forEach(key => data[key].checked && districts.push(data[key].data));
+    console.log(districts);
+    dispatch({
+        type: ACTION_TYPE.FILTER_SETTING,
+        payload: {
+            type: 'districts',
+            data: districts
+        }
+    });
+};
+
 
 /**
  ** UI animation action
  */
-
-export const toggleFetchingState = ({fetchingData}) => dispatch => dispatch({
-    type: ACTION_TYPE.FETCHING_DATA,
-    payload: fetchingData
-});
