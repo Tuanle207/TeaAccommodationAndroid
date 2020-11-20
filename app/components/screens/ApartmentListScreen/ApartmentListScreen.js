@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, RefreshControl, ToastAndroid, Pressable, Platform, UIManager, LayoutAnimation, VirtualizedList} from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, RefreshControl, ToastAndroid, Pressable, Platform, UIManager, LayoutAnimation, VirtualizedList, ActivityIndicator} from 'react-native';
 import { connect } from 'react-redux';
 import { getApartments } from '../../../actions';
 import ApartmentCard from '../../defaults/ApartmentCard';
@@ -8,11 +8,10 @@ import { isEmpty } from '../../../utils';
 import ListHeader from './ListHeader';
 import Animated from 'react-native-reanimated';
 
-const AnimatableFlatList = Animated.createAnimatedComponent(FlatList);
-
 const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentFilter, ui}) => {
-    
+        
     const [refreshing, setRefreshing] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [scrollY, setScrollY] = useState(new Animated.Value(0));
     const [modalVisible1, setModalVisible1] = useState(false);
     const [modalVisible2, setModalVisible2] = useState(false);
@@ -28,6 +27,7 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
 
     useEffect(() => {
         let fetchNeeded = true;
+
         Object.keys(apartmentFilter).forEach(key => {
             if (!isEmpty(apartmentFilter[key]))
                 fetchNeeded = true;
@@ -35,13 +35,20 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
 
         if (fetchNeeded)
             getApartments(apartmentFilter);
-    }, [apartmentFilter]);
+    }, [apartmentFilter, apartments]);
 
-    const isScrollToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
-        return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+    const renderFooter = () => {
+        return (
+            isLoadingMore ? 
+            <View style={{marginTop: 10, alignItems: 'center'}}>
+                <ActivityIndicator size='small' />
+            </View> : null
+        );
     };
 
-    const loadMoreDate = () => {
+    const loadMoreData = () => {
+        console.log('ending..');
+        setIsLoadingMore(true);
         if (apartments.meta.currentPage + 1 <= apartments.meta.totalPages) {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             getApartments({...apartmentFilter, page: apartments.meta.currentPage + 1});
@@ -58,13 +65,12 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
 
 
     return (
-        <Animated.View style={{flex: 1, position: 'relative', backgroundColor: '#e8ffff'}}>
+        <View style={{flex: 1, position: 'relative', backgroundColor: '#e8ffff'}}>
             <DistrictFilter
                 modalVisible={modalVisible1} 
                 setModalVisible={setModalVisible1}
             />
-            <AnimatableFlatList style={{padding: 10}}
-                flat
+            <FlatList style={{padding: 10}}
                 data={apartments.data}
                 renderItem={renderItem}
                 keyExtractor={el => `${el.id}`}
@@ -75,28 +81,13 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
                     () => setModalVisible4(true),
                     () => setModalVisible5(true),
                 ]} />}
-                removeClippedSubviews={true}
                 refreshControl={<RefreshControl refreshing={refreshing} 
                 onRefresh={getApartments} />}
-                scrollEventThrottle={16}
-                onScroll={Animated.event(
-                    [
-                        {
-                            nativeEvent: {contentOffset: {y: scrollY}}
-                        }
-                    ],
-                    {
-                        useNativeDriver: true,
-                        listener: event => {
-                            console.log('loading...');
-                            if (isScrollToBottom(event.nativeEvent)) {
-                                loadMoreDate();
-                            }
-                        }
-                    }
-                )}
+                onEndReached={loadMoreData}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={renderFooter}
             />
-        </Animated.View>
+        </View>
     );
 };
 
