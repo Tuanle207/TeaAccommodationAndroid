@@ -11,6 +11,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons'
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import MapView, { Circle, Marker } from 'react-native-maps';
+import { isEmpty, shortenMoneyAmount, shortenTextt } from '../../utils';
+import { WebView } from 'react-native-webview';
 
 const testData = {
     id: 10000,
@@ -51,12 +54,31 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails}) => {
     //const {id} = route.params;
     const [photoIndex, setPhotoIndex] = useState(0);
     const [photoView, setPhotoView] = useState(false);
+    const [coordinate, setCoordinate] = useState({});
 
     // useEffect(() => {
     //     if (apartmentDetails.findIndex(el => el.id === id) === -1) {
     //         getApartment();
     //     }
     // }, []);
+
+    const onPressMarkHandler = e => {
+        // console.log('i am clicked!');
+        // console.log(e.nativeEvent.coordinate);
+    };
+
+    const drawMarker = coordinate => {
+        if (isEmpty(coordinate)) {
+            return null;
+        }
+        return (
+            <Marker
+                onPress={onPressMarkHandler}
+                coordinate={coordinate}
+                title={'Vị trí đã chọn'}
+            />
+        );
+    };
 
     const renderPhotos = photos => photos.map((photo, index) => {
         return (
@@ -183,10 +205,25 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails}) => {
                     <Text style={styles.detail_row_value}> {testData.lastUpdatedAt} </Text>
                 </View>
 
-                <View style={styles.detail_row}>
+                <View style={{...styles.detail_row, ...styles.detail_row_wrap}}>
                     <FontAwesome style={styles.detail_row_icon} name="map" size={16} color="#000"/>
                     <Text style={styles.detail_row_text}>Vị trí: </Text>
-                    {/* <Map></Map> */}
+                    <MapView
+                        initialRegion={{
+                            latitude: 10.881182,
+                            longitude: 106.806602,
+                            latitudeDelta: 0.01,
+                            longitudeDelta: 0.005
+                        }}
+                        style={{height: 400, width: '100%', marginTop: 20}}>
+                        <Circle 
+                            center={{latitude: 10.881182, longitude: 106.806602}}
+                            radius={10000}
+                            strokeWidth={0}
+                            fillColor='rgba(43,12,123,0.5)'
+                        />
+                        {drawMarker(coordinate)}
+                    </MapView>
                 </View>
                 <Pressable>
                     <Text>Chỉ đường</Text>
@@ -267,6 +304,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: 10,
         // borderWidth: 1
+    },
+    detail_row_wrap: {
+        flexWrap: 'wrap',
     },
     detail_row_icon: {
         width: 20,
