@@ -26,15 +26,15 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
     }, []);
 
     useEffect(() => {
-        let fetchNeeded = true;
+        // let fetchNeeded = true;
 
-        Object.keys(apartmentFilter).forEach(key => {
-            if (!isEmpty(apartmentFilter[key]))
-                fetchNeeded = true;
-        });
+        // Object.keys(apartmentFilter).forEach(key => {
+        //     if (!isEmpty(apartmentFilter[key]))
+        //         fetchNeeded = true;
+        // });
 
-        if (fetchNeeded)
-            getApartments(apartmentFilter);
+        // if (fetchNeeded)
+        //     getApartments(apartmentFilter);
     }, [apartmentFilter, apartments]);
 
     const renderFooter = () => {

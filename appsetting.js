@@ -1,4 +1,4 @@
-const serverApi = "https://6e5d6d0e316d.ngrok.io";
+const serverApi = 'http://202.92.7.167:80';
 
 export {
     serverApi

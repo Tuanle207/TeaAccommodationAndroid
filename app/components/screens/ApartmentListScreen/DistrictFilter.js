@@ -8,14 +8,17 @@ import { isEmpty } from '../../../utils'
 
 
 const reducer = (state, action) => {
-    console.log('to...');
-    console.log(action.type);
+    
+    let newState = {...state};
 
     switch (action.type) {
         case 'init':
             return action.payload;
+        case 'toggle_all':
+            action.payload.code.forEach(el => newState[el] = action.payload.checked);
+            return newState;
         case 'toogle':
-            const newState = {...state};
+            newState = {...state};
 
             newState[action.payload.code].checked = action.payload.checked;
 
@@ -27,19 +30,29 @@ const reducer = (state, action) => {
 };
 
 const toggleDistrict = (dispatch, checked, code) => {
-    dispatch({
-        type: 'toogle',
-        payload: {
-            checked,
-            code
-        }
-    });
+    if (Array.isArray(code))
+        dispatch({
+            type: 'toogle_all',
+            payload: {
+                check,
+                code
+            }
+        });
+    else
+        dispatch({
+            type: 'toogle',
+            payload: {
+                checked,
+                code
+            }
+        });
 };
 
 const DistrictFilter = ({modalVisible, getDistricts, filterApartment,
     setModalVisible, districts}) => {
 
     const [localDistrictsFilter, dispatch] = useReducer(reducer, {});
+    const [checkAll, setCheckAll] = useState(true);
 
     useEffect(() => {
         if (districts.length === 0)
@@ -100,6 +113,23 @@ const DistrictFilter = ({modalVisible, getDistricts, filterApartment,
                 data={districts}
                 renderItem={renderDistrict}
                 keyExtractor={el => `${el.code}`}
+                ListHeaderComponent={( 
+                    <View style={{ 
+                        flexDirection: 'row', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between', 
+                        paddingVertical: 5,
+                        paddingHorizontal: 10,
+                        borderBottomWidth: 1, 
+                        borderBottomColor: 'rgba(0,0,0,0.25)'
+                    }}>
+                        <Text>{'Tất cả'}</Text>
+                        <CheckBox boxType='square' 
+                            value={checkAll} 
+                            onValueChange={value => toggleDistrict(dispatch, value, districts.map(el => el.code))}/>
+                    </View>
+                    
+                )}
             />    
             )
             :
