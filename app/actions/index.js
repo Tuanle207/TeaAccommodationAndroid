@@ -78,7 +78,6 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
 });
 
 export const logout = ({navigation}) => catchAsync(async dispatch => {
-
     await accommodationRequest.get('/logout');
 
     dispatch({
