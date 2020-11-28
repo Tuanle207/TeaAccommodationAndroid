@@ -7,8 +7,6 @@ import {
     Animated
 } from 'react-native';
 
-import {Svg, G, Line, Rect, Path} from 'react-native-svg';
-
 import {COLOR_DARK_BLUE, COLOR_DARK_BROWN, COLOR_LIGHT_BLUE, COLOR_LIGHT_BROWN} from '../styles/default.value';
 
 
@@ -46,13 +44,6 @@ const WelcomeScreen = () => {
         <FadeInView style={{flex:1}}>
             <Text style={styles.heading}>THIS IS WELCOME SCREEN! <Text style={{color: 'red'}}>DO NOT REMOVE THIS SCREEN! WE WILL USE IT AS WELL!</Text> HAVE NEW SCREEN? LET'S PUSH IT IN STACK CONTAINER IN NAVIGATION.JS!</Text>
             <View style={styles.textWrapper}>
-                <Svg style={{position: 'absolute', top: -100 , right: -200}} height="100" width="200">
-                    <Path
-                        d = 'M 75 80 C 80 40, 100 10, 180 5 C 140 10, 100 40, 115 80 L 75 80 Z'
-                        fill='#000'
-                        stroke='none'
-                    />
-                </Svg>
                 <Text style={styles.content}>HELLO WORLD! LET'S GET STARTED BUILDING OUR ANDROID APPLICATION! :)</Text>
             </View>
         </FadeInView>
