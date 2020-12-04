@@ -1,36 +1,36 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
-import {updateLoginInfo, login} from '../../actions';
+import { updateLoginInfo, login } from '../../actions';
+import { input, mainButton } from '../styles/userFeature.style';
 
-const LoginScreen = ({navigation, updateLoginInfo, login, info}) => {
+const LoginScreen = ({ navigation, updateLoginInfo, login, info }) => {
 
     useEffect(() => {
-    
-    }, [info]);
 
+    }, [info]);
 
     return (
         <View style={styles.container}>
             <View style={styles.mainScreen}>
                 <View style={styles.login}>
                     <Text style={{ fontSize: 20, fontWeight: "bold", color: '#F9F9F9', marginBottom: 10 }}>Đăng nhập</Text>
-                    <Text style={styles.text}>Tên đăng nhập</Text>
-                    <TextInput 
-                        style={styles.input}
-                        onChangeText={(e) => updateLoginInfo({email: e.valueOf()})}
+                    <Text style={input.label}>Tên đăng nhập</Text>
+                    <TextInput
+                        style={input.text}
+                        onChangeText={(e) => updateLoginInfo({ email: e.valueOf() })}
                         value={info.email}
-                         />
-                    <Text style={styles.text}>Mật khẩu</Text>
-                    <TextInput 
-                        style={styles.input}
-                        onChangeText={(e) => updateLoginInfo({password: e.valueOf()})}
+                    />
+                    <Text style={input.label}>Mật khẩu</Text>
+                    <TextInput
+                        style={input.text}
+                        onChangeText={(e) => updateLoginInfo({ password: e.valueOf() })}
                         value={info.password}
-                     />
-                    <View style={{alignItems: "center"}}>
-                        <TouchableOpacity style={styles.button} 
-                            onPress={() => login({...info, navigation})}>
-                            <Text style={{ fontWeight: "bold" }}>Đăng nhập</Text>
+                    />
+                    <View style={{ alignItems: "center" }}>
+                        <TouchableOpacity style={mainButton.style}
+                            onPress={() => login({ ...info, navigation })}>
+                            <Text style={mainButton.text}>Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -45,9 +45,9 @@ const LoginScreen = ({navigation, updateLoginInfo, login, info}) => {
     );
 }
 
-const mapStateToProps = (state) => ({info: state.loginInfo});
+const mapStateToProps = (state) => ({ info: state.loginInfo });
 
-export default connect(mapStateToProps, {updateLoginInfo, login})(LoginScreen);
+export default connect(mapStateToProps, { updateLoginInfo, login })(LoginScreen);
 
 const styles = StyleSheet.create({
     container: {
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     footer: {
-        height:50,
+        height: 50,
         flexDirection: "row",
         borderTopColor: "#D4CBCB",
         borderTopWidth: 1,
@@ -90,21 +90,23 @@ const styles = StyleSheet.create({
     },
     input: {
         width: "100%",
-        height: 32,
         borderBottomColor: "#fff",
         borderWidth: 1,
         borderColor: "#204051",
         color: "#fff",
         paddingLeft: 0,
-        fontSize: 16,
-        marginBottom: 19
+        paddingLeft: 0,
+        fontSize: 18,
+        marginBottom: 19,
+        paddingBottom: 5,
+        paddingTop: 5
     },
     button: {
         alignItems: "center",
         backgroundColor: "#06BBD8",
         borderRadius: 23,
         paddingHorizontal: 35,
-        paddingVertical: 7,
-        width: "50%",
+        paddingVertical: 10,
+        width: "58%",
     }
 });

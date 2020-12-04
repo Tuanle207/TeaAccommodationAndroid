@@ -199,7 +199,6 @@ export const filterApartment = data => dispatch => {
     });
 };
 
-
 /**
  ** UI animation action
  */
