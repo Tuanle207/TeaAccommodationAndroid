@@ -10,6 +10,8 @@ import {
     TextInput,
     BackHandler,
     Dimensions,
+    Platform,
+    Linking,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import {serverApi} from '../../../appsetting';
@@ -58,18 +60,30 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, navigatio
     //     if (photoView === false) {
     //         navigation.goBack();
     //     }
-    //     //checkLoggedIn({navigation});
-
-    //     // test opening Google Map using intend
-    //     // const url = Platform.select({
-    //     //     android: `google.navigation:q=${10.840670},${106.769619}`
-    //     // });
-    //     // openExternalApp(url);
+   
 
     //     return () => {
     //         BackHandler.removeEventListener('hardwareBackPress', handleBack);
     //     };
     // }, []);
+
+    const onNavigateBtnPressHandler = () => {
+        const detail = apartmentDetails.find(el => el.id === id);
+        
+        // opening Google Map using intend
+        const url = Platform.select({
+            android: `google.navigation:q=${detail.address.latitude},${detail.address.longitude}`
+        });
+        Linking.canOpenURL(url).then(support => {
+            if (support) {
+                Linking.openURL(url);
+            }
+            else {
+                //...
+            }
+        });
+    };
+
 
     const onPressMarkHandler = (e) => {
         // console.log('i am clicked!');
@@ -360,7 +374,7 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, navigatio
                         {drawMarker(coordinate)}
                     </MapView>
                 </View>
-                <Pressable style={styles.btn_navigation}>
+                <Pressable onPress={onNavigateBtnPressHandler} style={styles.btn_navigation}>
                     <Text style={styles.btn_navigation_text}>Chỉ đường</Text>
                     <FeatherIcon
                         name="corner-right-up"

@@ -2,6 +2,7 @@ import accommodationRequest from '../apis/serverRequest';
 import addressRequest from '../apis/addressRequest';
 import {catchAsync, isEmpty} from '../utils';
 import ACTION_TYPE from './type';
+import { serverApi } from '../../appsetting';
 
 
 export const doSomething = data => dispatch => {
@@ -74,7 +75,7 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
             token: response.data.token}
     });
 
-    navigation.navigate('LoginSuccess');
+    navigation.navigate('Đăng nhập thành công');
 }, (e) => {
     console.log('error!');
     console.log(e);
@@ -92,7 +93,7 @@ export const logout = ({navigation}) => catchAsync(async dispatch => {
         }
     });
 
-    navigation.navigate('Login');
+    navigation.navigate('Đăng nhập');
 
 }, (e) => {
     console.log('error!');
@@ -199,7 +200,38 @@ export const filterApartment = data => dispatch => {
     });
 };
 
+export const createApartment = data => catchAsync(async dispatch => {
+    console.log('uploading infomartion?');
 
+    const formDataBody = new FormData();
+    formDataBody.append('title', data.title);
+    formDataBody.append('description', data.description);
+    formDataBody.append('rent', data.rent);
+    formDataBody.append('area', data.area);
+    formDataBody.append('phoneContact', data.phoneContact);
+    formDataBody.append('facilities', JSON.stringify(data.facilities));
+    formDataBody.append('address', JSON.stringify(data.address));
+    data.photos.forEach((photo, index) => {
+        formDataBody.append(`photo_${index + 1}`, {
+            name: photo.fileName,
+            type: photo.type,
+            uri: photo.uri
+        });
+    });
+
+    console.log(formDataBody);
+
+    const response = await accommodationRequest.post('/apartments', formDataBody, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    console.log(response.data.data);
+    
+}, e => {
+    console.log(e.response.data);
+    console.log('error');
+});
 /**
  ** UI animation action
  */

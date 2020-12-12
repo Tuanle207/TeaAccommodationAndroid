@@ -10,7 +10,7 @@ export default function ApartmentCard({navigation, item}) {
     
     return (
         <Pressable style={styles.listItem}
-        onPress={() => {console.log('asdsd'); navigation.push('Apartment', { id: item.id });}}
+        onPress={() => {console.log('asdsd'); navigation.push('Chi Tiết phòng trọ', { id: item.id });}}
         key={item.id}
         >
             <ImageBackground style={styles.image} 
