@@ -48,6 +48,7 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
 
     const loadMoreData = () => {
         console.log('ending..');
+        console.log(apartments.meta);
         setIsLoadingMore(true);
         if (apartments.meta.currentPage + 1 <= apartments.meta.totalPages) {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
