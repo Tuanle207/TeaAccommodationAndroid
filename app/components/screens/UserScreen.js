@@ -59,8 +59,8 @@ export default class UserScreen extends Component {
 
 const styles = StyleSheet.create({
     avatar: {
-        height: 150,
-        width: 150,
+        height: 160,
+        width: 160,
         borderRadius: 80,
         alignSelf: 'center',
         marginTop: 16,

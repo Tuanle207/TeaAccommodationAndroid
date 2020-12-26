@@ -2,6 +2,7 @@ import accommodationRequest from '../apis/serverRequest';
 import addressRequest from '../apis/addressRequest';
 import {catchAsync, isEmpty} from '../utils';
 import ACTION_TYPE from './type';
+import Axios from 'axios';
 
 
 export const doSomething = data => dispatch => {
@@ -76,8 +77,8 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
 
     navigation.navigate('LoginSuccess');
 }, (e) => {
-    console.log('error!');
-    console.log(e);
+    console.log('error login!');
+    console.log(e.response.data);
 });
 
 export const logout = ({navigation}) => catchAsync(async dispatch => {
@@ -198,6 +199,70 @@ export const filterApartment = data => dispatch => {
         }
     });
 };
+
+//signup
+export const signup = ({email, password, passwordConfirm, name, phoneNumber, photo, role, navigation}) => catchAsync(async dispatch => {
+    if(password != passwordConfirm)
+        return false;
+    console.log('getting Signup');
+
+    const formDataSignup = new FormData();
+    formDataSignup.append('email', email);
+    formDataSignup.append('password', password);
+    formDataSignup.append('passwordConfirm', passwordConfirm);
+    formDataSignup.append('name', name);
+    formDataSignup.append('phoneNumber', phoneNumber);
+    formDataSignup.append('role', role);
+    formDataSignup.append('photo', {
+        name: photo.fileName,
+        type: photo.type,
+        uri: photo.uri
+    });
+
+    console.log(photo.name);
+    console.log(photo.type);
+    console.log(photo.uri);
+
+    // const response = await accommodationRequest.post('/signup', {
+    //     email,
+    //     password,
+    //     passwordConfirm,
+    //     name, 
+    //     phoneNumber, 
+    //     Photo,
+    //     role
+    // });
+
+    // console.log('success Signup');
+    // console.log(response);
+    // navigation.navigate("Login")
+    // dispatch({
+    //     type: ACTION_TYPE.SIGNUP_USER,
+    //     payload: {
+    //         data: response.data.data
+    //     }
+    // });
+
+    console.log(formDataSignup);
+
+    const response = await accommodationRequest.post('/signup', formDataSignup, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    console.log('success Signup');
+
+    navigation.navigate("Login")
+    dispatch({
+        type: ACTION_TYPE.SIGNUP_USER,
+        payload: {
+            data: response.data.data
+        }
+    });
+}, (e) => {
+    console.log('error Signup!');
+    console.log(e.response.data);
+});
 
 /**
  ** UI animation action
