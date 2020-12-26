@@ -218,11 +218,7 @@ export const signup = ({email, password, passwordConfirm, name, phoneNumber, pho
         type: photo.type,
         uri: photo.uri
     });
-
-    console.log(photo.name);
-    console.log(photo.type);
-    console.log(photo.uri);
-
+    
     // const response = await accommodationRequest.post('/signup', {
     //     email,
     //     password,

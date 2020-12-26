@@ -6,6 +6,7 @@ import { topic, input, mainButton, imageButton } from '../styles/userFeature.sty
 import { updateSignupInfo, signup } from '../../actions/index';
 import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 var radio_props = [
     { label: 'Cho thuê trọ', value: 0 },
@@ -13,7 +14,7 @@ var radio_props = [
 ];
 
 const photosReducer = (state, action) => {
-    
+
     switch (action.type) {
         case 'add':
             return [...state, action.payload];
@@ -35,6 +36,10 @@ const SignUpScreen = ({ navigation, signup }) => {
     const [role, setRole] = React.useState('landlord');
     const [photo, setPhoto] = React.useState({});
 
+    //To show and unshow password
+    const [isPassWordHidden, setIsPasswordHidden] = React.useState(true);
+    //To show and unshow password
+    const [isPassWordConfirmHidden, setIsPasswordConfirmHidden] = React.useState(true);
 
     //Select image from storage
     selectFile = () => {
@@ -60,15 +65,16 @@ const SignUpScreen = ({ navigation, signup }) => {
         });
     };
 
+
     return (
         <ScrollView>
             <View style={styles.container}>
                 <Text style={topic.style}>Đăng ký</Text>
                 <View style={styles.mainScreen}>
-                    <Text style={input.label}>Tên đăng nhập</Text>
+                    <Text style={input.label}>Họ và tên</Text>
                     <TextInput
                         style={input.text}
-                        onChangeText={(e) => setName(e.valueOf())}  
+                        onChangeText={(e) => setName(e.valueOf())}
                     />
                     <Text style={input.label}>Số điện thoại</Text>
                     <TextInput
@@ -79,17 +85,41 @@ const SignUpScreen = ({ navigation, signup }) => {
                         style={input.text}
                         onChangeText={(e) => setEmail(e.valueOf())} />
                     <Text style={input.label}>Mật khẩu</Text>
-                    <TextInput
-                        style={input.text}
-                        onChangeText={(e) => setPassword(e.valueOf())} />
+                    <View style={input.password}>
+                        <TextInput
+                            style={{ paddingLeft: 0, fontSize: 18, color: "#fff", width: "93%" }}
+                            secureTextEntry={isPassWordHidden ? true : false}
+                            onChangeText={(e) => setPassword(e.valueOf())} />
+                        <Icon.Button name="eye" backgroundColor="transparent"
+                            paddingLeft={0} paddingRight={0} marginTop={7}
+                            onPress={() => {
+                                if (isPassWordHidden == true)
+                                    setIsPasswordHidden(false);
+                                else
+                                    setIsPasswordHidden(true);
+                            }}
+                        />
+                    </View>
                     <Text style={input.label}>Xác nhận mật khẩu</Text>
-                    <TextInput
-                        style={input.text}
-                        onChangeText={(e) => setPasswordConfirm(e.valueOf())}
-                    />
+                    <View style={input.password}>
+                        <TextInput
+                            style={{ paddingLeft: 0, fontSize: 18, color: "#fff", width: "93%" }}
+                            secureTextEntry={isPassWordConfirmHidden ? true : false}
+                            onChangeText={(e) => setPasswordConfirm(e.valueOf())}
+                        />
+                        <Icon.Button name="eye" backgroundColor="transparent"
+                            paddingLeft={0} paddingRight={0} marginTop={7}
+                            onPress={() => {
+                                if (isPassWordConfirmHidden == true)
+                                    setIsPasswordConfirmHidden(false);
+                                else
+                                    setIsPasswordConfirmHidden(true);
+                            }}
+                        />
+                    </View>
                     <View style={{ alignItems: "center" }}>
-                        <Image style={styles.avatar} source={{uri: photo.uri}} ></Image>
-                        <TouchableOpacity onPress={() =>  selectFile()}>
+                        <Image style={styles.avatar} source={{ uri: photo.uri }} ></Image>
+                        <TouchableOpacity onPress={() => selectFile()}>
                             <Text style={imageButton.style}>Chọn ảnh đại diện</Text>
                         </TouchableOpacity>
                     </View>

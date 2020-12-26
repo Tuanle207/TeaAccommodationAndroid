@@ -27,7 +27,7 @@ const Navigation = () => {
   return (
     <NavigationContainer>
         <Stack.Navigator
-            initialRouteName='Login'
+            initialRouteName='SignUp'
             screenOptions={{
             }}
         >

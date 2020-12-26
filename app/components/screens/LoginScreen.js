@@ -24,6 +24,7 @@ const LoginScreen = ({ navigation, updateLoginInfo, login, info }) => {
                     <Text style={input.label}>Mật khẩu</Text>
                     <TextInput
                         style={input.text}
+                        secureTextEntry={true}
                         onChangeText={(e) => updateLoginInfo({ password: e.valueOf() })}
                         value={info.password}
                     />

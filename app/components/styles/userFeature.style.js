@@ -12,12 +12,24 @@ const input = StyleSheet.create({
         borderColor: "#204051",
         color: "#fff",
         paddingLeft: 0,
-        paddingLeft: 0,
         fontSize: 18,
         marginBottom: 19,
         paddingBottom: 5,
         paddingTop: 5
-    }
+    },
+    password:{
+        width: "100%",
+        borderBottomColor: "#fff",
+        borderWidth: 1,
+        borderColor: "#204051",
+        color: "#fff",
+        paddingLeft: 0,
+        marginBottom: 19,
+        paddingBottom: 5,
+        paddingTop: 5,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
 })
 
 const topic = StyleSheet.create({
