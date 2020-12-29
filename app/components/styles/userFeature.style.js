@@ -17,19 +17,22 @@ const input = StyleSheet.create({
         paddingBottom: 5,
         paddingTop: 5
     },
-    password:{
+    ContainerPassword:{
         width: "100%",
         borderBottomColor: "#fff",
         borderWidth: 1,
         borderColor: "#204051",
-        color: "#fff",
-        paddingLeft: 0,
         marginBottom: 19,
-        paddingBottom: 5,
-        paddingTop: 5,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
+    textPassword:{
+        paddingLeft: 0, 
+        fontSize: 18, 
+        color: "#fff", 
+        width: "93%", 
+        paddingBottom: 0
+    }
 })
 
 const topic = StyleSheet.create({

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import RadioForm from 'react-native-simple-radio-button';
@@ -12,20 +12,6 @@ var radio_props = [
     { label: 'Cho thuê trọ', value: 0 },
     { label: 'Tìm trọ', value: 1 }
 ];
-
-const photosReducer = (state, action) => {
-
-    switch (action.type) {
-        case 'add':
-            return [...state, action.payload];
-        case 'remove':
-            const newState = [...state];
-            newState.splice(action.payload.id, 1);
-            return newState;
-        default:
-            return state;
-    }
-};
 
 const SignUpScreen = ({ navigation, signup }) => {
     const [name, setName] = React.useState('');
@@ -78,16 +64,18 @@ const SignUpScreen = ({ navigation, signup }) => {
                     />
                     <Text style={input.label}>Số điện thoại</Text>
                     <TextInput
+                        keyboardType="number-pad"
                         style={input.text}
                         onChangeText={(e) => setPhoneNumber(e.valueOf())} />
                     <Text style={input.label}>Email</Text>
                     <TextInput
+                        keyboardType="email-address"
                         style={input.text}
                         onChangeText={(e) => setEmail(e.valueOf())} />
                     <Text style={input.label}>Mật khẩu</Text>
-                    <View style={input.password}>
+                    <View style={input.ContainerPassword}>
                         <TextInput
-                            style={{ paddingLeft: 0, fontSize: 18, color: "#fff", width: "93%" }}
+                            style={input.textPassword}
                             secureTextEntry={isPassWordHidden ? true : false}
                             onChangeText={(e) => setPassword(e.valueOf())} />
                         <Icon.Button name="eye" backgroundColor="transparent"
@@ -101,9 +89,9 @@ const SignUpScreen = ({ navigation, signup }) => {
                         />
                     </View>
                     <Text style={input.label}>Xác nhận mật khẩu</Text>
-                    <View style={input.password}>
+                    <View style={input.ContainerPassword}>
                         <TextInput
-                            style={{ paddingLeft: 0, fontSize: 18, color: "#fff", width: "93%" }}
+                            style={input.textPassword}
                             secureTextEntry={isPassWordConfirmHidden ? true : false}
                             onChangeText={(e) => setPasswordConfirm(e.valueOf())}
                         />

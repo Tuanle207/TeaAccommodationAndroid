@@ -75,7 +75,7 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
             token: response.data.token}
     });
 
-    navigation.navigate('LoginSuccess');
+    navigation.navigate('User');
 }, (e) => {
     console.log('error login!');
     console.log(e.response.data);
@@ -218,27 +218,6 @@ export const signup = ({email, password, passwordConfirm, name, phoneNumber, pho
         type: photo.type,
         uri: photo.uri
     });
-    
-    // const response = await accommodationRequest.post('/signup', {
-    //     email,
-    //     password,
-    //     passwordConfirm,
-    //     name, 
-    //     phoneNumber, 
-    //     Photo,
-    //     role
-    // });
-
-    // console.log('success Signup');
-    // console.log(response);
-    // navigation.navigate("Login")
-    // dispatch({
-    //     type: ACTION_TYPE.SIGNUP_USER,
-    //     payload: {
-    //         data: response.data.data
-    //     }
-    // });
-
     console.log(formDataSignup);
 
     const response = await accommodationRequest.post('/signup', formDataSignup, {
@@ -259,6 +238,13 @@ export const signup = ({email, password, passwordConfirm, name, phoneNumber, pho
     console.log('error Signup!');
     console.log(e.response.data);
 });
+
+export const loadUserInfo = data => {
+    return{
+        type: ACTION_TYPE.LOAD_USER_INFO,
+        payload: data
+    }
+}
 
 /**
  ** UI animation action
