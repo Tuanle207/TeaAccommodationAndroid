@@ -12,7 +12,6 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, fetchingData, update
     const [name, setName] = React.useState(user.data.name);
     const [phoneNumber, setPhoneNumber] = React.useState(user.data.phoneNumber);
     const [photo, setPhoto] = React.useState({});
-    const id = user.data.id;
 
     const checkSourceImage = () =>{
         if(Object.keys(photo).length !== 0)

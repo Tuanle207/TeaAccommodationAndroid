@@ -265,6 +265,25 @@ export const updateUserInformation = ({name, phoneNumber, photo, navigation}) =>
     console.log(e.response.data);
 });
 
+export const changePassword = ({user, currentPassword, password, passwordConfirm, navigation}) =>catchAsync(async dispatch =>{
+
+    const response = await accommodationRequest.patch('/updatePassword', { currentPassword, password, passwordConfirm }, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    navigation.navigate('User');
+    dispatch({
+        type: ACTION_TYPE.CHANGE_PASSWORD,
+        payload:{
+            data: response.data.data
+        }
+    });
+}, (e) => {
+    console.log('error change password');
+    console.log(e.response.data);
+});
+
 /**
  ** UI animation action
  */
