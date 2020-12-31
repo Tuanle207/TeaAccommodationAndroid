@@ -74,9 +74,8 @@ const navigationTittle = StyleSheet.create({
     style: {
         fontSize: 20,
         fontWeight: "bold",
-        alignSelf: "center",
         color: "#fff",
-        justifyContent: "center"
+        justifyContent: 'center',
     }
 })
 

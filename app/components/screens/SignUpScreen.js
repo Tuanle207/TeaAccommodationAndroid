@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'reac
 import { ScrollView } from 'react-native-gesture-handler';
 import RadioForm from 'react-native-simple-radio-button';
 import { topic, input, mainButton, imageButton } from '../styles/userFeature.style';
-import { updateSignupInfo, signup } from '../../actions/index';
+import { signup } from '../../actions/index';
 import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -148,7 +148,7 @@ const SignUpScreen = ({ navigation, signup }) => {
 
 const mapStateToProps = (state) => ({ info: state.signupInfo });
 
-export default connect(mapStateToProps, { updateSignupInfo, signup })(SignUpScreen);
+export default connect(mapStateToProps, {signup})(SignUpScreen);
 
 const styles = StyleSheet.create({
     container: {

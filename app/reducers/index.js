@@ -16,7 +16,7 @@ const reducers = combineReducers({
     apartmentDetails,
     apartmentComments,
     parameters,
-    input
+    input,
 });
 
 export default reducers;

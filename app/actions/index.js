@@ -40,7 +40,7 @@ export const checkLoggedIn = ({navigation}) => catchAsync(async dispatch => {
 
     const response = await accommodationRequest.get('/isLoggedIn');
     const data = response.data.data;
-  
+
     dispatch({
         type: ACTION_TYPE.USER_LOGGED_IN,
         payload: {
@@ -200,7 +200,6 @@ export const filterApartment = data => dispatch => {
     });
 };
 
-//signup
 export const signup = ({email, password, passwordConfirm, name, phoneNumber, photo, role, navigation}) => catchAsync(async dispatch => {
     if(password != passwordConfirm)
         return false;
@@ -239,12 +238,32 @@ export const signup = ({email, password, passwordConfirm, name, phoneNumber, pho
     console.log(e.response.data);
 });
 
-export const loadUserInfo = data => {
-    return{
-        type: ACTION_TYPE.LOAD_USER_INFO,
-        payload: data
-    }
-}
+export const updateUserInformation = ({name, phoneNumber, photo, navigation}) =>catchAsync(async dispatch => {
+    const formDataUpdateUser = new FormData();
+    formDataUpdateUser.append('name', name);
+    formDataUpdateUser.append('phoneNumber', phoneNumber);
+    formDataUpdateUser.append('photo', {
+        name: photo.fileName,
+        type: photo.type,
+        uri: photo.uri
+    });
+    const response = await accommodationRequest.post('/profile/edit', formDataUpdateUser, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    navigation.navigate('User');
+
+    dispatch({
+        type: ACTION_TYPE.UPDATE_USER_INFORMATION,
+        payload:{
+            data: response.data.data
+        }
+    });
+}, (e) => {
+    console.log('error Update user information!');
+    console.log(e.response.data);
+});
 
 /**
  ** UI animation action

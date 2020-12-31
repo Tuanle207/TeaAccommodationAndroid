@@ -32,7 +32,7 @@ const UserScreen = ({ checkLoggedIn, navigation, user, fetchingData}) => {
         <View >
             <ScrollView style={{width: '100%', height: '100%', backgroundColor: '#204051', paddingHorizontal: 30}}>
                 <Text style={topic.style}>Trang cá nhân</Text>
-                <Image style={styles.avatar} source={{uri:`${serverApi}${user.data.photo}`}}/>
+                <Image style={styles.avatar} source={{uri:`${serverApi}/${user.data.photo}`}}/>
                 <Text style={input.label}>Họ và tên</Text>
                 <Text style={input.text}>{user.data.name}</Text>
                 <Text style={input.label}>Số điện thoại</Text>
