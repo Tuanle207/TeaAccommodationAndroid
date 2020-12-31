@@ -32,7 +32,7 @@ const reducer = (state, action) => {
 };
 
 
-const DistrictFilter = ({modalVisible, getDistricts, filterApartment,
+const FacilityFilter = ({modalVisible, getDistricts, filterApartment,
     setModalVisible, districts}) => {
 
     const [localDistrictsFilter, dispatch] = useReducer(reducer, {});
@@ -143,4 +143,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, {getDistricts, filterApartment})(DistrictFilter);
+export default connect(mapStateToProps, {getDistricts, filterApartment})(FacilityFilter);

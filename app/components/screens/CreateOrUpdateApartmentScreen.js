@@ -22,6 +22,7 @@ import { isEmpty } from '../../utils';
 import { createApartment } from '../../actions';
 import { MARGIN_MEDIUM } from '../styles/default.value';
 import { connect } from 'react-redux';
+import addressRequest from '../../apis/addressRequest';
 
 
 const facilitiesData = ['wifi', 'máy giặt', 'tủ lạnh']
@@ -72,6 +73,8 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
     const [phoneContact, setPhoneContact] = useState('01224578226');
     const [facilities, dispatchFacilities] = useReducer(facilitiesReducer, facilitiesData.map((el) => ({checked: false, value: el})));
 
+    const [districtsData, setDistrictsData] = useState([]);
+    const [wardsData, setWardsData] = useState([]);
     const submit = () => {
         const apartmentInfos = {
             title,
@@ -97,6 +100,35 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
         //if (id !== null) apartmentInfos.id = id;
         createApartment(apartmentInfos);
     };
+
+    const handleCityChange = city => {
+        setCity(city);
+        if (city !== null && city !== "") {
+            addressRequest
+                .get('/district?province=79')
+                .then(response => {
+                    console.log(response.data.results);
+                    var { results } = response.data; 
+                    const districts = results.map(el => el.name);
+                    setDistrictsData(districts);
+                });
+        }
+            
+    };
+
+    const handleWardChange = ward => {
+        setWard(ward);
+        if (ward !== null && ward !== "") {
+            addressRequest
+                .get(`/commune?district=${ward}`)
+                .then(response => {
+                    console.log(response.data.results);
+                    var { results } = response.data; 
+                    const wards = results.map(el => el.name);
+                    setWardsData(wards);
+                });
+        }
+    }
 
     const selectImage = () => {
         var options = {
@@ -183,7 +215,7 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Địa chỉ</Text>
                     <View style={{borderBottomWidth: 1, borderColor: '#000'}}>
-                        <Picker selectedValue={city} onValueChange={txt => setCity(txt)}>
+                        <Picker selectedValue={city} onValueChange={txt => handleCityChange(txt)}>
                             {
                                 city === null && <Picker.Item label='Chọn tỉnh/thành phố' value='' />
                             }
@@ -195,9 +227,13 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
                             {
                                 district === null && <Picker.Item label='Chọn quận/huyện' value='' />
                             }
-                            <Picker.Item label='Thủ Đức' value='Thủ Đức' />
-                            <Picker.Item label='Quận 2' value='Quận 2' />
-                            <Picker.Item label='Quận 9' value='Quận 9' />
+                            {
+                                districtsData.map(el => {
+                                    return (
+                                        <Picker.Item key={el} label={el} value={el} />
+                                    );
+                                })
+                            }
                         </Picker>
                     </View>
                     <View style={{borderBottomWidth: 1, borderColor: '#000'}}>
@@ -205,9 +241,13 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
                             {
                                 ward === null && <Picker.Item label='Chọn phường/xã' value='' />
                             }
-                            <Picker.Item label='Linh Trung' value='Linh Trung' />
-                            <Picker.Item label='Linh Đông' value='Linh Đông' />
-                            <Picker.Item label='Linh Xuân' value='Linh Xuân' />
+                            {
+                                wardsData.map(el => {
+                                    return (
+                                        <Picker.Item key={el} label={el} value={el} />
+                                    );
+                                })
+                            }
                         </Picker>
                     </View>
                     <TextInput value={street} onChangeText={txt => setStreet(txt)} style = {{...styles.textInput, paddingLeft: 10}} placeholder = 'Số nhà, đường'/>
@@ -244,7 +284,7 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
                     {
                         photos.length > 0 ?
                         null
-                        :
+                        : 
                         <Text style={{alignSelf: 'center', marginTop: 10, marginBottom: 20}}>Chọn 4 hình ảnh về phòng trọ của bạn!</Text>
                     }
                     {

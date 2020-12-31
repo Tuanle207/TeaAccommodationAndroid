@@ -106,26 +106,24 @@ export const logout = ({navigation}) => catchAsync(async dispatch => {
  */
 export const getApartments = query => catchAsync(async dispatch => {
     dispatch({
-        type: ACTION_TYPE.FETCHING_DATA,
+        type: ACTION_TYPE.FETCHING_APARTMENTS,
         payload: true
     });
     
-    const params = {
-        limit: 3
-    };
+    let queryString = `?limit=${3}`;
+
     if (query) {
-        if (!isEmpty(query.districts)) params.district = query.districts.join(',');
-        if (query.page) params.page = query.page;
+        if (query.page) queryString += `&page=${query.page}`;
+        if (query.districts.length > 0) queryString += `&district=${query.districts.join(',')}`;
+        if (query.coordinate.length > 0) queryString += `&latitude=${query.coordinate[0]}&longitude=${query.coordinate[1]}`;
+        if (!isEmpty(query.rent)) queryString += `&rent[gte]=${query.rent.min}&rent[lte]=${query.rent.max}`;
+        if (!isEmpty(query.area)) queryString += `&area[gte]=${query.area.min}&area[lte]=${query.area.max}`;
     }
+    console.log(queryString);
+    
 
-    accommodationRequest.get('/apartments', {
-        params: params
-    });
-
-    const response = await accommodationRequest.get('/apartments', {
-        params: params
-    });
-    console.log(response.data.data);
+    const response = await accommodationRequest.get('/apartments' + queryString);
+    //console.log(response.data.meta);
     if (query?.page)
         dispatch({
             type: ACTION_TYPE.APARTMENTS_GETTING_NEXT_PAGE,
@@ -144,30 +142,45 @@ export const getApartments = query => catchAsync(async dispatch => {
         });
         
     dispatch({
-        type: ACTION_TYPE.FETCHING_DATA,
+        type: ACTION_TYPE.FETCHING_APARTMENTS,
         payload: false
     });
 }, e => {
     console.log('error');
     console.log(e);
     dispatch({
-        type: ACTION_TYPE.FETCHING_DATA,
+        type: ACTION_TYPE.FETCHING_APARTMENTS,
         payload: false
     });
 });
 
 
 export const getApartment = ({id}) => catchAsync(async dispatch => {
+
+    dispatch({
+        type: ACTION_TYPE.FETCHING_APARTMENT,
+        payload: true
+    });
+
     const response = await accommodationRequest.get(`/apartments/${id}`);
     
     dispatch({
         type: ACTION_TYPE.APARTMENT_GETTING,
         payload: response.data.data
     });
+
+    dispatch({
+        type: ACTION_TYPE.FETCHING_APARTMENT,
+        payload: false
+    });
     
 }, e => {
     console.log(e);
     console.log('error');
+    dispatch({
+        type: ACTION_TYPE.FETCHING_APARTMENT,
+        payload: false
+    });
 });
 
 
@@ -175,9 +188,9 @@ export const getApartment = ({id}) => catchAsync(async dispatch => {
  * Get list districts in HCM city 
  */
 export const getDistricts = () => catchAsync(async dispatch => {
-    console.log('alo?');
+
     const response = await addressRequest.get('/district?province=79');
-    console.log(response.data.results);
+    //console.log(response.data.results);
     dispatch({
         type: ACTION_TYPE.DISTRICTS_GETTING,
         payload: response.data.results
@@ -188,14 +201,30 @@ export const getDistricts = () => catchAsync(async dispatch => {
 });
 
 export const filterApartment = data => dispatch => {
-    const districts = [];
-    Object.keys(data).forEach(key => data[key].checked && districts.push(data[key].data));
-    console.log(districts);
+    const { type } = data;
+    let dataForDispatch = null;
+    switch (type) {
+        case 'districts':
+            const districts = [];
+            Object.keys(data.data).forEach(key => data.data[key].checked && districts.push(data.data[key].data));
+            dataForDispatch = districts;
+            break;
+        case 'coordinate':
+        case 'address':
+        case 'rent':
+        case 'area':
+            dataForDispatch = data.data;
+            break;
+        case 'facilities':
+        default:
+            return;
+    }
+    console.log(dataForDispatch);
     dispatch({
         type: ACTION_TYPE.FILTER_SETTING,
         payload: {
-            type: 'districts',
-            data: districts
+            type: type,
+            data: dataForDispatch
         }
     });
 };
@@ -232,6 +261,21 @@ export const createApartment = data => catchAsync(async dispatch => {
     console.log(e.response.data);
     console.log('error');
 });
+
+
+export const getParams = () => catchAsync(async dispatch => {
+    const response = await accommodationRequest.get('/params');
+    const { data } = response.data;
+    dispatch({
+        type: ACTION_TYPE.PARAMS_GETTING,
+        payload: data
+    });
+
+}, e => {
+    console.log(e);
+    console.log('error');
+});
+
 /**
  ** UI animation action
  */

@@ -6,6 +6,8 @@ const apartmentDetail = (state = INIT, action) => {
     let newState = [];
     switch (action.type) {
         case ACTION_TYPE.APARTMENT_GETTING:
+            return [...state, action.payload];
+        case ACTION_TYPE.APARTMENTS_GETTING:
             newState = [...state];
 
             const indexOld = newState.findIndex(el => el.id = action.payload.id)
@@ -15,8 +17,6 @@ const apartmentDetail = (state = INIT, action) => {
                 newState.push(action.payload);
                 
             return newState;
-        case ACTION_TYPE.APARTMENTS_GETTING_NEXT_PAGE:
-            return [...state, action.payload];
         default:
             return state;
     }

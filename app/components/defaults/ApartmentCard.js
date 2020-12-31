@@ -14,7 +14,7 @@ export default function ApartmentCard({navigation, item}) {
         key={item.id}
         >
             <ImageBackground style={styles.image} 
-                source={{uri: `${serverApi}${item.photos[0]}`}}
+                source={{uri: `${serverApi}/${item.photos[0]}`}}
                 resizeMode={'cover'}
             >
                 <View style={styles.info}>

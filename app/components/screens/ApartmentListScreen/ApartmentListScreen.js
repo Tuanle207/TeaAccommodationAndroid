@@ -7,6 +7,10 @@ import DistrictFilter from './DistrictFilter';
 import { isEmpty } from '../../../utils';
 import ListHeader from './ListHeader';
 import Animated from 'react-native-reanimated';
+import AnimatedLoader from 'react-native-animated-loader';
+import LocationFilter from './LocationFilter';
+import RentFilter from './RentFilter';
+import AreaFilter from './AreaFilter';
 
 const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentFilter, ui}) => {
         
@@ -20,10 +24,11 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
     const [modalVisible5, setModalVisible5] = useState(false);
 
     useEffect(()=> {
-        getApartments();
+        console.log('getting apartments');
+        getApartments(apartmentFilter);
         if (Platform.OS === 'android')
             UIManager.setLayoutAnimationEnabledExperimental(true);
-    }, []);
+    }, [apartmentFilter]);
 
     useEffect(() => {
         // let fetchNeeded = true;
@@ -47,14 +52,16 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
     };
 
     const loadMoreData = () => {
-        console.log('ending..');
-        console.log(apartments.meta);
-        setIsLoadingMore(true);
-        if (apartments.meta.currentPage + 1 <= apartments.meta.totalPages) {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            getApartments({...apartmentFilter, page: apartments.meta.currentPage + 1});
-        } else {
-            ToastAndroid.show('Không còn phòng trọ nào!', ToastAndroid.SHORT)
+        if (ui.fetchingApartments === false) {
+            console.log('ending..');
+            //console.log(apartments.meta);
+            setIsLoadingMore(true);
+            if (apartments.meta.currentPage + 1 <= apartments.meta.totalPages) {
+                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                getApartments({...apartmentFilter, page: apartments.meta.currentPage + 1});
+            } else {
+                ToastAndroid.show('Không còn phòng trọ nào!', ToastAndroid.SHORT)
+            }
         }
     };
     
@@ -67,10 +74,32 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
 
     return (
         <View style={{flex: 1, position: 'relative', backgroundColor: '#e8ffff'}}>
+            {
+                ui.fetchingApartments === true &&
+                <AnimatedLoader
+                    visible={true}
+                    overlayColor='rgba(0,0,0,0.75)'
+                    source={require('../../../assets/2166-dotted-loader.json')}
+                    animationStyle={{width: 100, height: 100}}
+                    speed={1}
+                />
+            }
             <DistrictFilter
                 modalVisible={modalVisible1} 
                 setModalVisible={setModalVisible1}
             />
+            <LocationFilter
+                modalVisible={modalVisible2}
+                setModalVisible={setModalVisible2}
+            />
+            <RentFilter 
+                modalVisible={modalVisible3}
+                setModalVisible={setModalVisible3}
+            />
+            <AreaFilter
+                modalVisible={modalVisible4}
+                setModalVisible={setModalVisible4}
+                />
             <FlatList style={{padding: 10}}
                 data={apartments.data}
                 renderItem={renderItem}
@@ -88,6 +117,7 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
                 onEndReachedThreshold={0.5}
                 ListFooterComponent={renderFooter}
             />
+           
         </View>
     );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal as RawModal, View, Pressable } from 'react-native';
+import { Modal as RawModal, View, Pressable, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 
 const Modal = ({children, visible, setVisible, onRequestClose, onFinish, onCancel}) => {
@@ -18,15 +18,16 @@ const Modal = ({children, visible, setVisible, onRequestClose, onFinish, onCance
                     <View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
-                        padding: 10,
                         backgroundColor: '#edc988'
                     }}>
-                        <Pressable onPress={() => setVisible(false)} >
-                            <EntypoIcon name={'cross'} size={16} color={'red'} />
-                        </Pressable>
-                        <Pressable onPress={() => {setVisible(false); onFinish();}} >
-                            <EntypoIcon name={'check'} size={16} color={'red'} />
-                        </Pressable>
+                        <TouchableOpacity style={styles.navigation_button} onPress={() => setVisible(false)} >
+                            <Text style={styles.button_text}>Hủy</Text>
+                            <EntypoIcon style={{marginTop: 3}} name={'cross'} size={18} color={'red'} />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{...styles.navigation_button, backgroundColor: 'green'}} onPress={() => {setVisible(false); onFinish();}} >
+                            <Text style={styles.button_text}>Chọn</Text>
+                            <EntypoIcon name={'check'} size={18} color={'red'} />
+                        </TouchableOpacity>
                     </View>
                     {children}
                 </View>
@@ -36,3 +37,18 @@ const Modal = ({children, visible, setVisible, onRequestClose, onFinish, onCance
 };
 
 export default Modal;
+
+const styles = StyleSheet.create({
+    navigation_button: {
+        flexGrow: 1,
+        backgroundColor: '#e08f62',
+        paddingVertical: 5,
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    button_text: {
+        marginRight: 10
+    }
+})

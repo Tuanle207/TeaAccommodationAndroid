@@ -25,12 +25,12 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import MapView, {Circle, Marker} from 'react-native-maps';
 import {isEmpty, shortenMoneyAmount, shortenTextt} from '../../utils';
-import {WebView} from 'react-native-webview';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Modal from 'react-native-modal';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 
-const ApartmentScreen = ({route, getApartment, apartmentDetails, user, navigation}) => {
+const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
     const {id} = route.params;
     const [photoIndex, setPhotoIndex] = useState(0);
     const [photoView, setPhotoView] = useState(false);
@@ -140,14 +140,32 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, navigatio
     //console.log('incomingggggggggggggggggggg');
     //console.log(apartmentDetails);
 
-    if (apartmentDetails.findIndex(el => el.id === id) === -1) {
-
+    if (ui.fetchingApartment || apartmentDetails.findIndex(el => el.id === id) === -1) {
         return(
-            <View>
-                <Text>Đang tải dữ liệu...</Text>
-            </View>
+            <SkeletonPlaceholder>
+               <View style={{ flexDirection: 'column' }}>
+                    <View style={{width: '100%', height: 300}} />
+                    <View style={{padding: 10}}>
+                        <View style={{ marginVertical: 10, borderRadius: 25, height: 20, width: 200}} />
+                        <View style={{ marginVertical: 5, borderRadius: 25, height: 20, width: 300}} />
+                        <View style={{ marginVertical: 10, flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <View style={{ borderRadius: 20, height: 25, width: 100}} />
+                            <View style={{ borderRadius: 20, height: 25, width: 200}} />
+                        </View>
+                        <View style={{ marginVertical: 10, flexDirection: 'row', alignItems: 'center'}}>
+                            <View style={{ borderRadius: 20, height: 25, width: 120}} />
+                            <View style={{flexDirection: 'row', alignItems: 'center', marginLeft: 'auto'}}>
+                                <View style={{ borderRadius: 20, height: 40, width: 40, marginRight: 10}} />
+                                <View style={{ borderRadius: 20, height: 25, width: 120}} />
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </SkeletonPlaceholder>
         );
     }
+
+   
 
     
 
@@ -298,7 +316,7 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, navigatio
                         color="#000"
                     />
                     <Text style={styles.detail_row_text}>Diện tích: </Text>
-                    <Text style={styles.detail_row_value}>{detail.area}m<Text style={styles.detail_row_value_supperscript}>2</Text></Text>
+                    <Text style={styles.detail_row_value}>{detail.area}㎡</Text>
                 </View>
 
                 <View style={styles.detail_row}>
@@ -449,7 +467,8 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, navigatio
 const mapStateToProps = (state) => {
     return {
         apartmentDetails: state.apartmentDetails,
-        user: state.user
+        user: state.user,
+        ui: state.ui
     };
 };
 
