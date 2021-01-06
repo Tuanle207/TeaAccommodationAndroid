@@ -1,7 +1,7 @@
 import React from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import { serverApi } from '../../../appsetting';
-import { shortenMoneyAmount, shortenText }  from '../../utils';
+import { calculateTime, shortenMoneyAmount, shortenText }  from '../../utils';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import FrontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -38,7 +38,7 @@ export default function ApartmentCard({children, navigation, item}) {
                     </View>
                     <View style={styles.detail}>
                         <EntypoIcon name='clock' size={16} color='#e7e7de' />
-                        <Text style={{...styles.detailText, ...{fontSize: 12}}}>Đăng lúc: {item.postedAt}</Text>
+                        <Text style={{...styles.detailText, ...{fontSize: 12}}}>{calculateTime(item.postedAt)}</Text>
                     </View>
                 </View>
                 {children}

@@ -118,6 +118,8 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
                 ref={scroll}
                 data={apartments.data}
                 renderItem={renderItem}
+                numColumns={2}
+                columnWrapperStyle={{justifyContent: 'space-between'}}
                 keyExtractor={el => `${el.id}`}
                 ListHeaderComponent={<ListHeader onRowPressHandlers={[
                     () => setModalVisible1(true),

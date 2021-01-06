@@ -26,3 +26,22 @@ export const capitalize = str => {
         return str;
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+// calculate time
+export const calculateTime = time => {
+    
+    const date = new Date(time.split(' ')[0]);
+    const diff = new Date().getTime() - date.getTime();
+    const days = Math.ceil(diff / (1000 * 3600 * 24));
+    console.log(days);
+    if (Math.floor(days / 365) >= 1)
+        return `${Math.floor(days / 30)} năm trước`;
+    if (Math.floor(days / 30) >= 1)
+        return  `${Math.floor(days / 30)} tháng trước`;
+    if (1 <= days && days < 30)
+        return `${days} ngày trước`;
+    if (1 <= Math.floor(days * 24) < 24)
+        return `${Math.floor(days * 24)} giờ trước`;
+    else
+        return `${Math.floor(days * 24 * 60)} phút trước`;
+};
