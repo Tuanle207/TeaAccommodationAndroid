@@ -24,7 +24,7 @@ import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import MapView, {Circle, Marker} from 'react-native-maps';
-import {isEmpty, shortenMoneyAmount, shortenTextt} from '../../utils';
+import {isEmpty, shortenMoneyAmount, shortenText} from '../../utils';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Modal from 'react-native-modal';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';

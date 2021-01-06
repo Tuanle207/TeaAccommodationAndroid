@@ -113,17 +113,16 @@ export const getApartments = query => catchAsync(async dispatch => {
     let queryString = `?limit=${3}`;
 
     if (query) {
-        if (query.page) queryString += `&page=${query.page}`;
-        if (query.districts.length > 0) queryString += `&district=${query.districts.join(',')}`;
-        if (query.coordinate.length > 0) queryString += `&latitude=${query.coordinate[0]}&longitude=${query.coordinate[1]}`;
-        if (!isEmpty(query.rent)) queryString += `&rent[gte]=${query.rent.min}&rent[lte]=${query.rent.max}`;
-        if (!isEmpty(query.area)) queryString += `&area[gte]=${query.area.min}&area[lte]=${query.area.max}`;
+        if (query.page)                     queryString += `&page=${query.page}`;
+        if (query.districts.length > 0)     queryString += `&district=${query.districts.join(',')}`;
+        if (query.coordinate.length > 0)    queryString += `&latitude=${query.coordinate[0]}&longitude=${query.coordinate[1]}`;
+        if (!isEmpty(query.rent))           queryString += `&rent[gte]=${query.rent.min}&rent[lte]=${query.rent.max}`;
+        if (!isEmpty(query.area))           queryString += `&area[gte]=${query.area.min}&area[lte]=${query.area.max}`;
+        if (query.facilities.length > 0)    queryString += `&facilities=${query.facilities.join(',')}`;
     }
-    console.log(queryString);
-    
 
     const response = await accommodationRequest.get('/apartments' + queryString);
-    //console.log(response.data.meta);
+
     if (query?.page)
         dispatch({
             type: ACTION_TYPE.APARTMENTS_GETTING_NEXT_PAGE,
@@ -145,15 +144,64 @@ export const getApartments = query => catchAsync(async dispatch => {
         type: ACTION_TYPE.FETCHING_APARTMENTS,
         payload: false
     });
-}, e => {
-    console.log('error');
-    console.log(e);
+}, (err, dispatch) => {
+    if (err.message = 'Network Error') {
+        console.log('loi mang!!!!!!!!!!!!!!1');
+        dispatch({
+            type: ACTION_TYPE.ERROR_OCCURRING,
+            payload: "Lỗi kết nối mạng"
+        })
+    }
+    
     dispatch({
         type: ACTION_TYPE.FETCHING_APARTMENTS,
         payload: false
     });
 });
 
+
+export const getMyApartments = query => catchAsync(async dispatch => {
+
+    dispatch({
+        type: ACTION_TYPE.FETCHING_APARTMENTS,
+        payload: true
+    });
+
+    let queryString = `?limit=${3}`;
+    if (query?.page) queryString += `&page=${query.page}`;
+    
+    const response = await accommodationRequest.get('/apartments/posted' + queryString);
+
+    if (query?.page)
+        dispatch({
+            type: ACTION_TYPE.MY_APARTMENTS_GETTING_NEXT_PAGE,
+            payload: {
+                meta: response.data.meta,
+                data: response.data.data
+            }
+        });
+    else
+        dispatch({
+            type: ACTION_TYPE.MY_APARTMENTS_GETTING,
+            payload: {
+                meta: response.data.meta,
+                data: response.data.data
+            }
+        });
+        
+    dispatch({
+        type: ACTION_TYPE.FETCHING_APARTMENTS,
+        payload: false
+    });
+}, (err, dispatch) => {
+    
+    console.log(err);
+
+    dispatch({
+        type: ACTION_TYPE.FETCHING_APARTMENTS,
+        payload: false
+    });
+});
 
 export const getApartment = ({id}) => catchAsync(async dispatch => {
 
@@ -174,8 +222,8 @@ export const getApartment = ({id}) => catchAsync(async dispatch => {
         payload: false
     });
     
-}, e => {
-    console.log(e);
+}, (e, dispatch) => {
+    console.log(ex);
     console.log('error');
     dispatch({
         type: ACTION_TYPE.FETCHING_APARTMENT,
@@ -213,9 +261,9 @@ export const filterApartment = data => dispatch => {
         case 'address':
         case 'rent':
         case 'area':
+        case 'facilities':
             dataForDispatch = data.data;
             break;
-        case 'facilities':
         default:
             return;
     }
@@ -270,7 +318,6 @@ export const getParams = () => catchAsync(async dispatch => {
         type: ACTION_TYPE.PARAMS_GETTING,
         payload: data
     });
-
 }, e => {
     console.log(e);
     console.log('error');

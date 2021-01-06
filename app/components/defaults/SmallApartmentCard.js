@@ -6,7 +6,7 @@ import EntypoIcon from 'react-native-vector-icons/Entypo';
 import FrontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
-export default function ApartmentCard({children, navigation, item}) {
+export default function SmallApartmentCard({children, navigation, item}) {
     
     return (
         <Pressable style={styles.listItem}

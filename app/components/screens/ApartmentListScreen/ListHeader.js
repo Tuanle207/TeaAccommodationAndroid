@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Platform, UIManager, View, Pressable, LayoutAnimation, StyleSheet, Text } from 'react-native';
+import React from 'react';
+import { View, Pressable, StyleSheet, Text, ScrollView } from 'react-native';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import FrontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -9,87 +9,67 @@ import { connect } from 'react-redux';
 
 const ListHeader = ({onRowPressHandlers, apartmentFilter}) => {
 
-    const [expanded, setExpanded] = useState(false);
-
-    useEffect(() => {
-        if (Platform.OS === 'android')
-        UIManager.setLayoutAnimationEnabledExperimental(true);
-    }, []);
-
-    const changeLayout = () => {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        setExpanded(!expanded);
-    };
-
     return (
         <View style={styles.filter}>
-            <View style={styles.content}>
-                <Pressable style={styles.filterRow} 
+            <View style={styles.filterWrapper}>
+                <View style={styles.menu_title_wrapper}>
+                    <Text style={styles.menu_title}>BỘ LỌC</Text>
+                </View>
+                <Pressable style={{...styles.filterRow, ...styles.filterMainRow}} 
                     onPress={onRowPressHandlers[0]}>
                     <EntypoIcon name='location-pin' size={16} color='#000' />
                         <Text style={{marginRight: 'auto', marginLeft: 10}}>
                             Quận: {apartmentFilter.districts.length == 0 ? 
                             '' : 
-                            `${shortenText(apartmentFilter.districts.join(', '), 20)}`}
+                            `${shortenText(apartmentFilter.districts.join(', '), 24)}`}
                         </Text>
-                    <EntypoIcon name='chevron-thin-right' size={16} color='#000' />
+                    <EntypoIcon name='triangle-down' size={16} color='#000' />
                 </Pressable>
-                {expanded &&
-                <Pressable style={styles.filterRow} 
+                    
+                <Pressable style={{...styles.filterRow, ...styles.filterMainRow}} 
                     onPress={onRowPressHandlers[1]}>
                     <FeatherIcon name='map' size={16} color='#000' />
-                        <Text style={{marginRight: 'auto', marginLeft: 10}}>Địa điểm</Text>
+                        <Text style={{marginRight: 'auto', marginLeft: 10}}>Địa điểm  -  chọn trên bản đồ</Text>
                     <EntypoIcon name='chevron-thin-right' size={16} color='#000' />
                 </Pressable>
-                }
-                {expanded &&
-                <Pressable style={styles.filterRow} 
-                    onPress={onRowPressHandlers[2]}>
-                    <MaterialIcon name='attach-money' size={16} color='#000' />
-                        <Text style={{marginRight: 'auto', marginLeft: 10}}>
-                            Mức giá: {isEmpty(apartmentFilter.rent) ? 
-                            '' : 
-                            `${shortenMoneyAmount(apartmentFilter.rent.min)} - ${shortenMoneyAmount(apartmentFilter.rent.max)} (triệu/tháng)`}
-                        </Text>
-                    <EntypoIcon name='chevron-thin-right' size={16} color='#000' />
-                </Pressable>
-                }
-                {expanded &&
-                <Pressable style={styles.filterRow} 
-                    onPress={onRowPressHandlers[3]}>
-                    <FrontAwesomeIcon name='home' size={16} color='#000' />
-                        <Text style={{marginRight: 'auto', marginLeft: 10}}>
-                            Diện tích: {isEmpty(apartmentFilter.area) ? 
-                            '' : 
-                            `${apartmentFilter.area.min} - ${apartmentFilter.area.max} (㎡)`}
-                        </Text>
-                    <EntypoIcon name='chevron-thin-right' size={16} color='#000' />
-                </Pressable>
-                }
-                {expanded &&
-                <Pressable style={styles.filterRow}
-                    onPress={onRowPressHandlers[4]}>
-                    <EntypoIcon name='tv' size={16} color='#000' />
-                        <Text style={{marginRight: 'auto', marginLeft: 10}}>Tiện nghi</Text>
-                    <EntypoIcon name='chevron-thin-right' size={16} color='#000' />
-                </Pressable>
-                }
-            </View>
-            <View style={styles.expandView}>
-                {
-                    !expanded ? 
-                    <Pressable style={styles.expandButton} onPress={changeLayout}>
-                        <Text style={styles.expandText}>Nâng cao</Text>
-                        <FrontAwesomeIcon name='angle-double-down' size={16} color='#000' />
+                <ScrollView 
+                    horizontal={true} 
+                    showsVerticalScrollIndicator ={false}
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.content}>
+                    
+                    <Pressable style={styles.filterRow} 
+                        onPress={onRowPressHandlers[2]}>
+                        <MaterialIcon name='attach-money' size={16} color='#000' />
+                            <Text style={{marginRight: 'auto', marginLeft: 10}}>
+                                Mức giá: {isEmpty(apartmentFilter.rent) ? 
+                                '' : 
+                                `${shortenMoneyAmount(apartmentFilter.rent.min)} - ${shortenMoneyAmount(apartmentFilter.rent.max)} (triệu/tháng)`}
+                            </Text>
+                        <EntypoIcon name='chevron-thin-right' size={16} color='#000' />
                     </Pressable>
-                    :
-                    <Pressable style={styles.expandButton} onPress={changeLayout}>
-                        <FrontAwesomeIcon name='angle-double-up' size={16} color='#000'/>
+                    
+                    
+                    <Pressable style={styles.filterRow} 
+                        onPress={onRowPressHandlers[3]}>
+                        <FrontAwesomeIcon name='home' size={16} color='#000' />
+                            <Text style={{marginRight: 'auto', marginLeft: 10}}>
+                                Diện tích: {isEmpty(apartmentFilter.area) ? 
+                                '' : 
+                                `${apartmentFilter.area.min} - ${apartmentFilter.area.max} (㎡)`}
+                            </Text>
+                        <EntypoIcon name='chevron-thin-right' size={16} color='#000' />
                     </Pressable>
-
-                }
+                    
+                    <Pressable style={styles.filterRow}
+                        onPress={onRowPressHandlers[4]}>
+                        <EntypoIcon name='tv' size={16} color='#000' />
+                            <Text style={{marginRight: 'auto', marginLeft: 10}}>Tiện nghi</Text>
+                        <EntypoIcon name='chevron-thin-right' size={16} color='#000' />
+                    </Pressable>
+                    
+                </ScrollView>  
             </View>
-            
         </View>
     );
 };
@@ -105,31 +85,60 @@ export default connect(mapStateToProps, null)(ListHeader);
 const styles = StyleSheet.create({
     filter: {
         paddingTop: 10,
-        paddingHorizontal: 10,
         marginBottom: 10,
-        backgroundColor: '#e8e8e8',
-        flexDirection: 'row',
-        alignItems: 'center'
+        backgroundColor: 'transparent',
+        flexDirection: 'column',
+    },
+    menu_title_wrapper: {
+        backgroundColor: '#db6400',
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+        width: 130,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 10,
+        position: 'absolute',
+        top: -10,
+        left: 20,
+        zIndex: 1
+    },
+    menu_title: {
+        letterSpacing: 1
+    },
+    filterWrapper: {
+        position: 'relative',
+        paddingTop: 35,
+        paddingBottom: 10,
+        paddingHorizontal: 10,
+        backgroundColor: '#ffba93',
     },
     content: {
-        flexGrow: 1
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'row',
     },
     filterRow: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
-        padding: 5,
+        padding: 10,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.25)',
-        marginBottom: 5
+        marginBottom: 5,
+        marginHorizontal: 5,
+        borderRadius: 5,
+        minWidth: 200
+    },
+    filterMainRow: {
+        flexGrow: 1,
     },
     expandView: {
         position: 'relative',
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'flex-end',
-        marginLeft: 10
+        marginLeft: 10,
     },
     expandText: {
         fontSize: 12,

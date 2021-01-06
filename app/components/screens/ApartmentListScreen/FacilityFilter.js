@@ -3,82 +3,50 @@ import { View, FlatList, Text } from 'react-native';
 import { connect } from 'react-redux';
 import CheckBox from '@react-native-community/checkbox';
 import Modal from '../../defaults/Modal';
-import { getDistricts, filterApartment } from '../../../actions';
-import { isEmpty } from '../../../utils'
+import { filterApartment } from '../../../actions';
+import { capitalize, isEmpty } from '../../../utils'
 
-
-const reducer = (state, action) => {
+const facilitiesReducer = (state, action) => {
     
-    let newState = {...state};
+    let newState = [...state];
 
     switch (action.type) {
-        case 'init':
-            return action.payload;
+        case 'init': 
+            return action.payload.map((el) => ({checked: false, value: el}));
         case 'toggle_all':
-            //action.payload.code.forEach(el => newState[el] = el.checked);
-            console.log(action);
             Object.keys(newState).forEach(el => newState[el].checked = action.payload.checked);
             return newState;
-        case 'toggle':
-            newState = {...state};
-
-            newState[action.payload.code].checked = action.payload.checked;
-
+        case 'check':
+            newState[action.payload.index].checked = true;
             return newState;
-
+        case 'uncheck':
+            newState[action.payload.index].checked = false;
+            return newState;
         default:
             return state;
     }
 };
 
 
-const FacilityFilter = ({modalVisible, getDistricts, filterApartment,
-    setModalVisible, districts}) => {
+const FacilityFilter = ({modalVisible, setModalVisible, filterApartment, facilitiesData}) => {
 
-    const [localDistrictsFilter, dispatch] = useReducer(reducer, {});
-    const [checkAll, setCheckAll] = useState(true);
-
-    useEffect(() => {
-        if (districts.length === 0)
-            getDistricts();
-    }, []);
+    const [facilities, dispatchFacilities] = useReducer(facilitiesReducer, facilitiesData.map((el) => ({checked: false, value: el})));
+    const [checkAll, setCheckAll] = useState(false);
 
     useEffect(() => {
-        if (districts?.length > 0) {
-            const payload = {};
-            districts.forEach(el => {
-                payload[el.code] = {
-                    checked: true,
-                    data: el.name
-                };
-            });
-            dispatch({
-                type: 'init',
-                payload
-            });
-        }
-    }, [districts]);
-
-    useEffect(() => {
-        console.log(localDistrictsFilter);
-    }, [localDistrictsFilter]);
-
-    const toggleDistrict = (dispatch, checked, code) => {
-        console.log(code);
-        dispatch({
-            type: Array.isArray(code) ? 'toggle_all' : 'toggle',
-            payload: {
-                checked,
-                code
-            }
+        dispatchFacilities({
+            type: 'init',
+            payload: facilitiesData
         });
-    };
+    }, [facilitiesData]);
     
 
 
-    const renderDistrict = ({item}) => {
+    const renderFacilities = ({item, index}) => {
+        console.log(item, index);
         return (
-            <View style={{ 
+            <View   
+            style={{ 
                 flexDirection: 'row', 
                 alignItems: 'center', 
                 justifyContent: 'space-between', 
@@ -87,10 +55,13 @@ const FacilityFilter = ({modalVisible, getDistricts, filterApartment,
                 borderBottomWidth: 1, 
                 borderBottomColor: 'rgba(0,0,0,0.25)'
             }}>
-                <Text>{item.name}</Text>
+                <Text>{capitalize(item)}</Text>
                 <CheckBox boxType='square' 
-                    value={localDistrictsFilter[item.code].checked} 
-                    onValueChange={value => toggleDistrict(dispatch, value, item.code)}/>
+                    value={facilities[index].checked} 
+                    onValueChange={value => dispatchFacilities({
+                        type: value ? 'check' : 'uncheck',
+                        payload: {index}
+                    })}/>
             </View>
         );
     }
@@ -100,15 +71,15 @@ const FacilityFilter = ({modalVisible, getDistricts, filterApartment,
             visible={modalVisible}
             setVisible={visible => setModalVisible(visible)}
             onRequestClose={() => {console.log('quit');}}
-            onFinish={() => {console.log('aksnsaof'); filterApartment({type: 'districts', data: localDistrictsFilter})}}
+            onFinish={() => filterApartment({type: 'facilities', data: facilities.map(el => el.value)})}
         >
         {
-            !isEmpty(districts) ? 
+            !isEmpty(facilitiesData) ? 
             (
                 <FlatList
-                data={districts}
-                renderItem={renderDistrict}
-                keyExtractor={el => `${el.code}`}
+                data={facilitiesData}
+                renderItem={renderFacilities}
+                keyExtractor={el => `${el}`}
                 ListHeaderComponent={( 
                     <View style={{ 
                         flexDirection: 'row', 
@@ -122,7 +93,16 @@ const FacilityFilter = ({modalVisible, getDistricts, filterApartment,
                         <Text>{'Tất cả'}</Text>
                         <CheckBox boxType='square' 
                             value={checkAll} 
-                            onValueChange={value => {setCheckAll(value); console.log(value); toggleDistrict(dispatch, value, districts.map(el => el.code))}}/>
+                            onValueChange={value => {
+                                setCheckAll(value); 
+                                dispatchFacilities({
+                                    type: 'toggle_all',
+                                    payload: {
+                                        checked: value
+                                    }
+                                });
+                            }}
+                        />
                     </View>
                     
                 )}
@@ -139,8 +119,8 @@ const FacilityFilter = ({modalVisible, getDistricts, filterApartment,
 
 const mapStateToProps = (state) => {
     return {
-        districts: state.parameters.districts
+        facilitiesData: state.parameters.facilities
     };
 };
 
-export default connect(mapStateToProps, {getDistricts, filterApartment})(FacilityFilter);
+export default connect(mapStateToProps, {filterApartment})(FacilityFilter);

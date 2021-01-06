@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import {
 } from 'react-native';
@@ -15,6 +15,9 @@ import LoginSuccess from './screens/LoginSuccess';
 import ApartmentListScreen from './screens/ApartmentListScreen/ApartmentListScreen';
 import ApartmentScreen from './screens/ApartmentScreen';
 import CreateOrUpdateApartmentScreen from './screens/CreateOrUpdateApartmentScreen';
+import MyApartmentScreen from './screens/MyApartmentScreen/MyApartmentScreen';
+import { getParams } from '../actions';
+import { connect } from 'react-redux';
 
 
 const Stack = createStackNavigator();
@@ -37,12 +40,15 @@ const MainStackNavigator = () => {
 const MyApartmentNavigator = () => {
     return (
         <Stack.Navigator
-            initialRouteName='Thêm phòng trọ mới'
+            initialRouteName='Phòng trọ đã đăng'
             screenOptions={{
                 headerShown: true
             }}
         >
+            <Stack.Screen name='Phòng trọ đã đăng' component={MyApartmentScreen} />
+            <Stack.Screen name='Chi Tiết phòng trọ' component={ApartmentScreen} />
             <Stack.Screen name='Thêm phòng trọ mới' component={CreateOrUpdateApartmentScreen} />
+            <Stack.Screen name='Cập nhật thông tin phòng trọ' component={CreateOrUpdateApartmentScreen} />
         </Stack.Navigator>
     );
 };
@@ -97,7 +103,12 @@ const BottomTabNavigator = () => {
     );
 }
 
-const Navigation = () => {
+const Navigation = ({ getParams }) => {
+
+    useEffect(() => {
+        getParams();
+    }, []);
+
   return (
     <NavigationContainer>
         <BottomTabNavigator/>
@@ -106,4 +117,4 @@ const Navigation = () => {
 };
 
 
-export default Navigation;
+export default connect(null, { getParams })(Navigation);

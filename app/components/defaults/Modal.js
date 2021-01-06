@@ -18,15 +18,15 @@ const Modal = ({children, visible, setVisible, onRequestClose, onFinish, onCance
                     <View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
-                        backgroundColor: '#edc988'
+                        backgroundColor: '#edc988',
+                        paddingVertical: 5,
+                        paddingHorizontal: 10
                     }}>
                         <TouchableOpacity style={styles.navigation_button} onPress={() => setVisible(false)} >
-                            <Text style={styles.button_text}>Hủy</Text>
-                            <EntypoIcon style={{marginTop: 3}} name={'cross'} size={18} color={'red'} />
+                            <Text style={styles.button_text}>HỦY</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{...styles.navigation_button, backgroundColor: 'green'}} onPress={() => {setVisible(false); onFinish();}} >
-                            <Text style={styles.button_text}>Chọn</Text>
-                            <EntypoIcon name={'check'} size={18} color={'red'} />
+                        <TouchableOpacity style={{...styles.navigation_button, ...styles.navigation_button_yes}} onPress={() => {setVisible(false); onFinish();}} >
+                            <Text style={styles.button_text_yes}>CHỌN</Text>
                         </TouchableOpacity>
                     </View>
                     {children}
@@ -40,15 +40,22 @@ export default Modal;
 
 const styles = StyleSheet.create({
     navigation_button: {
-        flexGrow: 1,
-        backgroundColor: '#e08f62',
         paddingVertical: 5,
-        paddingHorizontal: 15,
+        paddingHorizontal: 30,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: '#db6400',
+    },
+    navigation_button_yes: {
+        borderWidth: 2,
+        borderColor: '#5aa469',
     },
     button_text: {
-        marginRight: 10
+        color: '#ff3b7d'
+    },
+    button_text_yes: {
+        color: '#5aa469'
     }
 })

@@ -1,7 +1,7 @@
 // Handling request api error in action
 export const catchAsync = (fn, exptHandler) => (dispatch) => {
     fn(dispatch).catch(e => {
-        exptHandler(e);
+        exptHandler(e, dispatch);
     })
 };
 
@@ -18,4 +18,11 @@ export const shortenText = (text, maxLength = 100) => {
     let words = text.substr(0, maxLength);
     words = words.substr(0, Math.min(words.length, words.lastIndexOf(' ')));
     return maxLength > text.length ? words : words + ' ...';
+};
+
+// capitalize string
+export const capitalize = str => {
+    if (str == null || str === '')
+        return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
 };
