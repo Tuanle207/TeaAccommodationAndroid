@@ -1,5 +1,5 @@
 
-const ScreenNames = {
+export const ScreenNames = {
     
     APARTMENT_LIST: 'Tìm kiếm phòng trọ',
     APARTMENT_DETAIL: 'Chi Tiết phòng trọ',
@@ -10,4 +10,9 @@ const ScreenNames = {
     LOGIN_SUCCESS: 'Đăng nhập thành công'
 };
 
-export default ScreenNames;
+
+export const TabNames = {
+    SEARCHING_APARTMENTS: 'Tìm kiếm phòng trọ',
+    MY_APARTMENT: 'Phòng trọ của tôi',
+    ACCOUNT: 'Tài khoản'
+};

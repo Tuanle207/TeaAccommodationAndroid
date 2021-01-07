@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, RefreshControl, ToastAndroid, Platform, UIManager, LayoutAnimation, ActivityIndicator, TouchableOpacity, StyleSheet} from 'react-native';
 import { connect } from 'react-redux';
-import { getMyApartments } from '../../../actions';
-import MyApartmentCard from '../../defaults/MyApartmentCard';
+import { getMyApartments } from '../../actions';
+import MyApartmentCard from '../defaults/MyApartmentCard';
 import Animated from 'react-native-reanimated';
 import AnimatedLoader from 'react-native-animated-loader';
 import {
@@ -12,7 +12,7 @@ import {
     renderers
 } from 'react-native-popup-menu';
   
-import ConfirmPopup from '../../defaults/ConfirmPopup';
+import ConfirmPopup from '../defaults/ConfirmPopup';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import MeterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
@@ -90,7 +90,7 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, erro
                 <AnimatedLoader
                     visible={true}
                     overlayColor='rgba(0,0,0,0.5)'
-                    source={require('../../../assets/2166-dotted-loader.json')}
+                    source={require('../../assets/2166-dotted-loader.json')}
                     animationStyle={{width: 100, height: 100}}
                     speed={1}
                 />

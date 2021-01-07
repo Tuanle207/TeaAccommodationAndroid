@@ -29,11 +29,12 @@ export const calculateTime = time => {
     const diff = new Date().getTime() - date.getTime();
     const days = Math.ceil(diff / (1000 * 3600 * 24));
     
-    if (Math.floor(days / 365) >= 1)        return `${Math.floor(days / 30)} năm trước`;
-    if (Math.floor(days / 30) >= 1)         return `${Math.floor(days / 30)} tháng trước`;
-    if (1 <= days && days < 30)             return `${days} ngày trước`;
-    if (1 <= Math.floor(days * 24) < 24)    return `${Math.floor(days * 24)} giờ trước`;
-    else                                    return `${Math.floor(days * 24 * 60)} phút trước`;
+    if (Math.floor(days / 365) >= 1)            return `${Math.floor(days / 30)} năm trước`;
+    if (Math.floor(days / 30) >= 1)             return `${Math.floor(days / 30)} tháng trước`;
+    if (1 <= days)                              return `${days} ngày trước`;
+    if (1 <= Math.floor(days * 24))             return `${Math.floor(days * 24)} giờ trước`;
+    else if (1 <= Math.floor(days * 24 * 60))   return `${Math.floor(days * 24 * 60)} phút trước`;
+    else                                        return `vừa xong`;
 };
 
 // format datetime
@@ -43,3 +44,21 @@ export const formatDatetime = time => {
     const formatedTime = reversedTime[0] + ' ' + date.join('-')
     return formatedTime
 };
+
+// compareDate
+const compareDate = (commentA, commentB) => {
+
+    const date1 = new Date(commentA.commentedAt);
+    const date2 = new Date(commentB.commentedAt);
+    if (date1 > date2) {
+        return -1;
+    }
+    if (date1 < date2) {
+        return 1;
+    }
+    return 0;
+}
+
+export const sortArrayOfObjectByDate = arr => {
+    return arr.sort(compareDate)
+}

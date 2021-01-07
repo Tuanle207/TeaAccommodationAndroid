@@ -6,13 +6,13 @@ import {checkLoggedIn, logout} from '../../actions';
 
 const LoginSuccess = ({checkLoggedIn, logout, navigation, user, fetchingData}) => {
 
-    useEffect(() => {
-        checkLoggedIn({navigation});
+    // useEffect(() => {
+    //     checkLoggedIn({navigation});
 
-        return () => {
-            console.log('unmounting...');
-        }
-    }, []);
+    //     return () => {
+    //         console.log('unmounting...');
+    //     }
+    // }, []);
 
     if (fetchingData || !user.auth) {
         return (

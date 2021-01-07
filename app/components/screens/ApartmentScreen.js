@@ -12,10 +12,11 @@ import {
     Linking,
     TouchableOpacity,
     ToastAndroid,
+    Keyboard,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import {serverApi} from '../../../appsetting';
-import {getApartment} from '../../actions';
+import { createComment, getApartment } from '../../actions';
 import {connect} from 'react-redux';
 import FoundationIcon from 'react-native-vector-icons/Foundation';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -24,7 +25,7 @@ import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import MapView, {Circle, Marker} from 'react-native-maps';
-import {formatDatetime, isEmpty, shortenMoneyAmount, shortenText} from '../../utils';
+import {calculateTime, formatDatetime, isEmpty, shortenMoneyAmount, shortenText, sortArrayOfObjectByDate} from '../../utils';
 import serverRequest from '../../apis/serverRequest';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Modal from 'react-native-modal';
@@ -32,16 +33,15 @@ import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import AnimatedLoader from 'react-native-animated-loader';
 
 
-const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
+const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, apartmentComments, user, ui}) => {
     const {id} = route.params;
     const [photoIndex, setPhotoIndex] = useState(0);
     const [photoView, setPhotoView] = useState(false);
     const [userRating, setUserRating] = useState(-1);
+    const [userComment, setUserCommment] = useState('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        console.log('alooooo');
-        console.log(apartmentDetails);
         
         if (apartmentDetails != null && apartmentDetails.findIndex(el => el.id === id) === -1) {
             getApartment({id});
@@ -54,6 +54,11 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                 .catch(err => setUserRating(-1));
         }
     }, []);
+
+    useEffect(() => {
+        if (!userRating && userRating != -1)
+            getApartment({ id })
+    }, [userRating]);
 
     const onNavigateBtnPressHandler = () => {
         const detail = apartmentDetails.find(el => el.id === id);
@@ -72,29 +77,34 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
         });
     };
 
-
-    const onPressMarkHandler = (e) => {
-        // console.log('i am clicked!');
-        // console.log(e.nativeEvent.coordinate);
+    const onCommentPressHandler = (comment, apartmentId) => {
+        createComment({
+            apartmentId: apartmentId,
+            text: comment
+        });
+        setUserCommment('');
+        Keyboard.dismiss();
     };
 
     const onRatingButtonHandler = async (rating, id) =>  {
-
-        // const currRating = rating;
-        // setUserRating(rating);
-        // setLoading(true);
-        // try {
-        //     await serverRequest.post(`/apartments/${id}/ratings`, { rating: userRating });
-        //     ToastAndroid.show('Xếp hạng phòng trọ thành công!');
-        // }
-        // catch (err) {
-        //     console.log(err);
-        //     setUserRating(currRating);
-        //     ToastAndroid.show('Đã có lỗi xảy ra');
-        // }
-        // finally {
-        //     setLoading(false);
-        // }
+        console.log(rating, id);
+        const currRating = userRating;
+        setUserRating(rating);
+        setLoading(true);
+        try {
+            await serverRequest.post(`/apartments/${id}/ratings`, { rating: rating });
+            ToastAndroid.showWithGravity('Xếp hạng phòng trọ thành công!', ToastAndroid.SHORT, ToastAndroid.CENTER);
+            getApartment({id});
+        }
+        catch (err) {
+            console.log(err);
+            console.log(err.response.data);
+            setUserRating(currRating);
+            ToastAndroid.showWithGravity('Đã có lỗi xảy ra', ToastAndroid.SHORT, ToastAndroid.CENTER);
+        }
+        finally {
+            setLoading(false);
+        }
     };
 
     const renderPhotos = (photos) =>
@@ -116,7 +126,7 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
 
         return [1, 2, 3, 4, 5].map(i => {
             return (
-                <TouchableOpacity onPress={() => onRatingButtonHandler(i, id)}>
+                <TouchableOpacity onPress={() => onRatingButtonHandler(i, id)} key={i}>
                     {
                         i <= userRating ? 
                         <FoundationIcon style={styles.title_rating_icon} name='star' size={24} color={'green'} /> :
@@ -141,8 +151,7 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
         return <Text style={styles.detail_row_value}>Cơ bản</Text>
     };
 
-    //console.log('incomingggggggggggggggggggg');
-    //console.log(apartmentDetails);
+
 
     if (ui.fetchingApartment || apartmentDetails.findIndex(el => el.id === id) === -1) {
         return(
@@ -171,10 +180,13 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
 
     const detail = apartmentDetails.find(el => el.id === id);
 
+    sortArrayOfObjectByDate(apartmentComments.find(el => el.apartmentId === id).comments).forEach(el => {
+        console.log(el);
+    });
     return (
-        <ScrollView style={{flex: 1}}>
+        <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='handled' >
             {
-                loading === true &&
+                (loading === true || ui.createComment === true) &&
                 <AnimatedLoader
                     visible={true}
                     overlayColor='rgba(0,0,0,0.5)'
@@ -224,7 +236,7 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                     </View>
                     )
                     :
-                    <Text style={{alignSelf: 'center', fontSize: 12}} >Đăng nhập để xếp hạng phòng trọ này!</Text>
+                    <Text style={{textAlign: 'center', fontSize: 12}} >Đăng nhập để xếp hạng phòng trọ này!</Text>
                 }
                 <View style={styles.title}>
                     <Text style={styles.title_text}>{detail.title}</Text>
@@ -379,7 +391,7 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                 </Pressable>
             </View>
 
-            <View style={styles.comment_section}>
+            <View on style={styles.comment_section}>
                 <Text style={styles.comment_section_text}>Bình luận</Text>
                 {
                     user.auth === false ? 
@@ -396,45 +408,47 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                     :
                     (
                     <View style={styles.new_comment}>
-                        <Image style={styles.new_comment_user} source={{uri: `${serverApi}${detail.postedBy.photo}`}} />
-                        <TextInput style={styles.new_comment_input} multiline={true} maxLength={200} textAlignVertical={'top'} numberOfLines={4} placeholder='Bình luận về phòng trọ' />
+                        <Image style={styles.new_comment_user} source={{uri: `${serverApi}/${user.data.photo}`}} />
+                        <TextInput value={userComment} onChangeText={value => setUserCommment(value)} 
+                            style={styles.new_comment_input} multiline={true} 
+                            maxLength={200} 
+                            textAlignVertical={'top'} 
+                            numberOfLines={4} 
+                            placeholder='Bình luận về phòng trọ' />
                         <View style={styles.new_comment_action}>
-                            <Pressable>
+                            <TouchableOpacity>
                                 <EntypoIcon style={styles.new_comment_icon} name='attachment' size={24} color={'#000'}/>
-                            </Pressable>
-                            <Pressable>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => onCommentPressHandler(userComment, id)}>
                                 <IoniconsIcon style={styles.new_comment_icon} name='send' size={24} color={'#000'} />
-                            </Pressable>
+                            </TouchableOpacity>
                         </View>
                     </View>
                     )
                 }
 
                 <View style={styles.comment_list}>
-                    <View style={styles.commment_item}>
-                        <Image style={styles.comment_user} source={{uri: `${serverApi}${detail.postedBy.photo}`}} />
-                        <View styles={styles.comment_content}>
-                            <Text style={styles.comment_username}>{detail.postedBy.name}</Text>
-                            <Text style={styles.comment_text}>{'Phòng trọ khá rộng rãi thoải mái, chủ trọ thân thiện.'}</Text>
-                            <Image style={styles.comment_img} source={{uri: `${serverApi}${detail.photos[0]}`}}/>
-                        </View>
-                    </View>
-                    <View style={styles.commment_item}>
-                        <Image style={styles.comment_user} source={{uri: `${serverApi}${detail.postedBy.photo}`}} />
-                        <View styles={styles.comment_content}>
-                            <Text style={styles.comment_username}>{detail.postedBy.name}</Text>
-                            <Text style={styles.comment_text}>{'Phòng trọ khá rộng rãi thoải mái, chủ trọ thân thiện.'}</Text>
-                            <Image style={styles.comment_img} source={{uri: `${serverApi}${detail.photos[0]}`}}/>
-                        </View>
-                    </View>
-                    <View style={styles.commment_item}>
-                        <Image style={styles.comment_user} source={{uri: `${serverApi}${detail.postedBy.photo}`}} />
-                        <View styles={styles.comment_content}>
-                            <Text style={styles.comment_username}>{detail.postedBy.name}</Text>
-                            <Text style={styles.comment_text}>{'Phòng trọ khá rộng rãi thoải mái, chủ trọ thân thiện.'}</Text>
-                            <Image style={styles.comment_img} source={{uri: `${serverApi}${detail.photos[0]}`}}/>
-                        </View>
-                    </View>
+                    {
+                        (apartmentComments &&
+                        apartmentComments.findIndex(el => el.apartmentId === id) !== -1 && 
+                        apartmentComments.find(el => el.apartmentId === id).comments.length !== 0) ?
+                        sortArrayOfObjectByDate(apartmentComments.find(el => el.apartmentId === id).comments)
+                            .map(el => {
+                            return (
+                                <View key={el.id} style={styles.commment_item}>
+                                    <Image style={styles.comment_user} source={{uri: `${serverApi}/${el.user.photo}`}} />
+                                    <View styles={styles.comment_content}>
+                                    <Text style={styles.comment_username}>{el.user.name}</Text>
+                                        <Text style={styles.comment_time}>{calculateTime(el.commentedAt)}</Text>
+                                        <Text style={styles.comment_text}>{el.text}</Text>
+                                        {/* <Image style={styles.comment_img} source={{uri: `${serverApi}/${detail.photos[0]}`}}/> */}
+                                    </View>
+                                </View>
+                            )
+                        }) : 
+                        <Text style={styles.no_comment}>Chưa có bình luận nào về phòng trọ!</Text>
+                    }
+                    
                 </View>
             </View>
         </ScrollView>
@@ -444,12 +458,13 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
 const mapStateToProps = (state) => {
     return {
         apartmentDetails: state.apartmentDetails,
+        apartmentComments: state.apartmentComments,
         user: state.user,
         ui: state.ui
     };
 };
 
-export default connect(mapStateToProps, {getApartment})(ApartmentScreen);
+export default connect(mapStateToProps, { getApartment, createComment })(ApartmentScreen);
 
 const styles = StyleSheet.create({
     wrapper: {
@@ -545,7 +560,7 @@ const styles = StyleSheet.create({
 
     // comment section
     comment_section: {
-        padding: 10,
+        padding: 10
     },
     comment_section_text: {
         fontSize: 16,
@@ -554,8 +569,10 @@ const styles = StyleSheet.create({
     },
     force_login: {
         alignItems: 'center',
+        justifyContent: 'center',
         flexDirection: 'row',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        marginTop: 10
     },
     force_login_btn: {
         padding: 5
@@ -569,7 +586,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     new_comment: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginTop: 10
     },
     new_comment_user: {
         width: 40,
@@ -580,10 +598,12 @@ const styles = StyleSheet.create({
     },
     new_comment_input: {
         marginVertical: 10,
+        marginLeft: 5,
+        paddingHorizontal: 10,
         height: 100,
-        borderWidth: 1,
-        borderColor: '#1A2438',
-        backgroundColor: '#DBF6E9',
+        borderWidth: 3,
+        borderColor: 'rgba(0,0,0, 0.2)',
+        backgroundColor: '#d6efc7',
         borderRadius: 10,
         flex: 1
     },
@@ -595,24 +615,47 @@ const styles = StyleSheet.create({
     new_comment_icon: {
         padding: 5
     },
+    comment_list: {
+        marginTop: 5
+    },
     commment_item: {
         flexDirection: 'row',
-        marginVertical: 10
+        marginVertical: 10,
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0,0,0,0.3)'
     },
     comment_user: {
         width: 36,
         height: 36,
         borderRadius: 18,
-        marginRight: 5
+        marginRight: 15
     },
     comment_content: {
         alignItems: 'center',
-        flexShrink: 1
+        flexShrink: 1,
+        flex: 1,
     },
     comment_username: {
         fontWeight: 'bold'
     },
+    comment_user_wrapper: {
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        backgroundColor: 'blue',
+        flex: 1
+    },
+    comment_time: {
+        color: '#000', 
+        fontSize: 10,
+        width: 100
+    },
     comment_text: {
-
+        paddingRight: 40
+    },
+    no_comment: {
+        fontSize: 12,
+        textAlign: 'center'
     }
 });

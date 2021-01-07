@@ -6,18 +6,19 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 
 import LoginScreen from '../screens/LoginScreen';
 import LoginSuccess from '../screens/LoginSuccess';
-import ApartmentListScreen from '../screens/ApartmentListScreen/ApartmentListScreen';
+import ApartmentListScreen from '../screens/ApartmentListScreen';
 import ApartmentScreen from '../screens/ApartmentScreen';
 import CreateOrUpdateApartmentScreen from '../screens/CreateOrUpdateApartmentScreen';
-import MyApartmentScreen from '../screens/MyApartmentScreen/MyApartmentScreen';
+import MyApartmentScreen from '../screens/MyApartmentScreen';
 import { getParams } from '../../actions';
 import { connect } from 'react-redux';
-import ScreenNames from './ScreenNames;'
+import { ScreenNames, TabNames } from './NavigationConst';
 
 
 const Stack = createStackNavigator();
@@ -66,12 +67,6 @@ const UserProfileNavigator = () => {
         </Stack.Navigator>
     );
 }
-
-const TabNames = {
-    SEARCHING_APARTMENTS: 'Tìm kiếm phòng trọ',
-    MY_APARTMENT: 'Phòng trọ của tôi',
-    ACCOUNT: 'Tài khoản'
-};
 
 const BottomTabNavigator = () => {
     return (

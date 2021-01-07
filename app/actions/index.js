@@ -2,7 +2,8 @@ import accommodationRequest from '../apis/serverRequest';
 import addressRequest from '../apis/addressRequest';
 import {catchAsync, isEmpty} from '../utils';
 import ACTION_TYPE from './type';
-import ScreenNames from '../components/Navigation/ScreenNames';
+import { ScreenNames } from '../components/Navigation/NavigationConst';
+import { ToastAndroid } from 'react-native';
 
 
 export const doSomething = data => dispatch => {
@@ -54,7 +55,7 @@ export const checkLoggedIn = ({navigation}) => catchAsync(async dispatch => {
     });
 }, (e) => {
     console.log(e);
-    navigation.navigate('Login');
+    navigation.navigate(ScreenNames.LOGIN);
 });
 
 export const login = ({email, password, navigation}) => catchAsync(async dispatch => {
@@ -210,11 +211,19 @@ export const getApartment = ({id}) => catchAsync(async dispatch => {
         payload: true
     });
 
-    const response = await accommodationRequest.get(`/apartments/${id}`);
+    const apartmentResponse = await accommodationRequest.get(`/apartments/${id}`);
+    const commentsResponse = await accommodationRequest.get(`/apartments/${id}/comments`);
     
     dispatch({
         type: ACTION_TYPE.APARTMENT_GETTING,
-        payload: response.data.data
+        payload: apartmentResponse.data.data
+    });
+    dispatch({
+        type: ACTION_TYPE.COMMENTS_GETTING,
+        payload: {
+            apartmentId: id,
+            comments: commentsResponse.data.data
+        }
     });
 
     dispatch({
@@ -222,14 +231,15 @@ export const getApartment = ({id}) => catchAsync(async dispatch => {
         payload: false
     });
     
-}, (e, dispatch) => {
-    console.log(ex);
+}, (err, dispatch) => {
+    console.log(err);
     console.log('error');
     dispatch({
         type: ACTION_TYPE.FETCHING_APARTMENT,
         payload: false
     });
 });
+
 
 
 /**
@@ -310,6 +320,40 @@ export const createApartment = data => catchAsync(async dispatch => {
     console.log('error');
 });
 
+export const createComment = data => catchAsync(async dispatch => {
+    dispatch({
+        type: ACTION_TYPE.CREATING_COMMENT,
+        payload: true
+    });
+
+    const { apartmentId, text } = data;
+    const response = await accommodationRequest.post(`/apartments/${apartmentId}/comments`, { text });
+    const comment = response.data.data;
+    const now = new Date();
+    dispatch({
+        type: ACTION_TYPE.COMMENT_CREATING,
+        payload: {
+            id: comment.id,
+            text: comment.text,
+            commentedAt: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
+            user: comment.commentedBy,
+            apartmentId: comment.idApartment
+        }
+    })
+
+    dispatch({
+        type: ACTION_TYPE.CREATING_COMMENT,
+        payload: false
+    });
+    ToastAndroid.showWithGravity('Thêm bình luận thành công!', ToastAndroid.SHORT, ToastAndroid.CENTER);
+}, (err, dispatch) => {
+    ToastAndroid.showWithGravity('Đã có lỗi xảy ra', ToastAndroid.SHORT, ToastAndroid.CENTER);
+    console.log(err);
+    dispatch({
+        type: ACTION_TYPE.CREATING_COMMENT,
+        payload: false
+    });
+});
 
 export const getParams = () => catchAsync(async dispatch => {
     const response = await accommodationRequest.get('/params');
