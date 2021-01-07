@@ -161,7 +161,7 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
         return (
             <Marker
                 coordinate={coordinate}
-                pinColor={'#61b15a'}
+                pinColor={'#ecb390'}
                 title={'Vị trí phòng trọ'}
             />
         );

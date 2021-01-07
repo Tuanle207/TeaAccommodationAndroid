@@ -74,6 +74,26 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
             else {
                 //...
             }
+        }).catch(err => {
+            console.log(err);
+            ToastAndroid.show('Đã có lỗi xảy ra', ToastAndroid.SHORT);
+        });
+    };
+
+    const onPhoneBtnPressHandler = () => {
+        const detail = apartmentDetails.find(el => el.id === id);
+
+        const url = `tel:${detail.phoneContact}`;
+        Linking.canOpenURL(url).then(support => {
+            if (support) {
+                Linking.openURL(url);
+            }
+            else {
+
+            }
+        }).catch(err => {
+            console.log(err);
+            ToastAndroid.show('Không thể gọi vì ứng dụng không có quyền', ToastAndroid.SHORT);
         });
     };
 
@@ -105,6 +125,20 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
         finally {
             setLoading(false);
         }
+    };
+
+    const drawMarker = coordinate => {
+        if (isEmpty(coordinate)) {
+            return null;
+        }
+        return (
+            <Marker
+                coordinate={coordinate}
+                //icon={require('../../assets/pin.png')}
+                title={'Vị trí phòng trọ'}
+                pinColor={'#ecb390'}
+            />
+        );
     };
 
     const renderPhotos = (photos) =>
@@ -321,7 +355,7 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
                     </Text>
                 </View>
 
-                <View style={styles.detail_row}>
+                <View style={{ ...styles.detail_row, alignItems: 'flex-start' }}>
                     <FontAwesome
                         style={styles.detail_row_icon}
                         name='television'
@@ -370,25 +404,35 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
                         color='#000'
                     />
                     <Text style={styles.detail_row_text}>Vị trí: </Text>
-                    {/* <MapView
-                        initialRegion={{
-                            latitude: detail.address.latitude,
-                            longitude: detail.address.longitude,
-                            latitudeDelta: 0.01,
-                            longitudeDelta: 0.005,
-                        }}
-                        style={{height: 400, width: '100%', marginTop: 20}}>
-                        {drawMarker({latitude: detail.address.latitude, longitude: detail.address.longitude})}
-                    </MapView> */}
                 </View>
-                <Pressable onPress={onNavigateBtnPressHandler} style={styles.btn_navigation}>
-                    <Text style={styles.btn_navigation_text}>Chỉ đường</Text>
-                    <FeatherIcon
-                        name='corner-right-up'
-                        size={16}
-                        color='#000'
-                    />
-                </Pressable>
+                <MapView
+                    initialRegion={{
+                        latitude: detail.address.latitude,
+                        longitude: detail.address.longitude,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.005,
+                    }}
+                    style={{height: 300, width: Dimensions.get('screen').width, marginTop: 20, marginLeft: -10}}>
+                    {drawMarker({latitude: detail.address.latitude, longitude: detail.address.longitude})}
+                </MapView>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                    <Pressable onPress={onPhoneBtnPressHandler} style={styles.btn_navigation}>
+                        <Text style={styles.btn_navigation_text}>Liên hệ</Text>
+                        <EntypoIcon
+                            name='phone'
+                            size={16}
+                            color='#000'
+                        />
+                    </Pressable>
+                    <Pressable onPress={onNavigateBtnPressHandler} style={styles.btn_navigation}>
+                        <Text style={styles.btn_navigation_text}>Chỉ đường</Text>
+                        <FeatherIcon
+                            name='corner-right-up'
+                            size={16}
+                            color='#000'
+                        />
+                    </Pressable>
+                </View>
             </View>
 
             <View on style={styles.comment_section}>
@@ -397,12 +441,12 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
                     user.auth === false ? 
                     (
                     <View style={styles.force_login}>
-                        <Pressable style={styles.force_login_btn}>
+                        {/* <Pressable style={styles.force_login_btn}>
                             <Text style={styles.force_login_btn_text}>
                                 Đăng nhập
                             </Text>
-                        </Pressable>
-                        <Text style={styles.force_login_text}>để thêm bình luận cho phòng trọ!</Text>
+                        </Pressable> */}
+                        <Text style={styles.force_login_text}>Đăng nhập để thêm bình luận cho phòng trọ!</Text>
                     </View>
                     )
                     :
@@ -416,9 +460,9 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
                             numberOfLines={4} 
                             placeholder='Bình luận về phòng trọ' />
                         <View style={styles.new_comment_action}>
-                            <TouchableOpacity>
+                            {/* <TouchableOpacity>
                                 <EntypoIcon style={styles.new_comment_icon} name='attachment' size={24} color={'#000'}/>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                             <TouchableOpacity onPress={() => onCommentPressHandler(userComment, id)}>
                                 <IoniconsIcon style={styles.new_comment_icon} name='send' size={24} color={'#000'} />
                             </TouchableOpacity>
@@ -553,6 +597,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',
+        marginTop: 10
     },
     btn_navigation_text: {
         marginRight: 5,
@@ -608,7 +653,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     new_comment_action: {
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         marginLeft: 5,
         marginVertical: 10
     },
