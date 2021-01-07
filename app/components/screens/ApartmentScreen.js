@@ -5,13 +5,13 @@ import {
     StyleSheet,
     Image,
     Pressable,
-    StatusBar,
     ScrollView,
     TextInput,
-    BackHandler,
     Dimensions,
     Platform,
     Linking,
+    TouchableOpacity,
+    ToastAndroid,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import {serverApi} from '../../../appsetting';
@@ -24,17 +24,20 @@ import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import MapView, {Circle, Marker} from 'react-native-maps';
-import {isEmpty, shortenMoneyAmount, shortenText} from '../../utils';
+import {formatDatetime, isEmpty, shortenMoneyAmount, shortenText} from '../../utils';
+import serverRequest from '../../apis/serverRequest';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Modal from 'react-native-modal';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import AnimatedLoader from 'react-native-animated-loader';
 
 
 const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
     const {id} = route.params;
     const [photoIndex, setPhotoIndex] = useState(0);
     const [photoView, setPhotoView] = useState(false);
-    const [coordinate, setCoordinate] = useState({}); 
+    const [userRating, setUserRating] = useState(-1);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         console.log('alooooo');
@@ -42,30 +45,15 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
         
         if (apartmentDetails != null && apartmentDetails.findIndex(el => el.id === id) === -1) {
             getApartment({id});
+            serverRequest
+                .get(`/apartments/${id}/ratings`)
+                .then(res => {
+                    const { data } =res.data;
+                    setUserRating(data.rating);
+                })
+                .catch(err => setUserRating(-1));
         }
     }, []);
-
-    // useEffect(() => {
-
-    //     const handleBack = () => {
-    //         console.log('handling...');
-    //         if (photoView) {
-    //             console.log('back');
-    //             setPhotoView(false);
-    //         }
-    //         return true;
-    //     };
-    //     BackHandler.addEventListener('hardwareBackPress', handleBack);
-
-    //     if (photoView === false) {
-    //         navigation.goBack();
-    //     }
-   
-
-    //     return () => {
-    //         BackHandler.removeEventListener('hardwareBackPress', handleBack);
-    //     };
-    // }, []);
 
     const onNavigateBtnPressHandler = () => {
         const detail = apartmentDetails.find(el => el.id === id);
@@ -90,25 +78,29 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
         // console.log(e.nativeEvent.coordinate);
     };
 
-    const drawMarker = (coordinate) => {
-        if (isEmpty(coordinate)) {
-            return null;
-        }
-        return (
-            <Marker
-                onPress={onPressMarkHandler}
-                coordinate={coordinate}
-                icon={{uri: require('../../assets/pin.png')}}
-                pinColor={'green'}
-                title={'Vị trí phòng trọ'}
-            />
-        );
+    const onRatingButtonHandler = async (rating, id) =>  {
+
+        // const currRating = rating;
+        // setUserRating(rating);
+        // setLoading(true);
+        // try {
+        //     await serverRequest.post(`/apartments/${id}/ratings`, { rating: userRating });
+        //     ToastAndroid.show('Xếp hạng phòng trọ thành công!');
+        // }
+        // catch (err) {
+        //     console.log(err);
+        //     setUserRating(currRating);
+        //     ToastAndroid.show('Đã có lỗi xảy ra');
+        // }
+        // finally {
+        //     setLoading(false);
+        // }
     };
 
     const renderPhotos = (photos) =>
         photos.map((photo, index) => {
             return (
-                <Pressable
+                <TouchableOpacity
                     style={styles.slide}
                     key={index}
                     onPress={() => setPhotoView(true)}>
@@ -116,25 +108,37 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                         style={styles.image}
                         source={{uri: `${serverApi}${photo}`}}
                     />
-                </Pressable>
+                </TouchableOpacity>
             );
         });
 
-    const renderUserCurrentRating = (userRating) => {
-        for (let i = 0; i < userRating; i++) {
-            <FoundationIcon name="star" size={12} color={'#000'} />;
-        }
+    const renderUserCurrentRating = userRating => {
+
+        return [1, 2, 3, 4, 5].map(i => {
+            return (
+                <TouchableOpacity onPress={() => onRatingButtonHandler(i, id)}>
+                    {
+                        i <= userRating ? 
+                        <FoundationIcon style={styles.title_rating_icon} name='star' size={24} color={'green'} /> :
+                        <FoundationIcon style={styles.title_rating_icon} name='star' size={24} color={'#cfdac8'} />
+                    }
+                </TouchableOpacity>
+            );
+        });
     };
 
     const renderFacilities = (data) => {
-        return data.map((el) => {
-            return (
-                <View style={{flexDirection: 'row', alignItems: 'center'}} key={el}>
-                    <View style={{width: 6, height: 6, marginTop: 3, borderRadius: 3, backgroundColor: '#000', marginRight: 10}}></View>
-                    <Text>{el}</Text>
-                </View>
-            );
-        });
+        if (data.length > 0)
+            return data.map((el) => {
+                return (
+                    <View style={{flexDirection: 'row', alignItems: 'center'}} key={el}>
+                        <View style={{width: 6, height: 6, marginTop: 3, borderRadius: 3, backgroundColor: '#000', marginRight: 10}}></View>
+                        <Text>{el}</Text>
+                    </View>
+                );
+            });
+
+        return <Text style={styles.detail_row_value}>Cơ bản</Text>
     };
 
     //console.log('incomingggggggggggggggggggg');
@@ -165,14 +169,20 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
         );
     }
 
-   
-
-    
-
     const detail = apartmentDetails.find(el => el.id === id);
 
     return (
         <ScrollView style={{flex: 1}}>
+            {
+                loading === true &&
+                <AnimatedLoader
+                    visible={true}
+                    overlayColor='rgba(0,0,0,0.5)'
+                    source={require('../../assets/2166-dotted-loader.json')}
+                    animationStyle={{width: 100, height: 100}}
+                    speed={1}
+                />
+            }
             <Swiper
                 style={styles.wrapper}
                 //onIndexChanged={(index) => setPhotoIndex(index)}
@@ -207,50 +217,14 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                     user.auth === true ?
                     (
                     <View style={styles.user_rating}>
-                        <Pressable>
-                            <FoundationIcon
-                                style={styles.title_rating_icon}
-                                name="star"
-                                size={24}
-                                color={'red'}
-                            />
-                        </Pressable>
-                        <Pressable>
-                            <FoundationIcon
-                                style={styles.title_rating_icon}
-                                name="star"
-                                size={24}
-                                color={'red'}
-                            />
-                        </Pressable>
-                        <Pressable>
-                            <FoundationIcon
-                                style={styles.title_rating_icon}
-                                name="star"
-                                size={24}
-                                color={'red'}
-                            />
-                        </Pressable>
-                        <Pressable>
-                            <FoundationIcon
-                                style={styles.title_rating_icon}
-                                name="star"
-                                size={24}
-                                color={'red'}
-                            />
-                        </Pressable>
-                        <Pressable>
-                            <FoundationIcon
-                                style={styles.title_rating_icon}
-                                name="star"
-                                size={24}
-                                color={'red'}
-                            />
-                        </Pressable>
+                        <Text>Xếp hạng của bạn: </Text>
+                        { 
+                            renderUserCurrentRating(userRating)
+                        }
                     </View>
                     )
                     :
-                    null
+                    <Text style={{alignSelf: 'center', fontSize: 12}} >Đăng nhập để xếp hạng phòng trọ này!</Text>
                 }
                 <View style={styles.title}>
                     <Text style={styles.title_text}>{detail.title}</Text>
@@ -258,26 +232,26 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                         {detail.description}
                     </Text>
                 </View>
-
+                
                 <View style={styles.detail_row}>
                     <FontAwesome
                         style={styles.detail_row_icon}
-                        name="calendar"
+                        name='calendar'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>Đăng lúc:</Text>
                     <Text style={styles.detail_row_value}>
-                        {detail.postedAt}
+                        { formatDatetime(detail.postedAt) }
                     </Text>
                 </View>
 
                 <View style={styles.detail_row}>
                     <FontAwesome
                         style={styles.detail_row_icon}
-                        name="user"
+                        name='user'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>Người đăng: </Text>
                     <Image style={styles.detail_row_user} source={{uri: `${serverApi}${detail.postedBy.photo}`}} />
@@ -288,21 +262,24 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                 <View style={styles.detail_row}>
                     <FoundationIcon
                         style={styles.detail_row_icon}
-                        name="star"
+                        name='star'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>Xếp hạng: </Text>
-                    <Text style={styles.detail_row_value}> {4.7} </Text>
-                    <FoundationIcon name="star" size={14} color="#F0A500" />
+                    <Text style={styles.detail_row_value}> {detail.rating ? detail.rating : 'Chưa được xếp hạng'} </Text>
+                    {
+                        detail.rating &&
+                        <FoundationIcon name='star' size={14} color='#F0A500' />
+                    }
                 </View>
 
                 <View style={styles.detail_row}>
                     <FontAwesome
                         style={styles.detail_row_icon}
-                        name="dollar"
+                        name='dollar'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>Giá thuê: </Text>
                     <Text style={styles.detail_row_value}>{shortenMoneyAmount(detail.rent)} triệu/tháng</Text>
@@ -311,23 +288,23 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                 <View style={styles.detail_row}>
                     <FontAwesome
                         style={styles.detail_row_icon}
-                        name="home"
+                        name='home'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>Diện tích: </Text>
                     <Text style={styles.detail_row_value}>{detail.area}㎡</Text>
                 </View>
 
-                <View style={styles.detail_row}>
+                <View style={{...styles.detail_row, alignItems: 'flex-start'}}>
                     <EvilIcons
                         style={styles.detail_row_icon}
-                        name="location"
+                        name='location'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>Địa chỉ: </Text>
-                    <Text style={styles.detail_row_value}>
+                    <Text style={{...styles.detail_row_value, ...styles.long_detail_row_value}}>
                         {` ${detail.address.street}, ${detail.address.ward}, ${detail.address.district}`}{' '}
                     </Text>
                 </View>
@@ -335,9 +312,9 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                 <View style={styles.detail_row}>
                     <FontAwesome
                         style={styles.detail_row_icon}
-                        name="television"
+                        name='television'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>Tiện nghi: </Text>
                     <View style={styles.detail_row_value}>{renderFacilities(detail.facilities)}</View>
@@ -346,9 +323,9 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                 <View style={styles.detail_row}>
                     <FontAwesome
                         style={styles.detail_row_icon}
-                        name="phone"
+                        name='phone'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>Liên hệ: </Text>
                     <Text style={styles.detail_row_value}>
@@ -360,44 +337,44 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                 <View style={styles.detail_row}>
                     <IoniconsIcon
                         style={styles.detail_row_icon}
-                        name="checkmark"
+                        name='checkmark'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>
                         Cập nhật lần cuối:{' '}
                     </Text>
                     <Text style={styles.detail_row_value}>
                         {' '}
-                        {detail.lastUpdatedAt}{' '}
+                        { formatDatetime(detail.lastUpdatedAt) }{' '}
                     </Text>
                 </View>
 
                 <View style={{...styles.detail_row, ...styles.detail_row_wrap}}>
                     <FontAwesome
                         style={styles.detail_row_icon}
-                        name="map"
+                        name='map'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                     <Text style={styles.detail_row_text}>Vị trí: </Text>
-                    <MapView
+                    {/* <MapView
                         initialRegion={{
-                            latitude: 10.881182,
-                            longitude: 106.806602,
+                            latitude: detail.address.latitude,
+                            longitude: detail.address.longitude,
                             latitudeDelta: 0.01,
                             longitudeDelta: 0.005,
                         }}
                         style={{height: 400, width: '100%', marginTop: 20}}>
-                        {drawMarker(coordinate)}
-                    </MapView>
+                        {drawMarker({latitude: detail.address.latitude, longitude: detail.address.longitude})}
+                    </MapView> */}
                 </View>
                 <Pressable onPress={onNavigateBtnPressHandler} style={styles.btn_navigation}>
                     <Text style={styles.btn_navigation_text}>Chỉ đường</Text>
                     <FeatherIcon
-                        name="corner-right-up"
+                        name='corner-right-up'
                         size={16}
-                        color="#000"
+                        color='#000'
                     />
                 </Pressable>
             </View>
@@ -420,7 +397,7 @@ const ApartmentScreen = ({route, getApartment, apartmentDetails, user, ui}) => {
                     (
                     <View style={styles.new_comment}>
                         <Image style={styles.new_comment_user} source={{uri: `${serverApi}${detail.postedBy.photo}`}} />
-                        <TextInput style={styles.new_comment_input} multiline={true} maxLength={200} textAlignVertical={'top'} numberOfLines={4} placeholder="Bình luận về phòng trọ" />
+                        <TextInput style={styles.new_comment_input} multiline={true} maxLength={200} textAlignVertical={'top'} numberOfLines={4} placeholder='Bình luận về phòng trọ' />
                         <View style={styles.new_comment_action}>
                             <Pressable>
                                 <EntypoIcon style={styles.new_comment_icon} name='attachment' size={24} color={'#000'}/>
@@ -500,6 +477,7 @@ const styles = StyleSheet.create({
     user_rating: {
         flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: 'center'
     },
     title: {
         marginVertical: 10,
@@ -542,6 +520,10 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
         marginLeft: 'auto',
         // borderWidth: 1,
+    },
+    long_detail_row_value: {
+        maxWidth: 150,
+        textAlign: 'right'
     },
     detail_row_value_supperscript: {
         fontSize: 10,

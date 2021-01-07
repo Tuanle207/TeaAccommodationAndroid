@@ -9,15 +9,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 
-import WelcomeScreen from './screens/WelcomeScreen';
-import LoginScreen from './screens/LoginScreen';
-import LoginSuccess from './screens/LoginSuccess';
-import ApartmentListScreen from './screens/ApartmentListScreen/ApartmentListScreen';
-import ApartmentScreen from './screens/ApartmentScreen';
-import CreateOrUpdateApartmentScreen from './screens/CreateOrUpdateApartmentScreen';
-import MyApartmentScreen from './screens/MyApartmentScreen/MyApartmentScreen';
-import { getParams } from '../actions';
+import LoginScreen from '../screens/LoginScreen';
+import LoginSuccess from '../screens/LoginSuccess';
+import ApartmentListScreen from '../screens/ApartmentListScreen/ApartmentListScreen';
+import ApartmentScreen from '../screens/ApartmentScreen';
+import CreateOrUpdateApartmentScreen from '../screens/CreateOrUpdateApartmentScreen';
+import MyApartmentScreen from '../screens/MyApartmentScreen/MyApartmentScreen';
+import { getParams } from '../../actions';
 import { connect } from 'react-redux';
+import ScreenNames from './ScreenNames;'
 
 
 const Stack = createStackNavigator();
@@ -26,13 +26,13 @@ const Tab = createBottomTabNavigator();
 const MainStackNavigator = () => {
     return (
         <Stack.Navigator
-            initialRouteName='ApartmentList'
+            initialRouteName={ScreenNames.APARTMENT_LIST}
             screenOptions={{
                 headerShown: true
             }}
         >
-            <Stack.Screen name='Tìm kiếm phòng trọ' component={ApartmentListScreen} />
-            <Stack.Screen name='Chi Tiết phòng trọ' component={ApartmentScreen} />
+            <Stack.Screen name={ScreenNames.APARTMENT_LIST} component={ApartmentListScreen} />
+            <Stack.Screen name={ScreenNames.APARTMENT_DETAIL} component={ApartmentScreen} />
         </Stack.Navigator>
     );
 };
@@ -40,15 +40,15 @@ const MainStackNavigator = () => {
 const MyApartmentNavigator = () => {
     return (
         <Stack.Navigator
-            initialRouteName='Phòng trọ đã đăng'
+            initialRouteName={ScreenNames.MY_APARTMENT}
             screenOptions={{
                 headerShown: true
             }}
         >
-            <Stack.Screen name='Phòng trọ đã đăng' component={MyApartmentScreen} />
-            <Stack.Screen name='Chi Tiết phòng trọ' component={ApartmentScreen} />
-            <Stack.Screen name='Thêm phòng trọ mới' component={CreateOrUpdateApartmentScreen} />
-            <Stack.Screen name='Cập nhật thông tin phòng trọ' component={CreateOrUpdateApartmentScreen} />
+            <Stack.Screen name={ScreenNames.MY_APARTMENT} component={MyApartmentScreen} />
+            <Stack.Screen name={ScreenNames.APARTMENT_DETAIL} component={ApartmentScreen} />
+            <Stack.Screen name={ScreenNames.CREATE_APARTMENT} component={CreateOrUpdateApartmentScreen} />
+            <Stack.Screen name={ScreenNames.UPDATE_APARTMENT} component={CreateOrUpdateApartmentScreen} />
         </Stack.Navigator>
     );
 };
@@ -56,16 +56,22 @@ const MyApartmentNavigator = () => {
 const UserProfileNavigator = () => {
     return (
         <Stack.Navigator
-        initialRouteName='Đăng nhập'
+        initialRouteName={ScreenNames.LOGIN}
         screenOptions={{
             headerShown: true
         }}
         >
-            <Stack.Screen name='Đăng nhập' component={LoginScreen} />
-            <Stack.Screen name='Đăng nhập thành công' component={LoginSuccess} />
+            <Stack.Screen name={ScreenNames.LOGIN} component={LoginScreen} />
+            <Stack.Screen name={ScreenNames.LOGIN_SUCCESS} component={LoginSuccess} />
         </Stack.Navigator>
     );
 }
+
+const TabNames = {
+    SEARCHING_APARTMENTS: 'Tìm kiếm phòng trọ',
+    MY_APARTMENT: 'Phòng trọ của tôi',
+    ACCOUNT: 'Tài khoản'
+};
 
 const BottomTabNavigator = () => {
     return (
@@ -74,19 +80,14 @@ const BottomTabNavigator = () => {
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
   
-                if (route.name === 'Tìm kiếm phòng trọ') {
-                    // iconName = focused
-                    //   ? 'home'
-                    //   : 'home';
+                if (route.name === TabNames.SEARCHING_APARTMENTS) {
                     return <EntypoIcon name={'home'} size={size} color={color} />;
-                } else if (route.name === 'Phòng trọ của tôi') {
+                } else if (route.name === TabNames.MY_APARTMENT) {
                     return <EntypoIcon name={'list'} size={size} color={color} />;
-                }
-                else if (route.name == 'Tài khoản') {
+                } else if (route.name == TabNames.ACCOUNT) {
                     return <AntDesignIcon name={'user'} size={size} color={color} />;
                 }
 
-  
               // You can return any component that you like here!
               return <EntypoIcon name={iconName} size={size} color={color} />;
             },
@@ -96,9 +97,9 @@ const BottomTabNavigator = () => {
             inactiveTintColor: 'gray',
           }}
             >
-            <Tab.Screen name="Tìm kiếm phòng trọ" component={MainStackNavigator} />
-            <Tab.Screen name="Phòng trọ của tôi" component={MyApartmentNavigator} />
-            <Tab.Screen name="Tài khoản" component={UserProfileNavigator} />
+            <Tab.Screen name={TabNames.SEARCHING_APARTMENTS} component={MainStackNavigator} />
+            <Tab.Screen name={TabNames.MY_APARTMENT} component={MyApartmentNavigator} />
+            <Tab.Screen name={TabNames.ACCOUNT} component={UserProfileNavigator} />
         </Tab.Navigator>
     );
 }

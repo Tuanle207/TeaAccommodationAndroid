@@ -2,7 +2,7 @@ import accommodationRequest from '../apis/serverRequest';
 import addressRequest from '../apis/addressRequest';
 import {catchAsync, isEmpty} from '../utils';
 import ACTION_TYPE from './type';
-import { serverApi } from '../../appsetting';
+import ScreenNames from '../components/Navigation/ScreenNames';
 
 
 export const doSomething = data => dispatch => {
@@ -75,7 +75,7 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
             token: response.data.token}
     });
 
-    navigation.navigate('Đăng nhập thành công');
+    navigation.navigate(ScreenNames.LOGIN_SUCCESS);
 }, (e) => {
     console.log('error!');
     console.log(e);
@@ -93,7 +93,7 @@ export const logout = ({navigation}) => catchAsync(async dispatch => {
         }
     });
 
-    navigation.navigate('Đăng nhập');
+    navigation.navigate(ScreenNames.LOGIN);
 
 }, (e) => {
     console.log('error!');

@@ -1,12 +1,8 @@
 // Handling request api error in action
-export const catchAsync = (fn, exptHandler) => (dispatch) => {
-    fn(dispatch).catch(e => {
-        exptHandler(e, dispatch);
-    })
-};
+export const catchAsync = (fn, exptHandler) => dispatch => fn(dispatch).catch(err => exptHandler(err, dispatch));
 
 // Check if object or array is empty
-export const isEmpty = obj => Object.keys(obj).length === 0 && obj.constructor === Object;
+export const isEmpty = obj => Object.keys(obj).length === 0 && (obj.constructor === Object || obj.constructor === Array);
 
 // Shorten money amount to million dong
 export const shortenMoneyAmount = amount => {
@@ -29,19 +25,21 @@ export const capitalize = str => {
 
 // calculate time
 export const calculateTime = time => {
-    
     const date = new Date(time.split(' ')[0]);
     const diff = new Date().getTime() - date.getTime();
     const days = Math.ceil(diff / (1000 * 3600 * 24));
-    console.log(days);
-    if (Math.floor(days / 365) >= 1)
-        return `${Math.floor(days / 30)} năm trước`;
-    if (Math.floor(days / 30) >= 1)
-        return  `${Math.floor(days / 30)} tháng trước`;
-    if (1 <= days && days < 30)
-        return `${days} ngày trước`;
-    if (1 <= Math.floor(days * 24) < 24)
-        return `${Math.floor(days * 24)} giờ trước`;
-    else
-        return `${Math.floor(days * 24 * 60)} phút trước`;
+    
+    if (Math.floor(days / 365) >= 1)        return `${Math.floor(days / 30)} năm trước`;
+    if (Math.floor(days / 30) >= 1)         return `${Math.floor(days / 30)} tháng trước`;
+    if (1 <= days && days < 30)             return `${days} ngày trước`;
+    if (1 <= Math.floor(days * 24) < 24)    return `${Math.floor(days * 24)} giờ trước`;
+    else                                    return `${Math.floor(days * 24 * 60)} phút trước`;
+};
+
+// format datetime
+export const formatDatetime = time => {
+    const reversedTime = time.split(' ').reverse();
+    const date = reversedTime[1].split('-').reverse();
+    const formatedTime = reversedTime[0] + ' ' + date.join('-')
+    return formatedTime
 };
