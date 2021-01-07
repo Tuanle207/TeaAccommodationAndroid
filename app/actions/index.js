@@ -212,11 +212,12 @@ export const signup = ({email, password, passwordConfirm, name, phoneNumber, pho
     formDataSignup.append('name', name);
     formDataSignup.append('phoneNumber', phoneNumber);
     formDataSignup.append('role', role);
-    formDataSignup.append('photo', {
-        name: photo.fileName,
-        type: photo.type,
-        uri: photo.uri
-    });
+    if(Object.keys(photo).length !== 0)
+        formDataSignup.append('photo', {
+            name: photo.fileName,
+            type: photo.type,
+            uri: photo.uri
+        });
     console.log(formDataSignup);
 
     const response = await accommodationRequest.post('/signup', formDataSignup, {
@@ -242,11 +243,12 @@ export const updateUserInformation = ({name, phoneNumber, photo, navigation}) =>
     const formDataUpdateUser = new FormData();
     formDataUpdateUser.append('name', name);
     formDataUpdateUser.append('phoneNumber', phoneNumber);
-    formDataUpdateUser.append('photo', {
-        name: photo.fileName,
-        type: photo.type,
-        uri: photo.uri
-    });
+    if(Object.keys(photo).length !== 0)
+        formDataUpdateUser.append('photo', {
+            name: photo.fileName,
+            type: photo.type,
+            uri: photo.uri
+        });
     const response = await accommodationRequest.post('/profile/edit', formDataUpdateUser, {
         headers: {
             'Content-Type': 'multipart/form-data'

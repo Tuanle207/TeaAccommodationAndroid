@@ -17,12 +17,25 @@ const input = StyleSheet.create({
         paddingBottom: 5,
         paddingTop: 5
     },
+    textWithValidate:{
+        width: "100%",
+        borderBottomColor: "#fff",
+        borderWidth: 1,
+        borderColor: "#204051",
+        color: "#fff",
+        paddingLeft: 0,
+        fontSize: 18,
+        marginBottom: 5,
+        paddingBottom: 5,
+        paddingTop: 5
+    }
+    ,
     ContainerPassword:{
         width: "100%",
         borderBottomColor: "#fff",
         borderWidth: 1,
         borderColor: "#204051",
-        marginBottom: 19,
+        marginBottom: 5,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },

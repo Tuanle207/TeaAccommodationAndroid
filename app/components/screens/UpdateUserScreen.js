@@ -55,7 +55,7 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, fetchingData, update
     if (fetchingData || !user.auth) {
         return (
             <View>
-                <Text>Loadin Update User's Information...</Text>
+                <Text>Loading Update User's Information...</Text>
             </View>
         )
     }
