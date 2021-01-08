@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import { updateLoginInfo, login } from '../../actions';
 import { input, mainButton } from '../styles/userFeature.style';
@@ -15,7 +15,7 @@ const LoginScreen = ({ navigation, updateLoginInfo, login, info }) => {
             <View style={styles.mainScreen}>
                 <View style={styles.login}>
                     <Text style={{ fontSize: 20, fontWeight: "bold", color: '#F9F9F9', marginBottom: 10 }}>Đăng nhập</Text>
-                    <Text style={input.label}>Tên đăng nhập</Text>
+                    <Text style={input.label}>Email</Text>
                     <TextInput
                         style={input.text}
                         onChangeText={(e) => updateLoginInfo({ email: e.valueOf() })}

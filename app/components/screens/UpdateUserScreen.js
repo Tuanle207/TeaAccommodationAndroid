@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import { Text, View, Image, StyleSheet } from 'react-native';
+import { Text, View, Image, StyleSheet, ToastAndroid } from 'react-native';
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { input, imageButton, navigationTittle} from '../styles/userFeature.style';
 import { connect } from 'react-redux';
@@ -78,8 +78,12 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, fetchingData, update
                 <Icon.Button name='check' color='#06BBD8' backgroundColor='#132833' size={30}
                     onPress={() => {
                         if (checkUpdateInformation(requiredName, requiredPhoneNumber, mustPhoneNumber))
+                        {
                             updateUserInformation({ name, phoneNumber, photo, navigation });
-                        else alert('Chỉnh sửa thất bại');
+                            ToastAndroid.showWithGravity("Thay đổi thông tin thành công", ToastAndroid.SHORT, ToastAndroid.CENTER);
+                        }
+                        else 
+                            ToastAndroid.showWithGravity("Vui lòng điền thông tin đầy đủ và hợp lệ", ToastAndroid.SHORT, ToastAndroid.CENTER);
                     }} ></Icon.Button>
             </View>
             <ScrollView style={{ width: '100%', height: '100%', backgroundColor: '#204051', paddingHorizontal: 30 }}>

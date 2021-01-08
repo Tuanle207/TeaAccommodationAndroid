@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ToastAndroid } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import RadioForm from 'react-native-simple-radio-button';
 import { topic, input, mainButton, imageButton } from '../styles/userFeature.style';
@@ -130,6 +130,7 @@ const SignUpScreen = ({ navigation, signup }) => {
                     </Text>
                     <Text style={input.label}>Email</Text>
                     <TextInput
+
                         style={input.textWithValidate}
                         keyboardType="email-address"
                         onChangeText={(e) => {
@@ -154,7 +155,7 @@ const SignUpScreen = ({ navigation, signup }) => {
                             style={input.textPassword}
                             secureTextEntry={isPasswordHidden ? true : false}
                             onChangeText={(e) => {
-                                setPassword(e.valueOf())
+                                setPassword(e.valueOf());
                                 if (e.valueOf().length == 0)
                                     setRequiredPassword(true);
                                 else
@@ -236,10 +237,11 @@ const SignUpScreen = ({ navigation, signup }) => {
                             onPress={() => {
                                 if (checkDefault(name, phoneNumber, email, password, passwordConfirm) == true
                                     && checkToDoneSignup(requiredName, requiredPhoneNumber, mustPhoneNumber, requiredEmail,
-                                        formEmail, requiredPassword, requiredConfirmPassword, confirmPasswordMustLikePassword) == true)
+                                        formEmail, requiredPassword, requiredConfirmPassword, confirmPasswordMustLikePassword) == true) {
                                     signup({ email, password, passwordConfirm, name, phoneNumber, photo, role, navigation });
+                                }
                                 else {
-                                    alert('Bạn chưa hoàn thành bản đăng ký');
+                                    ToastAndroid.showWithGravity("Vui lòng điền thông tin đăng ký hợp lệ", ToastAndroid.SHORT, ToastAndroid.CENTER);
                                     checkAndShowValidationDefault(name, phoneNumber, email, password, passwordConfirm,
                                         setRequiredName, setRequiredPhoneNumber, setRequiredEmail,
                                         setRequiredPassword, setRequiredConfirmPassword);

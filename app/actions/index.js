@@ -3,6 +3,7 @@ import addressRequest from '../apis/addressRequest';
 import {catchAsync, isEmpty} from '../utils';
 import ACTION_TYPE from './type';
 import Axios from 'axios';
+import { ToastAndroid } from 'react-native';
 
 
 export const doSomething = data => dispatch => {
@@ -65,7 +66,7 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
     const response = await accommodationRequest.post('/login', {
         email, password
     });
-
+    ToastAndroid.showWithGravity("Đăng nhập thành công", ToastAndroid.SHORT, ToastAndroid.CENTER);
     console.log('success');
     dispatch({
         type: ACTION_TYPE.USER_LOGIN,
@@ -79,6 +80,10 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
 }, (e) => {
     console.log('error login!');
     console.log(e.response.data);
+    if(e.response.data.message == "Email hoặc mật khẩu không hợp lệ")
+        ToastAndroid.showWithGravity("Email hoặc mật khẩu không chính xác", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    else
+        ToastAndroid.showWithGravity('Kết nối bị lỗi', ToastAndroid.SHORT, ToastAndroid.CENTER)
 });
 
 export const logout = ({navigation}) => catchAsync(async dispatch => {
@@ -226,7 +231,7 @@ export const signup = ({email, password, passwordConfirm, name, phoneNumber, pho
         }
     })
     console.log('success Signup');
-
+    ToastAndroid.showWithGravity("Đăng ký thành công", ToastAndroid.SHORT, ToastAndroid.CENTER);
     navigation.navigate("Login")
     dispatch({
         type: ACTION_TYPE.SIGNUP_USER,
@@ -237,6 +242,11 @@ export const signup = ({email, password, passwordConfirm, name, phoneNumber, pho
 }, (e) => {
     console.log('error Signup!');
     console.log(e.response.data);
+    if(e.response.data.message.email.toString() == "Email này đã được sử dụng rồi")
+        ToastAndroid.showWithGravity("Email này đã được sử dụng", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    else
+        ToastAndroid.showWithGravity('Kết nối bị lỗi', ToastAndroid.SHORT, ToastAndroid.CENTER);
+
 });
 
 export const updateUserInformation = ({name, phoneNumber, photo, navigation}) =>catchAsync(async dispatch => {
@@ -274,6 +284,7 @@ export const changePassword = ({user, currentPassword, password, passwordConfirm
             'Content-Type': 'application/json'
         }
     })
+    ToastAndroid.showWithGravity("Đổi mật khẩu thành công", ToastAndroid.SHORT, ToastAndroid.CENTER);
     navigation.navigate('User');
     dispatch({
         type: ACTION_TYPE.CHANGE_PASSWORD,
@@ -284,6 +295,10 @@ export const changePassword = ({user, currentPassword, password, passwordConfirm
 }, (e) => {
     console.log('error change password');
     console.log(e.response.data);
+    if(e.response.data.message == "Mật khẩu không chính xác")
+        ToastAndroid.showWithGravity("Mật khẩu cũ không chính xác", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    else
+        ToastAndroid.showWithGravity('Kết nối bị lỗi', ToastAndroid.SHORT, ToastAndroid.CENTER);
 });
 
 /**
