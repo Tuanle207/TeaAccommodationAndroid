@@ -1,5 +1,5 @@
 import CheckBox from '@react-native-community/checkbox';
-import React, { useState, useReducer } from 'react';
+import React, { useState, useReducer, useEffect, useRef } from 'react';
 import { 
     Image, 
     KeyboardAvoidingView, 
@@ -18,14 +18,13 @@ import {Picker} from '@react-native-picker/picker'
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
-import { isEmpty } from '../../utils';
+import { isEmpty, ROLE_TYPE } from '../../utils';
 import { createApartment } from '../../actions';
 import { MARGIN_MEDIUM } from '../styles/default.value';
 import { connect } from 'react-redux';
 import addressRequest from '../../apis/addressRequest';
-
-
-const facilitiesData = ['wifi', 'máy giặt', 'tủ lạnh']
+import { bingMapApi, bingMapApiKey } from '../../apis/bingMapApi';
+import AnimatedLoader from 'react-native-animated-loader';
 
 const photosReducer = (state, action) => {
     
@@ -57,16 +56,23 @@ const facilitiesReducer = (state, action) => {
     }
 };
 
+const TYPE = {
+    CREATION: 0,
+    UPDATION: 1
+}
 
-const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
+const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, user, ui, facilitiesData }) => {
     
+    //const { type } = route.params;
+    const type = TYPE.CREATION;
+
     const [photos, dispatchPhotos] = useReducer(photosReducer, []);
     const [title, setTitle] = useState('Phòng trọ xịn xò');
     const [description, setDescription] = useState('Phòng xò xịn nhất Việt Name');
     const [rent, setRent] = useState('2500000');
     const [area, setArea] = useState('30');
     const [coordinate, setCoordinate] = useState({latitude: 10.88015919427308, longitude: 106.80892746895552}); 
-    const [street, setStreet] = useState('14 Linh Trung');
+    const [street, setStreet] = useState('20A Linh Trung');
     const [ward, setWard] = useState(null);
     const [district, setDistrict] = useState(null);
     const [city, setCity] = useState(null);
@@ -75,6 +81,77 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
 
     const [districtsData, setDistrictsData] = useState([]);
     const [wardsData, setWardsData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [streetInputFocus, setStreetInputFocus] = useState(false);
+
+    const mapViewRef = useRef(null);
+
+    useEffect(() => {
+        let flag = true;
+        [street, ward, city].forEach(el => {
+            if (el === null || el.trim() === '' || !el)
+                flag = false;
+        });
+        if (!district)
+            flag = false;
+
+        if (flag === true && streetInputFocus === false) {
+            (async () => {
+                try {
+                    console.log('loading');
+                    setLoading(true);
+                    let query = street + ', ' + ward + ', ' + district.name + ', ' + city;
+                    const firstRes = await bingMapApi.get(`/Locations?key=${bingMapApiKey}&maxResults=1&query=${query}`);
+                    if (firstRes.data.resourceSets[0].resources.length !== 0) {
+                        const coords = firstRes.data.resourceSets[0].resources[0].point.coordinates; 
+                        setCoordinate({ latitude: coords[0], longitude: coords[1] });
+                        centerMapCamera({ latitude: coords[0], longitude: coords[1] });
+                        return;
+                    }
+    
+                    query = ward + ', ' + district.name + ', ' + city;
+                    const secondRes = await bingMapApi.get(`/Locations?key=${bingMapApiKey}&maxResults=1&query=${query}`);
+                    if (secondRes.data.resourceSets[0].resources.length !== 0) {
+                        const coords = secondRes.data.resourceSets[0].resources[0].point.coordinates; 
+                        setCoordinate({ latitude: coords[0], longitude: coords[1] });
+                        centerMapCamera({ latitude: coords[0], longitude: coords[1] });
+                        return;
+                    }
+                    
+                    query = district.name + ', ' + city;
+                    const thirdRes = await bingMapApi.get(`/Locations?key=${bingMapApiKey}&maxResults=1&query=${query}`);
+                    if (thirdRes.data.resourceSets[0].resources.length !== 0) {
+                        const coords = thirdRes.data.resourceSets[0].resources[0].point.coordinates; 
+                        setCoordinate({ latitude: coords[0], longitude: coords[1] });
+                        centerMapCamera({ latitude: coords[0], longitude: coords[1] });
+                        return;
+                    }
+    
+                    query = city;
+                    const fourthRes = await bingMapApi.get(`/Locations?key=${bingMapApiKey}&maxResults=1&query=${query}`);
+                    const coords = fourthRes.data.resourceSets[0].resources[0].point.coordinates; 
+                    setCoordinate({ latitude: coords[0], longitude: coords[1] });
+                    centerMapCamera({ latitude: coords[0], longitude: coords[1] });
+                }
+                catch (err) {
+                    console.log(err);
+                    console.log(err.response.data);
+                }
+                finally {
+                    setLoading(false);
+                }
+            })();
+        }
+
+    }, [street, ward, district, city, streetInputFocus]);
+
+    const centerMapCamera = coordinate => mapViewRef.current.animateToRegion({
+        latitude: coordinate.latitude,
+        longitude: coordinate.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.005,
+    }, 1);
+
     const submit = () => {
         const apartmentInfos = {
             title,
@@ -86,7 +163,7 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
             address: {
                 street,
                 ward,
-                district,
+                district: district.name,
                 city,
                 latitude: coordinate.latitude,
                 longitude: coordinate.longitude
@@ -96,31 +173,34 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
         facilities.forEach(el => {
             if (el.checked === true)
                 apartmentInfos.facilities.push(el.value);
-        })
+        });
+        
+        console.log(apartmentInfos);
         //if (id !== null) apartmentInfos.id = id;
-        createApartment(apartmentInfos);
+        createApartment({apartmentInfos, navigation});
     };
 
     const handleCityChange = city => {
         setCity(city);
         if (city !== null && city !== "") {
             addressRequest
-                .get('/district?province=79')
+                .get(`district?province=79`)
                 .then(response => {
                     console.log(response.data.results);
                     var { results } = response.data; 
-                    const districts = results.map(el => el.name);
-                    setDistrictsData(districts);
+                    setDistrictsData(results);
                 });
         }
             
     };
 
-    const handleWardChange = ward => {
-        setWard(ward);
-        if (ward !== null && ward !== "") {
+    const handleDistrictChange = districtName => {
+        const district = districtsData.find(el => el.name === districtName);
+        console.log(district);
+        setDistrict(district);
+        if (district !== null && district !== '' || district.name !== '') {
             addressRequest
-                .get(`/commune?district=${ward}`)
+                .get(`/commune?district=${district.code}`)
                 .then(response => {
                     console.log(response.data.results);
                     var { results } = response.data; 
@@ -197,7 +277,16 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
     return (
         <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"} keyboardVerticalOffset = {65} style = {{flex:1}}>
             <ScrollView style = {{paddingVertical: 10, paddingHorizontal: 20}}>
-                
+                {
+                    (loading === true || ui.creatingApartment === true) &&
+                    <AnimatedLoader
+                        visible={true}
+                        overlayColor='rgba(0,0,0,0.5)'
+                        source={require('../../assets/2166-dotted-loader.json')}
+                        animationStyle={{width: 100, height: 100}}
+                        speed={1}
+                    />
+                }
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Thông tin cơ bản</Text>
                     <TextInput value={title} onChangeText={txt => setTitle(txt)} style = {styles.textInput} placeholder = 'Tiêu đề/tên trọ'/>
@@ -219,18 +308,18 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
                             {
                                 city === null && <Picker.Item label='Chọn tỉnh/thành phố' value='' />
                             }
-                            <Picker.Item label='Thành phố Hồ Chí Minh' value='Hồ Chí Minh' />
+                            <Picker.Item label='Thành Phố Hồ Chí Minh' value='Hồ Chí Minh' />
                         </Picker>
                     </View>
                     <View style={{borderBottomWidth: 1, borderColor: '#000'}}>
-                        <Picker selectedValue={district} onValueChange={txt => setDistrict(txt)}>
+                        <Picker selectedValue={district?.name} onValueChange={txt => handleDistrictChange(txt)}>
                             {
                                 district === null && <Picker.Item label='Chọn quận/huyện' value='' />
                             }
                             {
                                 districtsData.map(el => {
                                     return (
-                                        <Picker.Item key={el} label={el} value={el} />
+                                        <Picker.Item key={el.name} label={el.name} value={el.name} />
                                     );
                                 })
                             }
@@ -250,11 +339,17 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
                             }
                         </Picker>
                     </View>
-                    <TextInput value={street} onChangeText={txt => setStreet(txt)} style = {{...styles.textInput, paddingLeft: 10}} placeholder = 'Số nhà, đường'/>
+                    <TextInput value={street} 
+                        onBlur={() => {console.log('out'); setStreetInputFocus(false); } } 
+                        onFocus={() => {console.log('in'); setStreetInputFocus(true); } } 
+                        onChangeText={txt => setStreet(txt)} 
+                        style = {{...styles.textInput, paddingLeft: 10}} 
+                        placeholder = 'Số nhà, đường'/>
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Vị trí trên bản đồ</Text>
                     <MapView
+                        ref={mapViewRef}
                         onPress={(e) => setCoordinate(e.nativeEvent.coordinate)}
                         initialRegion={{
                             latitude: coordinate.latitude,
@@ -305,7 +400,15 @@ const CreateOrUpdateApartmentScreen = ({ createApartment }) => {
     )
 };
 
-export default connect(null, {createApartment})(CreateOrUpdateApartmentScreen);
+const mapStateToProps = state => {
+    return {
+        user: state.user,
+        facilitiesData: state.parameters.facilities,
+        ui: state.ui
+    };
+};
+
+export default connect(mapStateToProps, {createApartment})(CreateOrUpdateApartmentScreen);
 
 const styles = StyleSheet.create({
     section: {

@@ -17,10 +17,11 @@ import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import MeterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import EntypoIcon from 'react-native-vector-icons/Entypo'
+import { ROLE_TYPE } from '../../utils';
 
 const { SlideInMenu } = renderers;
 
-const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, errors}) => {
+const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user, errors}) => {
         
     const [refreshing, setRefreshing] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -81,6 +82,14 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, erro
         ToastAndroid.showWithGravityAndOffset(errors.messages[0], 2, ToastAndroid.CENTER, 0, 0);
     }
 
+    if (user.auth === false || (user.auth === true && user.data.role === ROLE_TYPE.NORMAL_USER)) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 16 }}>Bạn cần là chủ trọ để sử dụng tính năng này!</Text>
+                <Text style={{ marginTop: 10 }}>Hãy đăng nhập với tài khoản chủ trọ để tiếp tục!</Text>
+            </View>
+        );
+    } 
 
     return (
         <View
@@ -134,19 +143,25 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, erro
                     </TouchableOpacity>
                 </MenuOptions>
             </Menu>
-
-            <FlatList style={{padding: 10}}
-                ref={scroll}
-                data={myApartments.data}
-                renderItem={renderItem}
-                keyExtractor={el => `${el.id}`}
-                refreshControl={<RefreshControl refreshing={refreshing} 
-                onRefresh={getMyApartments} />}
-                onEndReached={loadMoreData}
-                onEndReachedThreshold={0.5}
-                ListFooterComponent={renderFooter}
-                onScroll={e => setYPostion(e.nativeEvent.contentOffset.y)}
-           />
+            {
+                myApartments.data.length > 0 ?
+                <FlatList style={{padding: 10}}
+                    ref={scroll}
+                    data={myApartments.data}
+                    renderItem={renderItem}
+                    keyExtractor={el => `${el.id}`}
+                    refreshControl={<RefreshControl refreshing={refreshing} 
+                    onRefresh={getMyApartments} />}
+                    onEndReached={loadMoreData}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={renderFooter}
+                    onScroll={e => setYPostion(e.nativeEvent.contentOffset.y)} /> :
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: 16 }}>Bạn chưa đăng phòng trọ nào!</Text>
+                    <Text style={{ marginTop: 10 }}>Hãy tạo 1 bài đăng mới!</Text>
+                </View>
+            }
+           
             {
                 yPostion > 30 ?
                 <TouchableOpacity onPress={() => scroll.current.scrollToOffset({x: 0, y: 0, animated: true})}
@@ -167,6 +182,7 @@ const mapStateToProps = state => {
     return {
         myApartments: state.myApartments,
         ui: state.ui,
+        user: state.user,
         errors: state.errors
     };
 };

@@ -57,8 +57,13 @@ const compareDate = (commentA, commentB) => {
         return 1;
     }
     return 0;
-}
+};
 
 export const sortArrayOfObjectByDate = arr => {
     return arr.sort(compareDate)
-}
+};
+
+export const ROLE_TYPE = {
+    NORMAL_USER: 'user',
+    LAND_LORD: 'landlord'
+};

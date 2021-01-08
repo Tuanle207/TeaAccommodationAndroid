@@ -287,18 +287,21 @@ export const filterApartment = data => dispatch => {
     });
 };
 
-export const createApartment = data => catchAsync(async dispatch => {
+export const createApartment = ({apartmentInfos, navigation}) => catchAsync(async dispatch => {
     console.log('uploading infomartion?');
-
+    dispatch({
+        type: ACTION_TYPE.CREATING_APARTMENT,
+        payload: true
+    });
     const formDataBody = new FormData();
-    formDataBody.append('title', data.title);
-    formDataBody.append('description', data.description);
-    formDataBody.append('rent', data.rent);
-    formDataBody.append('area', data.area);
-    formDataBody.append('phoneContact', data.phoneContact);
-    formDataBody.append('facilities', JSON.stringify(data.facilities));
-    formDataBody.append('address', JSON.stringify(data.address));
-    data.photos.forEach((photo, index) => {
+    formDataBody.append('title', apartmentInfos.title);
+    formDataBody.append('description', apartmentInfos.description);
+    formDataBody.append('rent', apartmentInfos.rent);
+    formDataBody.append('area', apartmentInfos.area);
+    formDataBody.append('phoneContact', apartmentInfos.phoneContact);
+    formDataBody.append('facilities', JSON.stringify(apartmentInfos.facilities));
+    formDataBody.append('address', JSON.stringify(apartmentInfos.address));
+    apartmentInfos.photos.forEach((photo, index) => {
         formDataBody.append(`photo_${index + 1}`, {
             name: photo.fileName,
             type: photo.type,
@@ -314,10 +317,21 @@ export const createApartment = data => catchAsync(async dispatch => {
         }
     });
     console.log(response.data.data);
+    dispatch({
+        type: ACTION_TYPE.CREATING_APARTMENT,
+        payload: false
+    });
+    ToastAndroid.showWithGravity('Đăng phòng trọ mới thành công!', ToastAndroid.LONG, ToastAndroid.CENTER);
+    navigation.goBack();
     
-}, e => {
-    console.log(e.response.data);
+}, (err, dispatch) => {
+    console.log(err.response.data);
     console.log('error');
+    ToastAndroid.show('Đã có lỗi xảy ra', ToastAndroid.SHORT);
+    dispatch({
+        type: ACTION_TYPE.CREATING_APARTMENT,
+        payload: true
+    });
 });
 
 export const createComment = data => catchAsync(async dispatch => {

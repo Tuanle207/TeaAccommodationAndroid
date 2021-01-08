@@ -15,6 +15,8 @@ const myApartments = (state = INIT, action) => {
                 meta: action.payload.meta, 
                 data: [...state.data, ...action.payload.data]
             };
+        case ACTION_TYPE.USER_LOGOUT:
+            return INIT;
         default:
             return state;
     } 
