@@ -67,3 +67,8 @@ export const ROLE_TYPE = {
     NORMAL_USER: 'user',
     LAND_LORD: 'landlord'
 };
+
+export const APARTMENT_MODIFICATION_TYPE = {
+    CREATION: 0,
+    UPDATION: 1
+}

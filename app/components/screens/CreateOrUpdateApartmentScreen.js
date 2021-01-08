@@ -18,8 +18,8 @@ import {Picker} from '@react-native-picker/picker'
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
-import { isEmpty, ROLE_TYPE } from '../../utils';
-import { createApartment } from '../../actions';
+import { APARTMENT_MODIFICATION_TYPE, isEmpty, ROLE_TYPE } from '../../utils';
+import { createApartment, getApartment, updateApartment } from '../../actions';
 import { MARGIN_MEDIUM } from '../styles/default.value';
 import { connect } from 'react-redux';
 import addressRequest from '../../apis/addressRequest';
@@ -51,6 +51,8 @@ const facilitiesReducer = (state, action) => {
         case 'uncheck':
             newState[action.payload.index].checked = false;
             return newState;
+        case 'init':
+            return action.payload;
         default:
             return state;
     }
@@ -61,10 +63,9 @@ const TYPE = {
     UPDATION: 1
 }
 
-const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, user, ui, facilitiesData }) => {
+const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, updateApartment, getApartment, user, ui, apartmentDetails, facilitiesData }) => {
     
-    //const { type } = route.params;
-    const type = TYPE.CREATION;
+    const { type, id } = route.params;
 
     const [photos, dispatchPhotos] = useReducer(photosReducer, []);
     const [title, setTitle] = useState('Phòng trọ xịn xò');
@@ -87,9 +88,60 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, use
     const mapViewRef = useRef(null);
 
     useEffect(() => {
+        if (type === APARTMENT_MODIFICATION_TYPE.UPDATION) {
+            if (apartmentDetails.findIndex(el => el.id === id) === -1)
+                getApartment({id});
+        }
+    }, []);
+
+    useEffect(() => {
+        if (type === APARTMENT_MODIFICATION_TYPE.UPDATION) {
+            if (apartmentDetails.findIndex(el => el.id === id) !== -1) {
+                const detail = apartmentDetails.find(el => el.id === id);
+
+                setTitle(detail.title);
+                setDescription(detail.description);
+                setRent(detail.rent);
+                setArea(detail.area);
+                setCoordinate({ latitude: detail.address.latitude, longitude: detail.address.longitude });
+                setStreet(detail.address.street);
+                setCity(detail.address.city);
+                setPhoneContact(detail.phoneContact);
+                dispatchFacilities({
+                    type: 'init',
+                    payload: facilitiesData.map((el) => ({checked: detail.facilities.includes(el.value) !== -1, value: el}))
+                });
+
+                // get districts and wards
+                addressRequest
+                .get(`district?province=79`)
+                .then(response => {
+                    var { results } = response.data;
+                    setDistrictsData(results);
+
+                    const district = results.find(el => el.name === detail.address.district);
+                    setDistrict(district);
+
+                    addressRequest
+                        .get(`/commune?district=${district.code}`)
+                        .then(response => {
+                            var { results } = response.data; 
+                            const wards = results.map(el => el.name);
+                            setWardsData(wards);
+                            //console.log(wards);
+                            setWard(detail.address.ward);
+                        });
+                });
+                
+                
+            }
+        }
+    }, [apartmentDetails]);
+
+    useEffect(() => {
         let flag = true;
         [street, ward, city].forEach(el => {
-            if (el === null || el.trim() === '' || !el)
+            if (el === null)
                 flag = false;
         });
         if (!district)
@@ -176,28 +228,41 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, use
         });
         
         console.log(apartmentInfos);
-        //if (id !== null) apartmentInfos.id = id;
-        createApartment({apartmentInfos, navigation});
+        console.log(type);
+        if (id !== null) apartmentInfos.id = id;
+        if (type === APARTMENT_MODIFICATION_TYPE.CREATION)
+            createApartment({apartmentInfos, navigation});
+        else if (type === APARTMENT_MODIFICATION_TYPE.UPDATION)
+            updateApartment({apartmentInfos, navigation});
     };
 
     const handleCityChange = city => {
         setCity(city);
+        getDistricts();
+    };
+
+    const getDistricts = callback => {
         if (city !== null && city !== "") {
             addressRequest
                 .get(`district?province=79`)
                 .then(response => {
                     console.log(response.data.results);
-                    var { results } = response.data; 
+                    var { results } = response.data;
+                    console.log('before');
+                    callback(results);
+                    console.log('after');
                     setDistrictsData(results);
                 });
-        }
-            
+        }  
     };
 
     const handleDistrictChange = districtName => {
         const district = districtsData.find(el => el.name === districtName);
-        console.log(district);
         setDistrict(district);
+        getWards(district);
+    };
+
+    const getWards = district => {
         if (district !== null && district !== '' || district.name !== '') {
             addressRequest
                 .get(`/commune?district=${district.code}`)
@@ -208,7 +273,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, use
                     setWardsData(wards);
                 });
         }
-    }
+    };
 
     const selectImage = () => {
         var options = {
@@ -278,7 +343,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, use
         <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"} keyboardVerticalOffset = {65} style = {{flex:1}}>
             <ScrollView style = {{paddingVertical: 10, paddingHorizontal: 20}}>
                 {
-                    (loading === true || ui.creatingApartment === true) &&
+                    (loading === true || ui.creatingApartment === true || ui.fetchingApartment || ui.updatingApartment) &&
                     <AnimatedLoader
                         visible={true}
                         overlayColor='rgba(0,0,0,0.5)'
@@ -290,8 +355,8 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, use
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Thông tin cơ bản</Text>
                     <TextInput value={title} onChangeText={txt => setTitle(txt)} style = {styles.textInput} placeholder = 'Tiêu đề/tên trọ'/>
-                    <TextInput value={rent} onChangeText={txt => setRent(txt)} style = {styles.textInput} placeholder = 'Giá thuê (triệu đồng/tháng)' keyboardType = 'number-pad'/>
-                    <TextInput value={area} onChangeText={txt => setArea(txt)} style = {styles.textInput} placeholder = 'Diện tích (m2)' keyboardType = 'number-pad'/>
+                    <TextInput value={rent.toString()} onChangeText={txt => setRent(txt)} style = {styles.textInput} placeholder = 'Giá thuê (triệu đồng/tháng)' keyboardType = 'number-pad'/>
+                    <TextInput value={area.toString()} onChangeText={txt => setArea(txt)} style = {styles.textInput} placeholder = 'Diện tích (m2)' keyboardType = 'number-pad'/>
                 </View>
                 
                 <View style={styles.section}>
@@ -404,11 +469,12 @@ const mapStateToProps = state => {
     return {
         user: state.user,
         facilitiesData: state.parameters.facilities,
+        apartmentDetails: state.apartmentDetails,
         ui: state.ui
     };
 };
 
-export default connect(mapStateToProps, {createApartment})(CreateOrUpdateApartmentScreen);
+export default connect(mapStateToProps, {createApartment, updateApartment, getApartment})(CreateOrUpdateApartmentScreen);
 
 const styles = StyleSheet.create({
     section: {

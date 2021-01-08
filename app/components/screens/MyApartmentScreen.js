@@ -17,7 +17,8 @@ import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import MeterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import EntypoIcon from 'react-native-vector-icons/Entypo'
-import { ROLE_TYPE } from '../../utils';
+import { APARTMENT_MODIFICATION_TYPE, ROLE_TYPE } from '../../utils';
+import { ScreenNames } from '../Navigation/NavigationConst';
 
 const { SlideInMenu } = renderers;
 
@@ -75,7 +76,7 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
 
     const updateApartment = id => {
         if (id != -1)
-            navigation.push('Cập nhật thông tin phòng trọ');
+            navigation.push(ScreenNames.UPDATE_APARTMENT, { id: id, type: APARTMENT_MODIFICATION_TYPE.UPDATION });
     }
 
     if (errors.hasError === true) {
@@ -169,7 +170,8 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
                     <AntDesignIcon name='arrowup' size={24} color={'#11698e'} />
                 </TouchableOpacity>
                 :
-                <TouchableOpacity onPress={() => navigation.push('Thêm phòng trọ mới')} style={{position: 'absolute', bottom: 20, right: 20, padding: 5, borderRadius: 100, borderWidth: 2, borderColor: '#fc8621', backgroundColor: '#f4eeed'}}>
+                <TouchableOpacity onPress={() => navigation.push(ScreenNames.CREATE_APARTMENT, {id: null, type: APARTMENT_MODIFICATION_TYPE.CREATION})} 
+                    style={{position: 'absolute', bottom: 20, right: 20, padding: 5, borderRadius: 100, borderWidth: 2, borderColor: '#fc8621', backgroundColor: '#f4eeed'}}>
                     <EntypoIcon name='plus' size={24} color={'#fc8621'} />
                 </TouchableOpacity>
             }

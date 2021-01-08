@@ -5,6 +5,7 @@ const INIT = {
     fetchingApartment: false,
     creatingComment: false,
     creatingApartment: false,
+    updatingApartment: false,
     openingApp: true
 };
 
@@ -18,6 +19,8 @@ const ui = (state = INIT, action) => {
             return {...state, creatingComment: action.payload};
         case ACTION_TYPE.CREATING_APARTMENT:
             return {...state, creatingApartment: action.payload};
+        case ACTION_TYPE.UPDATING_APARTMENT:
+            return {...state, updatingApartment: action.payload};
         default:
             return state;
     }

@@ -111,7 +111,7 @@ export const getApartments = query => catchAsync(async dispatch => {
         payload: true
     });
     
-    let queryString = `?limit=${3}`;
+    let queryString = `?limit=${10}`;
 
     if (query) {
         if (query.page)                     queryString += `&page=${query.page}`;
@@ -168,7 +168,7 @@ export const getMyApartments = query => catchAsync(async dispatch => {
         payload: true
     });
 
-    let queryString = `?limit=${3}`;
+    let queryString = `?limit=${10}`;
     if (query?.page) queryString += `&page=${query.page}`;
     
     const response = await accommodationRequest.get('/apartments/posted' + queryString);
@@ -330,6 +330,60 @@ export const createApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
     ToastAndroid.show('Đã có lỗi xảy ra', ToastAndroid.SHORT);
     dispatch({
         type: ACTION_TYPE.CREATING_APARTMENT,
+        payload: true
+    });
+});
+
+export const updateApartment = ({apartmentInfos, navigation}) => catchAsync(async dispatch => {
+    console.log('uploading infomartion?');
+    dispatch({
+        type: ACTION_TYPE.UPDATING_APARTMENT,
+        payload: true
+    });
+    const formDataBody = new FormData();
+    formDataBody.append('title', apartmentInfos.title);
+    formDataBody.append('description', apartmentInfos.description);
+    formDataBody.append('rent', apartmentInfos.rent);
+    formDataBody.append('area', apartmentInfos.area);
+    formDataBody.append('phoneContact', apartmentInfos.phoneContact);
+    formDataBody.append('facilities', JSON.stringify(apartmentInfos.facilities));
+    formDataBody.append('address', JSON.stringify(apartmentInfos.address));
+    if (apartmentInfos.photos.length > 0) {
+        apartmentInfos.photos.forEach((photo, index) => {
+            formDataBody.append(`photo_${index + 1}`, {
+                name: photo.fileName,
+                type: photo.type,
+                uri: photo.uri
+            });
+        });
+    }
+    
+
+    console.log(formDataBody);
+
+    const response = await accommodationRequest.post(`/apartments/${apartmentInfos.id}`, formDataBody, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    console.log(response.data.data);
+    dispatch({
+        type: ACTION_TYPE.APARTMENTS_GETTING,
+        payload: response.data.data
+    })
+    dispatch({
+        type: ACTION_TYPE.UPDATING_APARTMENT,
+        payload: false
+    });
+    ToastAndroid.showWithGravity('Cập nhật thông tin phòng trọ thành công!', ToastAndroid.LONG, ToastAndroid.CENTER);
+    navigation.goBack();
+    
+}, (err, dispatch) => {
+    console.log(err.response.data);
+    console.log('error');
+    ToastAndroid.show('Đã có lỗi xảy ra', ToastAndroid.SHORT);
+    dispatch({
+        type: ACTION_TYPE.UPDATING_APARTMENT,
         payload: true
     });
 });
