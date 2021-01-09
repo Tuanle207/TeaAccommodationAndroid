@@ -3,7 +3,7 @@ import { View, FlatList, Text } from 'react-native';
 import { connect } from 'react-redux';
 import CheckBox from '@react-native-community/checkbox';
 import Modal from '../../defaults/Modal';
-import {getDistricts, filterApartment} from '../../../actions';
+import { getDistricts, filterApartment } from '../../../actions';
 import { isEmpty } from '../../../utils'
 
 
@@ -15,9 +15,11 @@ const reducer = (state, action) => {
         case 'init':
             return action.payload;
         case 'toggle_all':
-            action.payload.code.forEach(el => newState[el] = action.payload.checked);
+            //action.payload.code.forEach(el => newState[el] = el.checked);
+            console.log(action);
+            Object.keys(newState).forEach(el => newState[el].checked = action.payload.checked);
             return newState;
-        case 'toogle':
+        case 'toggle':
             newState = {...state};
 
             newState[action.payload.code].checked = action.payload.checked;
@@ -29,24 +31,6 @@ const reducer = (state, action) => {
     }
 };
 
-const toggleDistrict = (dispatch, checked, code) => {
-    if (Array.isArray(code))
-        dispatch({
-            type: 'toogle_all',
-            payload: {
-                check,
-                code
-            }
-        });
-    else
-        dispatch({
-            type: 'toogle',
-            payload: {
-                checked,
-                code
-            }
-        });
-};
 
 const DistrictFilter = ({modalVisible, getDistricts, filterApartment,
     setModalVisible, districts}) => {
@@ -64,7 +48,7 @@ const DistrictFilter = ({modalVisible, getDistricts, filterApartment,
             const payload = {};
             districts.forEach(el => {
                 payload[el.code] = {
-                    checked: false,
+                    checked: true,
                     data: el.name
                 };
             });
@@ -78,6 +62,18 @@ const DistrictFilter = ({modalVisible, getDistricts, filterApartment,
     useEffect(() => {
         console.log(localDistrictsFilter);
     }, [localDistrictsFilter]);
+
+    const toggleDistrict = (dispatch, checked, code) => {
+        console.log(code);
+        dispatch({
+            type: Array.isArray(code) ? 'toggle_all' : 'toggle',
+            payload: {
+                checked,
+                code
+            }
+        });
+    };
+    
 
 
     const renderDistrict = ({item}) => {
@@ -104,7 +100,7 @@ const DistrictFilter = ({modalVisible, getDistricts, filterApartment,
             visible={modalVisible}
             setVisible={visible => setModalVisible(visible)}
             onRequestClose={() => {console.log('quit');}}
-            onFinish={() => filterApartment(localDistrictsFilter)}
+            onFinish={() => {console.log('aksnsaof'); filterApartment({type: 'districts', data: localDistrictsFilter})}}
         >
         {
             !isEmpty(districts) ? 
@@ -126,7 +122,7 @@ const DistrictFilter = ({modalVisible, getDistricts, filterApartment,
                         <Text>{'Tất cả'}</Text>
                         <CheckBox boxType='square' 
                             value={checkAll} 
-                            onValueChange={value => toggleDistrict(dispatch, value, districts.map(el => el.code))}/>
+                            onValueChange={value => {setCheckAll(value); console.log(value); toggleDistrict(dispatch, value, districts.map(el => el.code))}}/>
                     </View>
                     
                 )}

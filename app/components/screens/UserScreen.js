@@ -2,32 +2,33 @@ import React, { useEffect} from 'react';
 import { Text, View, Image, StyleSheet,TextInput } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { topic, input } from '../styles/userFeature.style';
-import { checkLoggedIn} from '../../actions';
+import { checkLoggedIn, logout} from '../../actions';
 import { connect } from 'react-redux';
 import { serverApi } from '../../../appsetting';
+import { ScreenNames } from '../Navigation/NavigationConst';
 
-const UserScreen = ({ checkLoggedIn, navigation, user, fetchingData}) => {
+const UserScreen = ({ checkLoggedIn, logout, navigation, user, checkingLogin}) => {
     const translateRoleUser = () => {
-        if(user.data.role == 'landlord')
+        if(user.data.role === 'landlord')
             return 'Cho thuê trọ';
         else
             return 'Tìm trọ';
     }
     useEffect(() => {
-        checkLoggedIn({ navigation });
-
-        return () => {
-            console.log('unmounting...');
-        }
+        if (user.auth === false)
+            checkLoggedIn({ navigation });
     }, []);
 
-    if (fetchingData || !user.auth) {
+    console.log(user);
+
+    if (checkingLogin || user.auth === false) {
         return (
             <View>
-                <Text>Loading User's Information</Text>
+                <Text>Đang tải...</Text>
             </View>
         )
     }
+
     return (
         <View >
             <ScrollView style={{width: '100%', height: '100%', backgroundColor: '#204051', paddingHorizontal: 30}}>
@@ -42,11 +43,14 @@ const UserScreen = ({ checkLoggedIn, navigation, user, fetchingData}) => {
                 <Text style={input.label}>Loại tài khoản</Text>
                 <Text style={input.text}>{translateRoleUser()}</Text>
                 <View style={{marginTop: 10}}>
-                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("UpdateUser")}>
+                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(ScreenNames.UPDATE_USER)}>
                         <Text style={styles.insideButton}>Chỉnh sửa trang cá nhân</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("ChangePassword")}>
+                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(ScreenNames.CHANGE_PASSWORD)}>
                         <Text style={styles.insideButton}>Đổi mật khẩu</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button} onPress={() => logout({navigation})}>
+                        <Text style={styles.insideButton}>Đăng xuất</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -56,9 +60,9 @@ const UserScreen = ({ checkLoggedIn, navigation, user, fetchingData}) => {
 export default connect(
     state => ({
         user: state.user,
-        fetchingData: state.ui.fetchingData
+        checkingLogin: state.ui.checkingLogin
     }),
-    { checkLoggedIn })(UserScreen);
+    { checkLoggedIn, logout })(UserScreen);
 
 const styles = StyleSheet.create({
     avatar: {
@@ -71,10 +75,9 @@ const styles = StyleSheet.create({
         marginBottom: 16
     },
     button: {
-        height: 40,
+        paddingVertical: 10,
         width: '95%',
         alignSelf: 'center',
-        justifyContent: 'center',
         backgroundColor: '#092532',
         marginBottom: 10,
         borderRadius: 6,

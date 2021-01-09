@@ -59,7 +59,7 @@ const ChangePasswordScreen = ({checkLoggedIn, user, navigation, changePassword})
     return (
         <View>
             <View style={{ backgroundColor: '#132833', height: 53, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-                <Icon.Button name="close" color='#D9D9D9' backgroundColor='transparent' size={30} onPress={() => navigation.navigate('User')}></Icon.Button>
+                <Icon.Button name="close" color='#D9D9D9' backgroundColor='transparent' size={30} onPress={() => navigation.goBack()}></Icon.Button>
                 <Text style={{
                     fontSize: 20,
                     fontWeight: "bold",

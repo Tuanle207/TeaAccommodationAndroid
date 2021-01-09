@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import { updateLoginInfo, login } from '../../actions';
+import { ScreenNames } from '../Navigation/NavigationConst';
 import { input, mainButton } from '../styles/userFeature.style';
 
 const LoginScreen = ({ navigation, updateLoginInfo, login, info }) => {
@@ -38,7 +39,7 @@ const LoginScreen = ({ navigation, updateLoginInfo, login, info }) => {
             </View>
             <View style={styles.footer}>
                 <Text style={{ color: "#D4CBCB" }}>Bạn chưa có tài khoản?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+                <TouchableOpacity onPress={() => navigation.navigate(ScreenNames.SIGNUP)}>
                     <Text style={{ color: "#fff", fontWeight: "bold" }}> Hãy đăng ký</Text>
                 </TouchableOpacity>
             </View>

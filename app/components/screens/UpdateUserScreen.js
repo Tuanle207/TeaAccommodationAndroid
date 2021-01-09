@@ -8,7 +8,7 @@ import { checkLoggedIn, updateUserInformation} from '../../actions';
 import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-const UpdateUserScreen = ({checkLoggedIn, navigation, user, fetchingData, updateUserInformation}) => {
+const UpdateUserScreen = ({checkLoggedIn, navigation, user, ui, updateUserInformation}) => {
     const [name, setName] = React.useState(user.data.name);
     const [phoneNumber, setPhoneNumber] = React.useState(user.data.phoneNumber);
     const [photo, setPhoto] = React.useState({});
@@ -26,7 +26,7 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, fetchingData, update
     }
 
     //Select image from storage
-    selectFile = () => {
+    const selectFile = () => {
         var options = {
             title: 'Chọn ảnh',
             storageOptions: {
@@ -49,31 +49,25 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, fetchingData, update
         });
     };
 
-    useEffect(() => {
-        checkLoggedIn({ navigation });
-        return () => {
-            console.log('unmounting...');
-        }
-    }, []);
-
-    if (fetchingData || !user.auth) {
-        return (
-            <View>
-                <Text>Loading Update User's Information...</Text>
-            </View>
-        )
-    }
-
+    
     function checkUpdateInformation(requiredName, requiredPhoneNumber, mustPhoneNumber){
         if(requiredName == false && requiredPhoneNumber == false && mustPhoneNumber == false)
             return true;
         return false;
     }
 
+    if (ui.checkLogin === true || !user.auth) {
+        return (
+            <View>
+                <Text>Đang tải...</Text>
+            </View>
+        )
+    }
+
     return (
         <View>
             <View style={{backgroundColor: '#132833', height: 53, flexDirection:'row' ,justifyContent:'space-around', alignItems:'center'}}>
-                <Icon.Button name="close" color='#D9D9D9' backgroundColor='#132833' size={30} onPress={()=>navigation.navigate('User')}></Icon.Button>
+                <Icon.Button name="close" color='#D9D9D9' backgroundColor='#132833' size={30} onPress={() => navigation.goBack()}></Icon.Button>
                 <Text style={navigationTittle.style}>Chỉnh sửa trang cá nhân</Text>
                 <Icon.Button name='check' color='#06BBD8' backgroundColor='#132833' size={30}
                     onPress={() => {
@@ -126,7 +120,7 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, fetchingData, update
 export default connect(
     state => ({
         user: state.user,
-        fetchingData: state.ui.fetchingData
+        ui: state.ui
     }),
     { checkLoggedIn, updateUserInformation})(UpdateUserScreen);
 
