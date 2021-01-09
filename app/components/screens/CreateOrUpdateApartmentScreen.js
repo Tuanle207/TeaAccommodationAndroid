@@ -25,6 +25,7 @@ import { connect } from 'react-redux';
 import addressRequest from '../../apis/addressRequest';
 import { bingMapApi, bingMapApiKey } from '../../apis/bingMapApi';
 import AnimatedLoader from 'react-native-animated-loader';
+import { serverApi } from '../../../appsetting';
 
 const photosReducer = (state, action) => {
     
@@ -35,6 +36,8 @@ const photosReducer = (state, action) => {
             const newState = [...state];
             newState.splice(action.payload.id, 1);
             return newState;
+        case 'init':
+            return action.payload;
         default:
             return state;
     }
@@ -106,12 +109,16 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 setCoordinate({ latitude: detail.address.latitude, longitude: detail.address.longitude });
                 setStreet(detail.address.street);
                 setCity(detail.address.city);
+                dispatchPhotos({
+                    type: 'init',
+                    payload: detail.photos.map(el => ({uri: serverApi + el}))
+                })
                 setPhoneContact(detail.phoneContact);
                 dispatchFacilities({
                     type: 'init',
-                    payload: facilitiesData.map((el) => ({checked: detail.facilities.includes(el.value) !== -1, value: el}))
+                    payload: facilitiesData.map((el) => ({checked: detail.facilities.includes(el), value: el}))
                 });
-
+                console.log(detail.photos.map(el => ({uri: serverApi + el})));
                 // get districts and wards
                 addressRequest
                 .get(`district?province=79`)
@@ -139,6 +146,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
     }, [apartmentDetails]);
 
     useEffect(() => {
+
         let flag = true;
         [street, ward, city].forEach(el => {
             if (el === null)
@@ -150,7 +158,6 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
         if (flag === true && streetInputFocus === false) {
             (async () => {
                 try {
-                    console.log('loading');
                     setLoading(true);
                     let query = street + ', ' + ward + ', ' + district.name + ', ' + city;
                     const firstRes = await bingMapApi.get(`/Locations?key=${bingMapApiKey}&maxResults=1&query=${query}`);
@@ -238,10 +245,6 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
 
     const handleCityChange = city => {
         setCity(city);
-        getDistricts();
-    };
-
-    const getDistricts = callback => {
         if (city !== null && city !== "") {
             addressRequest
                 .get(`district?province=79`)
@@ -249,7 +252,6 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                     console.log(response.data.results);
                     var { results } = response.data;
                     console.log('before');
-                    callback(results);
                     console.log('after');
                     setDistrictsData(results);
                 });
@@ -259,10 +261,6 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
     const handleDistrictChange = districtName => {
         const district = districtsData.find(el => el.name === districtName);
         setDistrict(district);
-        getWards(district);
-    };
-
-    const getWards = district => {
         if (district !== null && district !== '' || district.name !== '') {
             addressRequest
                 .get(`/commune?district=${district.code}`)
@@ -271,6 +269,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                     var { results } = response.data; 
                     const wards = results.map(el => el.name);
                     setWardsData(wards);
+                    setWard(wards[0]);
                 });
         }
     };
@@ -290,7 +289,6 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
             } else if (res.error) {
                 console.log('ImagePicker Error: ', res.error);
             } else {
-
                 dispatchPhotos({
                     type: 'add',
                     payload: res
@@ -327,13 +325,17 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
         )
     });
 
-    const renderItemPhoto = () => {
+    const renderPhotoItems = () => {
         return photos.map((el, index) => {
             return (
                 <View style={styles.imageWrapper} key={index}>
-                    <TouchableOpacity onPress={() => dispatchPhotos({type: 'remove', payload: {id: index}})} style={styles.removeImgBtn} >
-                        <EntypoIcon name={'circle-with-cross'} size={30} color={'#6E16FE'} />
-                    </TouchableOpacity>
+                    {
+                        type === APARTMENT_MODIFICATION_TYPE.CREATION ?
+                        <TouchableOpacity onPress={() => dispatchPhotos({type: 'remove', payload: {id: index}})} style={styles.removeImgBtn} >
+                            <EntypoIcon name={'circle-with-cross'} size={30} color={'#6E16FE'} />
+                        </TouchableOpacity>
+                        : null
+                    }                   
                     <Image source = {{uri: el.uri}} style={styles.image} resizeMode = 'cover'/>
                 </View>
             )});
@@ -439,13 +441,23 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Hình ảnh thực tế</Text>
                     {
-                        renderItemPhoto()
+                        renderPhotoItems()
                     }
                     {
                         photos.length > 0 ?
                         null
                         : 
                         <Text style={{alignSelf: 'center', marginTop: 10, marginBottom: 20}}>Chọn 4 hình ảnh về phòng trọ của bạn!</Text>
+                    }
+                    {
+                        type === APARTMENT_MODIFICATION_TYPE.UPDATION && photos.length !== 0 ?
+                        <TouchableOpacity
+                            onPress={ () => dispatchPhotos({ type: 'init', payload: [] }) }
+                            style={{paddingVertical: 5, alignSelf: 'center', alignItems: 'center', flexDirection: 'row'}} >
+                            <Text style={{ fontWeight: 'bold', color: '#fca652', fontSize: 16}}>Cập nhật hình ảnh mới</Text>
+                            <Text style={{ color: '#fca652'}}> cho phòng trọ?</Text>
+                        </TouchableOpacity>
+                        : null
                     }
                     {
                         photos.length < 4 ?

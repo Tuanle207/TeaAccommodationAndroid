@@ -42,23 +42,18 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        
         if (apartmentDetails != null && apartmentDetails.findIndex(el => el.id === id) === -1) {
             getApartment({id});
-            serverRequest
-                .get(`/apartments/${id}/ratings`)
-                .then(res => {
-                    const { data } =res.data;
-                    setUserRating(data.rating);
-                })
-                .catch(err => setUserRating(-1));
         }
-    }, []);
+    },[]);
 
     useEffect(() => {
-        if (!userRating && userRating != -1)
-            getApartment({ id })
-    }, [userRating]);
+        if (user.auth === true && apartmentDetails != null && apartmentDetails.findIndex(el => el.id === id) !== -1) {
+            const detail = apartmentDetails.find(el => el.id === id);
+            console.log(detail);
+            setUserRating(detail.userRating);
+        }
+    }, [apartmentDetails]);
 
     const onNavigateBtnPressHandler = () => {
         const detail = apartmentDetails.find(el => el.id === id);

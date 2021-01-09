@@ -161,7 +161,7 @@ export const getApartments = query => catchAsync(async dispatch => {
 });
 
 
-export const getMyApartments = query => catchAsync(async dispatch => {
+export const getMyApartments = query => catchAsync(async (dispatch, getState) => {
 
     dispatch({
         type: ACTION_TYPE.FETCHING_APARTMENTS,
@@ -189,7 +189,11 @@ export const getMyApartments = query => catchAsync(async dispatch => {
                 data: response.data.data
             }
         });
-        
+    if (getState().ui.reloadMyApartment === true)
+        dispatch({
+            type: ACTION_TYPE.MY_APARTMENTS_RELOADING,
+            payload: false
+        });
     dispatch({
         type: ACTION_TYPE.FETCHING_APARTMENTS,
         payload: false
@@ -197,14 +201,17 @@ export const getMyApartments = query => catchAsync(async dispatch => {
 }, (err, dispatch) => {
     
     console.log(err);
-
+    dispatch({
+        type: ACTION_TYPE.MY_APARTMENTS_RELOADING,
+        payload: false
+    });
     dispatch({
         type: ACTION_TYPE.FETCHING_APARTMENTS,
         payload: false
     });
 });
 
-export const getApartment = ({id}) => catchAsync(async dispatch => {
+export const getApartment = ({id}) => catchAsync(async (dispatch, getState) => {
 
     dispatch({
         type: ACTION_TYPE.FETCHING_APARTMENT,
@@ -212,8 +219,17 @@ export const getApartment = ({id}) => catchAsync(async dispatch => {
     });
 
     const apartmentResponse = await accommodationRequest.get(`/apartments/${id}`);
+    const apartment = apartmentResponse.data.data;
     const commentsResponse = await accommodationRequest.get(`/apartments/${id}/comments`);
-    
+    const { user } = getState();
+    console.log(getState());
+    if (user.auth === true) {
+        console.log('get user rating');
+        const userRatingResponse = await accommodationRequest.get(`/apartments/${id}/ratings`);
+        const res = userRatingResponse.data.data;
+        apartment.userRating = res !== null ? res.rating : -1;
+    }
+    console.log(commentsResponse.data);
     dispatch({
         type: ACTION_TYPE.APARTMENT_GETTING,
         payload: apartmentResponse.data.data
@@ -322,7 +338,12 @@ export const createApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
         payload: false
     });
     ToastAndroid.showWithGravity('Đăng phòng trọ mới thành công!', ToastAndroid.LONG, ToastAndroid.CENTER);
+
     navigation.goBack();
+    dispatch({
+        type: ACTION_TYPE.MY_APARTMENTS_RELOADING,
+        payload: true
+    });
     
 }, (err, dispatch) => {
     console.log(err.response.data);
@@ -348,7 +369,10 @@ export const updateApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
     formDataBody.append('phoneContact', apartmentInfos.phoneContact);
     formDataBody.append('facilities', JSON.stringify(apartmentInfos.facilities));
     formDataBody.append('address', JSON.stringify(apartmentInfos.address));
+    console.log(apartmentInfos.photos);
+    
     if (apartmentInfos.photos.length > 0) {
+        console.log('alo');
         apartmentInfos.photos.forEach((photo, index) => {
             formDataBody.append(`photo_${index + 1}`, {
                 name: photo.fileName,
@@ -376,8 +400,12 @@ export const updateApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
         payload: false
     });
     ToastAndroid.showWithGravity('Cập nhật thông tin phòng trọ thành công!', ToastAndroid.LONG, ToastAndroid.CENTER);
+
     navigation.goBack();
-    
+        dispatch({
+        type: ACTION_TYPE.MY_APARTMENTS_RELOADING,
+        payload: true
+    });
 }, (err, dispatch) => {
     console.log(err.response.data);
     console.log('error');

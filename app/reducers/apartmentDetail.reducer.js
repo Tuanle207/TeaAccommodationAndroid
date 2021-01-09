@@ -15,6 +15,7 @@ const apartmentDetail = (state = INIT, action) => {
             return newState;
 
         case ACTION_TYPE.APARTMENTS_GETTING:
+        case ACTION_TYPE.MY_APARTMENTS_GETTING:
             return INIT;
         default:
             return state;

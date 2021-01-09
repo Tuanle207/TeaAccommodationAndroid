@@ -1,5 +1,5 @@
 // Handling request api error in action
-export const catchAsync = (fn, exptHandler) => dispatch => fn(dispatch).catch(err => exptHandler(err, dispatch));
+export const catchAsync = (fn, exptHandler) => (dispatch, getState) => fn(dispatch, getState).catch(err => exptHandler(err, dispatch));
 
 // Check if object or array is empty
 export const isEmpty = obj => Object.keys(obj).length === 0 && (obj.constructor === Object || obj.constructor === Array);

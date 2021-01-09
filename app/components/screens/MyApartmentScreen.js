@@ -40,6 +40,11 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
         if (Platform.OS === 'android')
             UIManager.setLayoutAnimationEnabledExperimental(true);
     }, []);
+
+    // useEffect(() => {
+    //     if (ui.reloadMyApartment === true) 
+    //         getMyApartments();
+    // }, [ui]);
     
     const renderFooter = () => {
         return (
