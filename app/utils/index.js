@@ -71,4 +71,4 @@ export const ROLE_TYPE = {
 export const APARTMENT_MODIFICATION_TYPE = {
     CREATION: 0,
     UPDATION: 1
-}
+};

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Modal as RawModal, View, Pressable, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import EntypoIcon from 'react-native-vector-icons/Entypo';
+import { Modal as RawModal, View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 
 const Modal = ({children, visible, setVisible, onRequestClose, onFinish, onCancel}) => {
     

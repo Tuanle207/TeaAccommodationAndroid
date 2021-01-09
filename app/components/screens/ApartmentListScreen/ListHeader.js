@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { View, Pressable, StyleSheet, Text, ScrollView } from 'react-native';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
@@ -153,4 +154,3 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     }
 });
-
