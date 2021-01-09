@@ -1,14 +1,29 @@
 import ACTION_TYPE from '../actions/type';
 
 const INIT = {
-    fetchingData: false,
+    fetchingApartments: false,
+    fetchingApartment: false,
+    creatingComment: false,
+    creatingApartment: false,
+    updatingApartment: false,
+    reloadMyApartment: false,
     openingApp: true
 };
 
 const ui = (state = INIT, action) => {
     switch (action.type) {
-        case ACTION_TYPE.FETCHING_DATA:
-            return {...state, fetchingData: action.payload};
+        case ACTION_TYPE.FETCHING_APARTMENTS:
+            return {...state, fetchingApartments: action.payload};
+        case ACTION_TYPE.FETCHING_APARTMENT:
+            return {...state, fetchingApartment: action.payload};
+        case ACTION_TYPE.COMMENT_CREATING:
+            return {...state, creatingComment: action.payload};
+        case ACTION_TYPE.CREATING_APARTMENT:
+            return {...state, creatingApartment: action.payload};
+        case ACTION_TYPE.UPDATING_APARTMENT:
+            return {...state, updatingApartment: action.payload};
+        case ACTION_TYPE.MY_APARTMENTS_RELOADING:
+            return {...state, reloadMyApartment: action.payload};
         default:
             return state;
     }

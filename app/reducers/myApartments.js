@@ -5,22 +5,21 @@ const INIT = {
     data: []
 };
 
-const apartmentListReducer = (state = INIT, action) => {
+const myApartments = (state = INIT, action) => {
     
     switch (action.type) {
-        case ACTION_TYPE.APARTMENTS_GETTING:
-            console.log(action);
+        case ACTION_TYPE.MY_APARTMENTS_GETTING:
             return action.payload;
-        case ACTION_TYPE.APARTMENTS_GETTING_NEXT_PAGE:
-            console.log(action);
-            
+        case ACTION_TYPE.MY_APARTMENTS_GETTING_NEXT_PAGE:
             return {
                 meta: action.payload.meta, 
                 data: [...state.data, ...action.payload.data]
             };
+        case ACTION_TYPE.USER_LOGOUT:
+            return INIT;
         default:
             return state;
     } 
 };
 
-export default apartmentListReducer;
+export default myApartments;

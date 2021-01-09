@@ -1,20 +1,20 @@
 import React from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import { serverApi } from '../../../appsetting';
-import { shortenMoneyAmount, shortenText }  from '../../utils';
+import { calculateTime, shortenMoneyAmount, shortenText }  from '../../utils';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import FrontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
-export default function ApartmentCard({navigation, item}) {
+export default function ApartmentCard({children, navigation, item}) {
     
     return (
         <Pressable style={styles.listItem}
-        onPress={() => {console.log('asdsd'); navigation.push('Apartment', { id: item.id });}}
+        onPress={() => {console.log('asdsd'); navigation.push('Chi Tiết phòng trọ', { id: item.id });}}
         key={item.id}
         >
             <ImageBackground style={styles.image} 
-                source={{uri: `${serverApi}${item.photos[0]}`}}
+                source={{uri: `${serverApi}/${item.photos[0]}`}}
                 resizeMode={'cover'}
             >
                 <View style={styles.info}>
@@ -38,9 +38,10 @@ export default function ApartmentCard({navigation, item}) {
                     </View>
                     <View style={styles.detail}>
                         <EntypoIcon name='clock' size={16} color='#e7e7de' />
-                        <Text style={{...styles.detailText, ...{fontSize: 12}}}>Đăng lúc: {item.postedAt}</Text>
+                        <Text style={{...styles.detailText, ...{fontSize: 12}}}>{calculateTime(item.postedAt)}</Text>
                     </View>
                 </View>
+                {children}
             </ImageBackground>
         </Pressable>
     );
@@ -51,7 +52,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         paddingBottom: 10,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.25)'
+        borderBottomColor: 'rgba(0,0,0,0.25)',
+        position: 'relative'
     },
     image: {
         aspectRatio: 1,

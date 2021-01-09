@@ -7,16 +7,16 @@ const apartmentDetail = (state = INIT, action) => {
     switch (action.type) {
         case ACTION_TYPE.APARTMENT_GETTING:
             newState = [...state];
-
-            const indexOld = newState.findIndex(el => el.id = action.payload.id)
-            if (indexOld != -1)
-                newState.splice(indexOld, 1, action.payload);
+            const oldIndex = newState.findIndex(el => el.id === action.payload.id);
+            if (oldIndex != -1)
+                newState.splice(oldIndex, 1, action.payload);
             else
                 newState.push(action.payload);
-                
             return newState;
-        case ACTION_TYPE.APARTMENTS_GETTING_NEXT_PAGE:
-            return [...state, action.payload];
+
+        case ACTION_TYPE.APARTMENTS_GETTING:
+        case ACTION_TYPE.MY_APARTMENTS_GETTING:
+            return INIT;
         default:
             return state;
     }
