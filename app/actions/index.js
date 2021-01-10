@@ -525,6 +525,11 @@ export const updateApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
 
 export const changeApartmentStatus = data => catchAsync(async dispatch => {
     
+    dispatch({
+        type: ACTION_TYPE.CHANGING_APARTMENT_STATUS,
+        payload: true
+    })
+
     const { id, status } = data;
     let request = null;
     if (status === APARTMENT_STATUS.AVAILABLE) {
@@ -532,12 +537,29 @@ export const changeApartmentStatus = data => catchAsync(async dispatch => {
     } else {
         request = accommodationRequest.patch(`/apartments/${id}/deactivate`);
     }
-
+    
     await request;
 
+    console.log('success');
+    if (status === APARTMENT_STATUS.AVAILABLE) {
+        ToastAndroid.showWithGravity('Đã chuyển sang trạng thái CÒN PHÒNG thành công!', ToastAndroid.LONG, ToastAndroid.CENTER);
+    } else {
+        ToastAndroid.showWithGravity('Đã chuyển sang trạng thái HẾT PHÒNG thành công!', ToastAndroid.LONG, ToastAndroid.CENTER);
+    }
+    
+    dispatch({
+        type: ACTION_TYPE.CHANGING_APARTMENT_STATUS,
+        payload: false
+    })
     
 }, (err, dispatch) => {
 
+    console.log(err);
+    ToastAndroid.showWithGravity('Đã có lỗi xảy ra', ToastAndroid.LONG, ToastAndroid.CENTER);
+    dispatch({
+        type: ACTION_TYPE.CHANGING_APARTMENT_STATUS,
+        payload: false
+    })
 });
 
 export const createComment = data => catchAsync(async dispatch => {

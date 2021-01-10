@@ -74,6 +74,6 @@ export const APARTMENT_MODIFICATION_TYPE = {
 };
 
 export const APARTMENT_STATUS = {
-    AVAILABLE: 0,
-    FULL: 1
+    AVAILABLE: 'còn phòng',
+    FULL: 'hết phòng'
 };

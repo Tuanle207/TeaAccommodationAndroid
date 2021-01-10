@@ -21,7 +21,7 @@ const ConfirmPopup = ({visible, setVisible, onRequestClose, onFinish, onCancel, 
                             <Text style={styles.actions_text}>HỦY</Text>
                         </TouchableOpacity>
                         
-                        <TouchableOpacity onPress={() => setVisible(false)} style={styles.actions_button}>
+                        <TouchableOpacity onPress={() => { setVisible(false); onFinish(); }} style={styles.actions_button}>
                             <Text style={styles.actions_text}>TIẾP TỤC</Text>
                         </TouchableOpacity>
                     </View>

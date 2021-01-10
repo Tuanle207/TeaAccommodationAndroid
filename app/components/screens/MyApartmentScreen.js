@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, RefreshControl, ToastAndroid, Platform, UIManager, LayoutAnimation, ActivityIndicator, TouchableOpacity, StyleSheet} from 'react-native';
 import { connect } from 'react-redux';
-import { getMyApartments } from '../../actions';
+import { changeApartmentStatus, getMyApartments } from '../../actions';
 import MyApartmentCard from '../defaults/MyApartmentCard';
 import Animated from 'react-native-reanimated';
 import AnimatedLoader from 'react-native-animated-loader';
@@ -15,14 +15,14 @@ import {
 import ConfirmPopup from '../defaults/ConfirmPopup';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import MeterialIcons from 'react-native-vector-icons/MaterialIcons';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import FoundationIcon from 'react-native-vector-icons/Foundation';
 import EntypoIcon from 'react-native-vector-icons/Entypo'
-import { APARTMENT_MODIFICATION_TYPE, ROLE_TYPE } from '../../utils';
+import { APARTMENT_MODIFICATION_TYPE, APARTMENT_STATUS, ROLE_TYPE } from '../../utils';
 import { ScreenNames } from '../Navigation/NavigationConst';
 
 const { SlideInMenu } = renderers;
 
-const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user, errors}) => {
+const MyApartmentScreen  = ({navigation, changeApartmentStatus, getMyApartments, myApartments, ui, user, errors}) => {
         
     const [refreshing, setRefreshing] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -30,7 +30,8 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
     const [yPostion, setYPostion] = useState(0);
     const [menuVisibility, setMenuVisibility] = useState(false);
     const [currentApartmentId, setCurrentApartmentId] = useState(-1);
-    const [popupStatusVisibility, setPopupStatusVisibility] = useState(false);
+    const [popupAvailableStatusVisibility, setPopupAvailableStatusVisibility] = useState(false);
+    const [popupFullStatusVisibility, setPopupFullStatusVisibility] = useState(false);
     const [popupDeleteVisibility, setPopupDeleteVisibility] = useState(false);
 
     const scroll = React.createRef();
@@ -42,6 +43,13 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
         if (Platform.OS === 'android')
             UIManager.setLayoutAnimationEnabledExperimental(true);
     }, []);
+
+    useEffect(() => {
+        console.log('ok');
+        console.log(myApartments);
+        if (myApartments.data.length > 0)
+            setCurrentApartmentId(myApartments.data[0].id);
+    }, [myApartments]);
 
     // useEffect(() => {
     //     if (ui.reloadMyApartment === true) 
@@ -67,6 +75,16 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
                 ToastAndroid.show('Không còn phòng trọ nào!', ToastAndroid.SHORT)
             }
         }
+    };
+
+    const onChangeStatusBtnPressHandler = () => {
+        setMenuVisibility(false);
+        const apartment = myApartments.data.find(el => el.id === currentApartmentId);
+        if (apartment.status === APARTMENT_STATUS.FULL)
+            setPopupAvailableStatusVisibility(true);
+        else
+            setPopupFullStatusVisibility(true);
+        
     };
     
     const renderItem = ({item}) => {
@@ -103,7 +121,7 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
         <View
             style={{flex: 1, position: 'relative', backgroundColor: '#e8ffff'}}>
             {
-                ui.fetchingApartments === true &&
+                (ui.fetchingApartments === true && ui.changingApartmentStatus === true) &&
                 <AnimatedLoader
                     visible={true}
                     overlayColor='rgba(0,0,0,0.5)'
@@ -114,9 +132,15 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
             }
 
             <ConfirmPopup 
-                visible={popupStatusVisibility} 
-                setVisible={setPopupStatusVisibility} 
-                text={'Xác nhận chuyển trạng thái phòng trọ này thành hết phòng?'}/>
+                visible={popupFullStatusVisibility} 
+                setVisible={setPopupFullStatusVisibility} 
+                text={'Xác nhận chuyển trạng thái phòng trọ này thành HẾT PHÒNG?'}
+                onFinish={ () => changeApartmentStatus({ id: currentApartmentId, status: APARTMENT_STATUS.FULL }) } />
+            <ConfirmPopup 
+                visible={popupAvailableStatusVisibility} 
+                setVisible={setPopupAvailableStatusVisibility} 
+                text={'Xác nhận chuyển trạng thái phòng trọ này thành CÒN PHÒNG?'}
+                onFinish={ () => changeApartmentStatus({ id: currentApartmentId, status: APARTMENT_STATUS.AVAILABLE }) } />
             <ConfirmPopup 
                 visible={popupDeleteVisibility} 
                 setVisible={setPopupDeleteVisibility} 
@@ -137,12 +161,25 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
                             <Text style={styles.menu_item_text}>Cập nhật thông tin</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {setMenuVisibility(false); setPopupStatusVisibility(true)}} style={styles.menu_row_item}>
-                        <FontAwesomeIcon name={'battery-empty'} size={24} color={'#ffc764'} />
+                    <TouchableOpacity onPress={ onChangeStatusBtnPressHandler } style={styles.menu_row_item}>
+                        {
+                            currentApartmentId === -1 ?
+                            null :
+                            myApartments.data.find(el => el.id === currentApartmentId).status === APARTMENT_STATUS.AVAILABLE ?
+                            <FoundationIcon name={'battery-full'} size={24} color={'#ffc764'} /> : 
+                            <FoundationIcon name={'battery-empty'} size={24} color={'#ffc764'} />
+                        }
                         <View style={styles.menu_item_text_wrapper}>
-                            <Text style={styles.menu_item_text}>Tạm hết phòng trống</Text>
+                            {
+                                currentApartmentId === -1 ?
+                                null :
+                                myApartments.data.find(el => el.id === currentApartmentId).status === APARTMENT_STATUS.AVAILABLE ?
+                                <Text style={styles.menu_item_text}>Đã hết phòng trống</Text> : 
+                                <Text style={styles.menu_item_text}>Đã có phòng trống</Text>
+                            }
                         </View>
                     </TouchableOpacity>
+                    
                     <TouchableOpacity onPress={() => {setMenuVisibility(false); setPopupDeleteVisibility(true)}} style={styles.menu_row_item}>
                             <MeterialIcons name={'delete'} size={24} color={'#ffc764'} />
                             <View style={styles.menu_item_text_wrapper}>
@@ -197,7 +234,7 @@ const mapStateToProps = state => {
 };
 
 
-export default connect(mapStateToProps, {getMyApartments})(MyApartmentScreen);
+export default connect(mapStateToProps, { getMyApartments, changeApartmentStatus })(MyApartmentScreen);
 
 const styles = StyleSheet.create({
     menu: {
