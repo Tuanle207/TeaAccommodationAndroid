@@ -72,3 +72,8 @@ export const APARTMENT_MODIFICATION_TYPE = {
     CREATION: 0,
     UPDATION: 1
 };
+
+export const APARTMENT_STATUS = {
+    AVAILABLE: 0,
+    FULL: 1
+};

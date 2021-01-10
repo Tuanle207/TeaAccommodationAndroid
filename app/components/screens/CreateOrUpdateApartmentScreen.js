@@ -9,7 +9,7 @@ import {
     View, 
     ScrollView, 
     TextInput, 
-    TouchableOpacity 
+    TouchableOpacity
 } from 'react-native';
 
 import MapView, { Marker } from 'react-native-maps';
@@ -319,7 +319,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                     <CheckBox value={facilities[index].checked} onValueChange={value => dispatchFacilities({
                         type: value ? 'check' : 'uncheck',
                         payload: {index}
-                    })} onTintColor = '#006a71' onCheckColor = '#006a71'/>
+                    })} tintColors={{false: 'rgba(255,255,255,0.8)'}} />
                 </View>
             </View>
         )
@@ -342,8 +342,8 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
     }
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"} keyboardVerticalOffset = {65} style = {{flex:1}}>
-            <ScrollView style = {{paddingVertical: 10, paddingHorizontal: 20}}>
+        <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"} style = {{flex:1}}>
+            <ScrollView style = {{paddingVertical: 10, paddingHorizontal: 20, backgroundColor: '#204051'}}>
                 {
                     (loading === true || ui.creatingApartment === true || ui.fetchingApartment || ui.updatingApartment) &&
                     <AnimatedLoader
@@ -355,9 +355,22 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                     />
                 }
                 <View style={styles.section}>
-                    <Text style = {styles.sectionTitle}>Thông tin cơ bản</Text>
-                    <TextInput value={title} onChangeText={txt => setTitle(txt)} style = {styles.textInput} placeholder = 'Tiêu đề/tên trọ'/>
-                    <TextInput value={rent.toString()} onChangeText={txt => setRent(txt)} style = {styles.textInput} placeholder = 'Giá thuê (triệu đồng/tháng)' keyboardType = 'number-pad'/>
+                    <Text style = {styles.sectionTitle}>Tiêu đề</Text>
+                    <TextInput value={title} onChangeText={txt => setTitle(txt)} style = {styles.textInput}/>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style = {styles.sectionTitle}>Thông tin mô tả</Text>
+                    <TextInput value={description} onChangeText={txt => setDescription(txt)} style = {styles.textInputMul} textAlignVertical='top' multiline = {true}/>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style = {styles.sectionTitle}>Diện tích (㎡)</Text>
+                    <TextInput value={rent.toString()} onChangeText={txt => setRent(txt)} style = {styles.textInput} keyboardType = 'number-pad'/>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style = {styles.sectionTitle}>Giá thuê (đồng/tháng)</Text>
                     <TextInput value={area.toString()} onChangeText={txt => setArea(txt)} style = {styles.textInput} placeholder = 'Diện tích (m2)' keyboardType = 'number-pad'/>
                 </View>
                 
@@ -369,17 +382,22 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 </View>
                 
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Địa chỉ</Text>
-                    <View style={{borderBottomWidth: 1, borderColor: '#000'}}>
-                        <Picker selectedValue={city} onValueChange={txt => handleCityChange(txt)}>
+                    <Text style={styles.sectionTitle}>Tỉnh/Thành phố</Text>
+                    <View style={{borderBottomWidth: 1, borderColor: '#fff'}}>
+                        <Picker style={{color: '#fff'}} selectedValue={city} onValueChange={txt => handleCityChange(txt)} dropdownIconColor={'white'} >
                             {
                                 city === null && <Picker.Item label='Chọn tỉnh/thành phố' value='' />
                             }
                             <Picker.Item label='Thành Phố Hồ Chí Minh' value='Hồ Chí Minh' />
                         </Picker>
                     </View>
-                    <View style={{borderBottomWidth: 1, borderColor: '#000'}}>
-                        <Picker selectedValue={district?.name} onValueChange={txt => handleDistrictChange(txt)}>
+                </View>
+                    
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Quận/Huyện</Text>
+                    <View style={{borderBottomWidth: 1, borderColor: '#fff'}}>
+                        <Picker style={{color: '#fff'}} selectedValue={district?.name} onValueChange={txt => handleDistrictChange(txt)} dropdownIconColor={'white'}>
                             {
                                 district === null && <Picker.Item label='Chọn quận/huyện' value='' />
                             }
@@ -392,8 +410,12 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                             }
                         </Picker>
                     </View>
-                    <View style={{borderBottomWidth: 1, borderColor: '#000'}}>
-                        <Picker selectedValue={ward}  onValueChange={txt => setWard(txt)}>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style = {styles.sectionTitle}>Phường/Xã</Text>
+                    <View style={{borderBottomWidth: 1, borderColor: '#fff'}}>
+                        <Picker style={{color: '#fff'}} selectedValue={ward}  onValueChange={txt => setWard(txt)} dropdownIconColor={'white'}>
                             {
                                 ward === null && <Picker.Item label='Chọn phường/xã' value='' />
                             }
@@ -406,13 +428,21 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                             }
                         </Picker>
                     </View>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style = {styles.sectionTitle}>Số nhà, đường</Text>
                     <TextInput value={street} 
                         onBlur={() => {console.log('out'); setStreetInputFocus(false); } } 
                         onFocus={() => {console.log('in'); setStreetInputFocus(true); } } 
                         onChangeText={txt => setStreet(txt)} 
                         style = {{...styles.textInput, paddingLeft: 10}} 
-                        placeholder = 'Số nhà, đường'/>
+                        />
                 </View>
+
+                    
+                    
+                
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Vị trí trên bản đồ</Text>
                     <MapView
@@ -429,13 +459,8 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                     </MapView>
                 </View>
                 <View style={styles.section}>
-                    <Text style = {styles.sectionTitle}>Liên hệ</Text>
-                    <TextInput value={phoneContact} onChangeText={txt => setPhoneContact(txt)} style = {styles.textInput} placeholder = 'Số điện thoại'/>
-                </View>
-                
-                <View style={styles.section}>
-                    <Text style = {styles.sectionTitle}>Thông tin mô tả</Text>
-                    <TextInput value={description} onChangeText={txt => setDescription(txt)} style = {styles.textInputMul} placeholder = 'Mô tả' textAlignVertical='top' multiline = {true}/>
+                    <Text style = {styles.sectionTitle}>Số điện thoại liên hệ</Text>
+                    <TextInput value={phoneContact} onChangeText={txt => setPhoneContact(txt)} style = {styles.textInput} />
                 </View>
                
                <View style={styles.section}>
@@ -447,7 +472,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                         photos.length > 0 ?
                         null
                         : 
-                        <Text style={{alignSelf: 'center', marginTop: 10, marginBottom: 20}}>Chọn 4 hình ảnh về phòng trọ của bạn!</Text>
+                        <Text style={{alignSelf: 'center', marginTop: 10, marginBottom: 20, color: '#fff'}}>Chọn 4 hình ảnh về phòng trọ của bạn!</Text>
                     }
                     {
                         type === APARTMENT_MODIFICATION_TYPE.UPDATION && photos.length !== 0 ?
@@ -493,8 +518,8 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     sectionTitle: {
-        fontSize: 16,
-        fontWeight: 'bold'
+        color: '#D9D9D9',
+        fontSize: 13,
     },
     textInput: {
       height: 45,
@@ -502,11 +527,13 @@ const styles = StyleSheet.create({
       borderTopWidth: 0,
       borderLeftWidth: 0,
       borderBottomWidth: 1,
+      borderBottomColor: '#fff',
 
       marginBottom: 5,
       marginTop: 5,
       fontSize: 15,
-      paddingLeft: 0
+      paddingLeft: 0,
+      color: '#fff'
     },
     textInputMul: {
       height: 90,
@@ -514,11 +541,14 @@ const styles = StyleSheet.create({
       borderTopWidth: 0,
       borderLeftWidth: 0,
       borderBottomWidth: 1,
+      borderBottomColor: '#fff',
 
       marginBottom: 5,
       marginTop: 5,
       padding: 10,
+      paddingLeft: 0,
       fontSize: 15,
+      color: '#fff'
     },
     checkBox: {
       flexDirection: 'row', 
@@ -529,6 +559,7 @@ const styles = StyleSheet.create({
     textLabel: {
       flex: 1,
       fontSize: 12,
+      color: '#fff'
     },
     imageWrapper: {
         width: '100%',

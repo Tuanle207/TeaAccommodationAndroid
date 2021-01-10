@@ -8,7 +8,7 @@ const input = StyleSheet.create({
     text:{
         width: "100%",
         borderBottomColor: "#fff",
-        borderWidth: 1,
+        borderBottomWidth: 1,
         borderColor: "#204051",
         color: "#fff",
         paddingLeft: 0,
@@ -20,7 +20,7 @@ const input = StyleSheet.create({
     textWithValidate:{
         width: "100%",
         borderBottomColor: "#fff",
-        borderWidth: 1,
+        borderBottomWidth: 1,
         borderColor: "#204051",
         color: "#fff",
         paddingLeft: 0,
@@ -33,7 +33,7 @@ const input = StyleSheet.create({
     ContainerPassword:{
         width: "100%",
         borderBottomColor: "#fff",
-        borderWidth: 1,
+        borderBottomWidth: 1,
         borderColor: "#204051",
         marginBottom: 5,
         flexDirection: 'row',

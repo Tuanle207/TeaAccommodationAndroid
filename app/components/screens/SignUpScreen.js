@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ToastAndroid, KeyboardAvoidingView, Platform } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import RadioForm from 'react-native-simple-radio-button';
 import { topic, input, mainButton, imageButton } from '../styles/userFeature.style';
@@ -37,7 +37,7 @@ const SignUpScreen = ({ navigation, signup }) => {
     const [confirmPasswordMustLikePassword, setConfirmPasswordMustLikePassword] = React.useState(false);
 
     //Select image from storage
-    selectFile = () => {
+    const selectFile = () => {
         var options = {
             title: 'Chọn ảnh',
             storageOptions: {
@@ -93,166 +93,168 @@ const SignUpScreen = ({ navigation, signup }) => {
     };
 
     return (
-        <ScrollView>
-            <View style={styles.container}>
-                <Text style={topic.style}>Đăng ký</Text>
-                <View style={styles.mainScreen}>
-                    <Text style={input.label}>Họ và tên</Text>
-                    <TextInput
-                        style={input.textWithValidate}
-                        onChangeText={(e) => {
-                            setName(e.valueOf())
-                            if (e.valueOf().length == 0)
-                                setRequiredName(true);
-                            else
-                                setRequiredName(false);
-                        }}
-                    />
-                    <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>{requiredName ? <Text>Họ tên không được bỏ trống</Text> : ''}</Text>
-                    <Text style={input.label}>Số điện thoại</Text>
-                    <TextInput
-                        style={input.textWithValidate}
-                        keyboardType="number-pad"
-                        onChangeText={(e) => {
-                            setPhoneNumber(e.valueOf())
-                            if (e.valueOf().length == 0)
-                                setRequiredPhoneNumber(true);
-                            else
-                                setRequiredPhoneNumber(false);
-                            if (/^-?[\d.]+(?:e-?\d+)?$/.test(e.valueOf()) == true)
-                                setMustPhoneNumber(false);
-                            else
-                                setMustPhoneNumber(true);
-                        }}
-                    />
-                    <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>
-                        {(requiredPhoneNumber) ? <Text>Số điện thoại không được bỏ trống</Text> : mustPhoneNumber ? <Text>Số điện thoại chỉ được chứa số</Text> : ''}
-                    </Text>
-                    <Text style={input.label}>Email</Text>
-                    <TextInput
+        <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"}  style = {{flex:1}}>
+            <ScrollView>
+                <View style={styles.container}>
+                    <Text style={topic.style}>Đăng ký</Text>
+                    <View style={styles.mainScreen}>
+                        <Text style={input.label}>Họ và tên</Text>
+                        <TextInput
+                            style={input.textWithValidate}
+                            onChangeText={(e) => {
+                                setName(e.valueOf())
+                                if (e.valueOf().length == 0)
+                                    setRequiredName(true);
+                                else
+                                    setRequiredName(false);
+                            }}
+                        />
+                        <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>{requiredName ? <Text>Họ tên không được bỏ trống</Text> : ''}</Text>
+                        <Text style={input.label}>Số điện thoại</Text>
+                        <TextInput
+                            style={input.textWithValidate}
+                            keyboardType="number-pad"
+                            onChangeText={(e) => {
+                                setPhoneNumber(e.valueOf())
+                                if (e.valueOf().length == 0)
+                                    setRequiredPhoneNumber(true);
+                                else
+                                    setRequiredPhoneNumber(false);
+                                if (/^-?[\d.]+(?:e-?\d+)?$/.test(e.valueOf()) == true)
+                                    setMustPhoneNumber(false);
+                                else
+                                    setMustPhoneNumber(true);
+                            }}
+                        />
+                        <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>
+                            {(requiredPhoneNumber) ? <Text>Số điện thoại không được bỏ trống</Text> : mustPhoneNumber ? <Text>Số điện thoại chỉ được chứa số</Text> : ''}
+                        </Text>
+                        <Text style={input.label}>Email</Text>
+                        <TextInput
 
-                        style={input.textWithValidate}
-                        keyboardType="email-address"
-                        onChangeText={(e) => {
-                            setEmail(e.valueOf())
-                            if (e.valueOf().length == 0)
-                                setRequiredEmail(true);
-                            else
-                                setRequiredEmail(false);
-                            if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(e.valueOf()) == true)
-                                setFormEmail(false);
-                            else
-                                setFormEmail(true);
-                        }}
-                    />
-                    <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>
-                        {(requiredEmail) ? <Text>Email không được bỏ trống</Text> : formEmail ? 
-                        <Text>Email chưa đúng định dạng. Example: example@gmail.com</Text> : ''}
-                    </Text>
-                    <Text style={input.label}>Mật khẩu</Text>
-                    <View style={input.ContainerPassword}>
-                        <TextInput
-                            style={input.textPassword}
-                            secureTextEntry={isPasswordHidden ? true : false}
+                            style={input.textWithValidate}
+                            keyboardType="email-address"
                             onChangeText={(e) => {
-                                setPassword(e.valueOf());
+                                setEmail(e.valueOf())
                                 if (e.valueOf().length == 0)
-                                    setRequiredPassword(true);
+                                    setRequiredEmail(true);
                                 else
-                                    setRequiredPassword(false);
-                            }} />
-                        <Icon.Button name="eye" backgroundColor="transparent"
-                            paddingLeft={0} paddingRight={0} marginTop={7}
-                            onPress={() => {
-                                if (isPasswordHidden == true)
-                                    setIsPasswordHidden(false);
+                                    setRequiredEmail(false);
+                                if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(e.valueOf()) == true)
+                                    setFormEmail(false);
                                 else
-                                    setIsPasswordHidden(true);
+                                    setFormEmail(true);
                             }}
                         />
-                    </View>
-                    <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>{requiredPassword ?
-                        <Text>Mật khẩu không được bỏ trống</Text> : ''}</Text>
-                    <Text style={input.label}>Xác nhận mật khẩu</Text>
-                    <View style={input.ContainerPassword}>
-                        <TextInput
-                            style={input.textPassword}
-                            secureTextEntry={isPasswordConfirmHidden ? true : false}
-                            onChangeText={(e) => {
-                                setPasswordConfirm(e.valueOf())
-                                if (e.valueOf().length == 0)
-                                    setRequiredConfirmPassword(true);
-                                else
-                                    setRequiredConfirmPassword(false);
-                                if (e.valueOf() == password.valueOf())
-                                    setConfirmPasswordMustLikePassword(false);
-                                else
-                                    setConfirmPasswordMustLikePassword(true);
-                            }} />
-                        <Icon.Button name="eye" backgroundColor="transparent"
-                            paddingLeft={0} paddingRight={0} marginTop={7}
-                            onPress={() => {
-                                if (isPasswordConfirmHidden == true)
-                                    setIsPasswordConfirmHidden(false);
-                                else
-                                    setIsPasswordConfirmHidden(true);
-                            }}
-                        />
-                    </View>
-                    <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>
-                        {(requiredConfirmPassword) ? <Text>Xác nhận mật khẩu không được bỏ trống</Text> : 
-                        confirmPasswordMustLikePassword ? <Text>Chưa trùng khớp với mật khẩu</Text> : ''}
-                    </Text>
-                    <View style={{ alignItems: "center" }}>
-                        <Image style={styles.avatar} source={{ uri: photo.uri }} ></Image>
-                        <TouchableOpacity onPress={() => selectFile()}>
-                            <Text style={imageButton.style}>Chọn ảnh đại diện</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.radio_button}>
-                        <RadioForm
-                            radio_props={radio_props}
-                            initial={0}
-                            formHorizontal={true}
-                            buttonColor={'white'}
-                            labelColor={'white'}
-                            selectedButtonColor={'white'}
-                            selectedLabelColor={'white'}
-                            buttonInnerColor={'#000'}
-                            buttonSize={8}
-                            buttonOuterSize={20}
-                            onPress={(value) => {
-                                if (value == 0)
-                                    setRole('landlord');
-                                else
-                                    setRole('user');
-                                console.log(value);
-                            }}
-                            labelStyle={{ marginRight: 40 }}
-                        >
-                        </RadioForm>
-                    </View>
-                    <View style={{ marginBottom: 37 }}>
-                        <TouchableOpacity style={mainButton.style}
-                            onPress={() => {
-                                if (checkDefault(name, phoneNumber, email, password, passwordConfirm) == true
-                                    && checkToDoneSignup(requiredName, requiredPhoneNumber, mustPhoneNumber, requiredEmail,
-                                        formEmail, requiredPassword, requiredConfirmPassword, confirmPasswordMustLikePassword) == true) {
-                                    signup({ email, password, passwordConfirm, name, phoneNumber, photo, role, navigation });
-                                }
-                                else {
-                                    ToastAndroid.showWithGravity("Vui lòng điền thông tin đăng ký hợp lệ", ToastAndroid.SHORT, ToastAndroid.CENTER);
-                                    checkAndShowValidationDefault(name, phoneNumber, email, password, passwordConfirm,
-                                        setRequiredName, setRequiredPhoneNumber, setRequiredEmail,
-                                        setRequiredPassword, setRequiredConfirmPassword);
-                                }
-                            }}>
-                            <Text style={mainButton.text}>Đăng ký</Text>
-                        </TouchableOpacity>
+                        <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>
+                            {(requiredEmail) ? <Text>Email không được bỏ trống</Text> : formEmail ? 
+                            <Text>Email chưa đúng định dạng. Ví dụ: example@gmail.com</Text> : ''}
+                        </Text>
+                        <Text style={input.label}>Mật khẩu</Text>
+                        <View style={input.ContainerPassword}>
+                            <TextInput
+                                style={input.textPassword}
+                                secureTextEntry={isPasswordHidden ? true : false}
+                                onChangeText={(e) => {
+                                    setPassword(e.valueOf());
+                                    if (e.valueOf().length == 0)
+                                        setRequiredPassword(true);
+                                    else
+                                        setRequiredPassword(false);
+                                }} />
+                            <Icon.Button name="eye" backgroundColor="transparent"
+                                paddingLeft={0} paddingRight={0} marginTop={7}
+                                onPress={() => {
+                                    if (isPasswordHidden == true)
+                                        setIsPasswordHidden(false);
+                                    else
+                                        setIsPasswordHidden(true);
+                                }}
+                            />
+                        </View>
+                        <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>{requiredPassword ?
+                            <Text>Mật khẩu không được bỏ trống</Text> : ''}</Text>
+                        <Text style={input.label}>Xác nhận mật khẩu</Text>
+                        <View style={input.ContainerPassword}>
+                            <TextInput
+                                style={input.textPassword}
+                                secureTextEntry={isPasswordConfirmHidden ? true : false}
+                                onChangeText={(e) => {
+                                    setPasswordConfirm(e.valueOf())
+                                    if (e.valueOf().length == 0)
+                                        setRequiredConfirmPassword(true);
+                                    else
+                                        setRequiredConfirmPassword(false);
+                                    if (e.valueOf() == password.valueOf())
+                                        setConfirmPasswordMustLikePassword(false);
+                                    else
+                                        setConfirmPasswordMustLikePassword(true);
+                                }} />
+                            <Icon.Button name="eye" backgroundColor="transparent"
+                                paddingLeft={0} paddingRight={0} marginTop={7}
+                                onPress={() => {
+                                    if (isPasswordConfirmHidden == true)
+                                        setIsPasswordConfirmHidden(false);
+                                    else
+                                        setIsPasswordConfirmHidden(true);
+                                }}
+                            />
+                        </View>
+                        <Text style={{ color: 'red', marginBottom: 10, fontSize: 13 }}>
+                            {(requiredConfirmPassword) ? <Text>Xác nhận mật khẩu không được bỏ trống</Text> : 
+                            confirmPasswordMustLikePassword ? <Text>Chưa trùng khớp với mật khẩu</Text> : ''}
+                        </Text>
+                        <View style={{ alignItems: "center" }}>
+                            <Image style={styles.avatar} source={{ uri: photo.uri }} ></Image>
+                            <TouchableOpacity onPress={() => selectFile()}>
+                                <Text style={imageButton.style}>Chọn ảnh đại diện</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.radio_button}>
+                            <RadioForm
+                                radio_props={radio_props}
+                                initial={0}
+                                formHorizontal={true}
+                                buttonColor={'white'}
+                                labelColor={'white'}
+                                selectedButtonColor={'white'}
+                                selectedLabelColor={'white'}
+                                buttonInnerColor={'#000'}
+                                buttonSize={8}
+                                buttonOuterSize={20}
+                                onPress={(value) => {
+                                    if (value == 0)
+                                        setRole('landlord');
+                                    else
+                                        setRole('user');
+                                    console.log(value);
+                                }}
+                                labelStyle={{ marginRight: 40 }}
+                            >
+                            </RadioForm>
+                        </View>
+                        <View style={{ marginBottom: 37 }}>
+                            <TouchableOpacity style={mainButton.style}
+                                onPress={() => {
+                                    if (checkDefault(name, phoneNumber, email, password, passwordConfirm) == true
+                                        && checkToDoneSignup(requiredName, requiredPhoneNumber, mustPhoneNumber, requiredEmail,
+                                            formEmail, requiredPassword, requiredConfirmPassword, confirmPasswordMustLikePassword) == true) {
+                                        signup({ email, password, passwordConfirm, name, phoneNumber, photo, role, navigation });
+                                    }
+                                    else {
+                                        ToastAndroid.showWithGravity("Vui lòng điền thông tin đăng ký hợp lệ", ToastAndroid.SHORT, ToastAndroid.CENTER);
+                                        checkAndShowValidationDefault(name, phoneNumber, email, password, passwordConfirm,
+                                            setRequiredName, setRequiredPhoneNumber, setRequiredEmail,
+                                            setRequiredPassword, setRequiredConfirmPassword);
+                                    }
+                                }}>
+                                <Text style={mainButton.text}>Đăng ký</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 

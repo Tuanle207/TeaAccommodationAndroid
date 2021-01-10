@@ -1,6 +1,6 @@
 import accommodationRequest from '../apis/serverRequest';
 import addressRequest from '../apis/addressRequest';
-import {catchAsync, isEmpty} from '../utils';
+import {APARTMENT_STATUS, catchAsync, isEmpty} from '../utils';
 import ACTION_TYPE from './type';
 import { ScreenNames } from '../components/Navigation/NavigationConst';
 import { ToastAndroid } from 'react-native';
@@ -41,7 +41,7 @@ export const checkLoggedIn = ({navigation}) => catchAsync(async dispatch => {
 
     const response = await accommodationRequest.get('/isLoggedIn');
     const data = response.data.data;
-    console.log('ko duoc');
+    console.log('checking login........');
     dispatch({
         type: ACTION_TYPE.USER_LOGGED_IN,
         payload: {
@@ -59,7 +59,7 @@ export const checkLoggedIn = ({navigation}) => catchAsync(async dispatch => {
         type: ACTION_TYPE.CHECKING_LOGIN,
         payload: false
     });
-    navigation.navigate(ScreenNames.LOGIN);
+    //navigation.navigate(ScreenNames.LOGIN);
 });
 
 export const login = ({email, password, navigation}) => catchAsync(async dispatch => {
@@ -520,6 +520,24 @@ export const updateApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
         type: ACTION_TYPE.UPDATING_APARTMENT,
         payload: true
     });
+});
+
+
+export const changeApartmentStatus = data => catchAsync(async dispatch => {
+    
+    const { id, status } = data;
+    let request = null;
+    if (status === APARTMENT_STATUS.AVAILABLE) {
+        request = accommodationRequest.patch(`/apartments/${id}/activate`);
+    } else {
+        request = accommodationRequest.patch(`/apartments/${id}/deactivate`);
+    }
+
+    await request;
+
+    
+}, (err, dispatch) => {
+
 });
 
 export const createComment = data => catchAsync(async dispatch => {
