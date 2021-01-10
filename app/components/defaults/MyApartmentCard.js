@@ -4,7 +4,7 @@ import EntypoIcon from 'react-native-vector-icons/Entypo';
 import { APARTMENT_STATUS, capitalize } from '../../utils';
 import ApartmentCard from './ApartmentCard';
 
-const MyApartmentCard = ({ navigation, item, menuVisibility, 
+const MyApartmentCard = ({ navigation, item, 
     setMenuVisibility, setCurrentApartmentId}) => {
 
     const onPressHandler = id => {

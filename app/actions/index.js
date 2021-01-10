@@ -512,6 +512,9 @@ export const updateApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
         type: ACTION_TYPE.MY_APARTMENTS_RELOADING,
         payload: true
     });
+    
+    dispatch(getMyApartments());
+
 }, (err, dispatch) => {
     console.log(err.response.data);
     console.log('error');
@@ -546,6 +549,8 @@ export const changeApartmentStatus = data => catchAsync(async dispatch => {
     } else {
         ToastAndroid.showWithGravity('Đã chuyển sang trạng thái HẾT PHÒNG thành công!', ToastAndroid.LONG, ToastAndroid.CENTER);
     }
+
+    dispatch(getMyApartments());
     
     dispatch({
         type: ACTION_TYPE.CHANGING_APARTMENT_STATUS,
