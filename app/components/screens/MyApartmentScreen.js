@@ -36,6 +36,8 @@ const MyApartmentScreen  = ({navigation, getMyApartments, myApartments, ui, user
     const scroll = React.createRef();
 
     useEffect(()=> {
+        console.log('my apartment');
+        console.log(user);
         getMyApartments();
         if (Platform.OS === 'android')
             UIManager.setLayoutAnimationEnabledExperimental(true);

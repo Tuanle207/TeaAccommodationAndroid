@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     Text,
     View,
@@ -13,6 +13,8 @@ import {
     TouchableOpacity,
     ToastAndroid,
     Keyboard,
+    StatusBar,
+    LayoutAnimation,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import {serverApi} from '../../../appsetting';
@@ -40,6 +42,7 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
     const [userRating, setUserRating] = useState(-1);
     const [userComment, setUserCommment] = useState('');
     const [loading, setLoading] = useState(false);
+    const statusBarRef = useRef(null);
 
     useEffect(() => {
         if (apartmentDetails != null && apartmentDetails.findIndex(el => el.id === id) === -1) {

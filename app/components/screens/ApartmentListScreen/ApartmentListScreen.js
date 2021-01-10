@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, RefreshControl, ToastAndroid, Pressable, Platform, UIManager, LayoutAnimation, VirtualizedList, ActivityIndicator} from 'react-native';
+import { View, Text, FlatList, StyleSheet, RefreshControl, ToastAndroid, Pressable, Platform, UIManager, LayoutAnimation, VirtualizedList, ActivityIndicator, StatusBar} from 'react-native';
 import { connect } from 'react-redux';
-import { getApartments } from '../../../actions';
+import { getApartments, checkLoggedIn } from '../../../actions';
 import ApartmentCard from '../../defaults/ApartmentCard';
 import DistrictFilter from './DistrictFilter';
 import { isEmpty } from '../../../utils';
 import ListHeader from './ListHeader';
 import Animated from 'react-native-reanimated';
 
-const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentFilter, ui}) => {
+const ApartmentListScreen  = ({navigation, getApartments, checkLoggedIn, apartments, apartmentFilter, ui}) => {
         
     const [refreshing, setRefreshing] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -20,22 +20,12 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
     const [modalVisible5, setModalVisible5] = useState(false);
 
     useEffect(()=> {
+        console.log('incoming');
+        checkLoggedIn();
         getApartments();
         if (Platform.OS === 'android')
             UIManager.setLayoutAnimationEnabledExperimental(true);
     }, []);
-
-    useEffect(() => {
-        // let fetchNeeded = true;
-
-        // Object.keys(apartmentFilter).forEach(key => {
-        //     if (!isEmpty(apartmentFilter[key]))
-        //         fetchNeeded = true;
-        // });
-
-        // if (fetchNeeded)
-        //     getApartments(apartmentFilter);
-    }, [apartmentFilter, apartments]);
 
     const renderFooter = () => {
         return (
@@ -65,7 +55,7 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
 
 
     return (
-        <View style={{flex: 1, position: 'relative', backgroundColor: '#e8ffff'}}>
+        <View style={{flex: 1, position: 'relative', backgroundColor: 'red'}}>
             <DistrictFilter
                 modalVisible={modalVisible1} 
                 setModalVisible={setModalVisible1}
@@ -99,4 +89,4 @@ const mapStateToProps = state => {
     };
 };
 
-export default connect(mapStateToProps, {getApartments})(ApartmentListScreen);
+export default connect(mapStateToProps, { getApartments, checkLoggedIn })(ApartmentListScreen);

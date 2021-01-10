@@ -10,9 +10,13 @@ const userReducer = (state = INIT, action) => {
         case ACTION_TYPE.USER_LOGOUT:
             return action.payload;
         case ACTION_TYPE.USER_LOGGED_IN:
-            return {...state, ...action.payload};
-        case 'USER_UPDATE':
-            return state;
+            return { ...state, ...action.payload };
+        case ACTION_TYPE.UPDATE_USER_INFORMATION:
+            return { ...state, ...action.payload };
+        case ACTION_TYPE.SIGNUP_USER:
+            return { ...state, ...action.payload };
+        case ACTION_TYPE.CHANGE_PASSWORD:
+            return { ...state, ...action.payload };
         default:
             return state;
     }

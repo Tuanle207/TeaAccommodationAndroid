@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         marginBottom: 10,
         backgroundColor: 'transparent',
-        flexDirection: 'column',
+        flexDirection: 'column'
     },
     menu_title_wrapper: {
         backgroundColor: '#db6400',

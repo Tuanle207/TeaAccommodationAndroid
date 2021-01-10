@@ -1,8 +1,7 @@
 import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
 
-import {
-} from 'react-native';
+import { StatusBar, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -16,24 +15,39 @@ import ApartmentListScreen from '../screens/ApartmentListScreen';
 import ApartmentScreen from '../screens/ApartmentScreen';
 import CreateOrUpdateApartmentScreen from '../screens/CreateOrUpdateApartmentScreen';
 import MyApartmentScreen from '../screens/MyApartmentScreen';
-import { getParams } from '../../actions';
+import { checkLoggedIn, getParams } from '../../actions';
 import { connect } from 'react-redux';
 import { ScreenNames, TabNames } from './NavigationConst';
+import SignUpScreen from '../screens/SignUpScreen';
+import UpdateUserScreen from '../screens/UpdateUserScreen';
+import ChangePasswordScreen from '../screens/ChangePasswordScreen';
+import UserScreen from '../screens/UserScreen';
 
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const renderHeader = name => (
+    <View style={{ padding: 5, backgroundColor: '#456268'}}>
+        <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 16, color: '#fff' }}>{name}</Text>
+    </View>
+)
 
 const MainStackNavigator = () => {
     return (
         <Stack.Navigator
             initialRouteName={ScreenNames.APARTMENT_LIST}
             screenOptions={{
-                headerShown: true
+                headerShown: false
             }}
         >
-            <Stack.Screen name={ScreenNames.APARTMENT_LIST} component={ApartmentListScreen} />
-            <Stack.Screen name={ScreenNames.APARTMENT_DETAIL} component={ApartmentScreen} />
+            <Stack.Screen name={ScreenNames.APARTMENT_LIST} 
+                component={ApartmentListScreen}
+                options={{ headerShown: true,  header: () => renderHeader(ScreenNames.APARTMENT_LIST)}} 
+                />
+            <Stack.Screen name={ScreenNames.APARTMENT_DETAIL} 
+                component={ApartmentScreen}
+                options={{ headerShown: false,  header: () => renderHeader(ScreenNames.APARTMENT_DETAIL)}}  />
         </Stack.Navigator>
     );
 };
@@ -46,10 +60,16 @@ const MyApartmentNavigator = () => {
                 headerShown: true
             }}
         >
-            <Stack.Screen name={ScreenNames.MY_APARTMENT} component={MyApartmentScreen} />
+            <Stack.Screen name={ScreenNames.MY_APARTMENT} 
+                component={MyApartmentScreen} 
+                options={{ headerShown: true,  header: () => renderHeader(ScreenNames.MY_APARTMENT)}} />
             <Stack.Screen name={ScreenNames.APARTMENT_DETAIL} component={ApartmentScreen} />
-            <Stack.Screen name={ScreenNames.CREATE_APARTMENT} component={CreateOrUpdateApartmentScreen} />
-            <Stack.Screen name={ScreenNames.UPDATE_APARTMENT} component={CreateOrUpdateApartmentScreen} />
+            <Stack.Screen name={ScreenNames.CREATE_APARTMENT} 
+            component={CreateOrUpdateApartmentScreen} 
+                 options={{ headerShown: true,  header: () => renderHeader(ScreenNames.CREATE_APARTMENT)}} />
+            <Stack.Screen name={ScreenNames.UPDATE_APARTMENT} 
+                component={CreateOrUpdateApartmentScreen}
+                options={{ headerShown: true,  header: () => renderHeader(ScreenNames.UPDATE_APARTMENT)}}  />
         </Stack.Navigator>
     );
 };
@@ -57,16 +77,20 @@ const MyApartmentNavigator = () => {
 const UserProfileNavigator = () => {
     return (
         <Stack.Navigator
-        initialRouteName={ScreenNames.LOGIN}
+        initialRouteName={ScreenNames.USER}
         screenOptions={{
-            headerShown: true
+            headerShown: false
         }}
         >
             <Stack.Screen name={ScreenNames.LOGIN} component={LoginScreen} />
             <Stack.Screen name={ScreenNames.LOGIN_SUCCESS} component={LoginSuccess} />
+            <Stack.Screen name={ScreenNames.SIGNUP} component={SignUpScreen} />
+            <Stack.Screen name={ScreenNames.CHANGE_PASSWORD} component={ChangePasswordScreen} />
+            <Stack.Screen name={ScreenNames.UPDATE_USER} component={UpdateUserScreen} />
+            <Stack.Screen name={ScreenNames.USER} component={UserScreen} />
         </Stack.Navigator>
     );
-}
+};
 
 const BottomTabNavigator = () => {
     return (
@@ -107,6 +131,7 @@ const Navigation = ({ getParams }) => {
 
   return (
     <NavigationContainer>
+        <StatusBar backgroundColor='#456268'  />
         <BottomTabNavigator/>
     </NavigationContainer>
   );

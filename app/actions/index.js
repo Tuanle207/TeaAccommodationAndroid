@@ -1,6 +1,6 @@
 import accommodationRequest from '../apis/serverRequest';
 import addressRequest from '../apis/addressRequest';
-import {catchAsync, isEmpty} from '../utils';
+import {APARTMENT_STATUS, catchAsync, isEmpty} from '../utils';
 import ACTION_TYPE from './type';
 import { ScreenNames } from '../components/Navigation/NavigationConst';
 import { ToastAndroid } from 'react-native';
@@ -35,13 +35,13 @@ export const updateLoginInfo = data => {
 export const checkLoggedIn = ({navigation}) => catchAsync(async dispatch => {
 
     dispatch({
-        type: ACTION_TYPE.FETCHING_DATA,
+        type: ACTION_TYPE.CHECKING_LOGIN,
         payload: true
     });
 
     const response = await accommodationRequest.get('/isLoggedIn');
     const data = response.data.data;
-  
+    console.log('checking login........');
     dispatch({
         type: ACTION_TYPE.USER_LOGGED_IN,
         payload: {
@@ -50,12 +50,16 @@ export const checkLoggedIn = ({navigation}) => catchAsync(async dispatch => {
         }
     });
     dispatch({
-        type: ACTION_TYPE.FETCHING_DATA,
+        type: ACTION_TYPE.CHECKING_LOGIN,
         payload: false
     });
-}, (e) => {
-    console.log(e);
-    navigation.navigate(ScreenNames.LOGIN);
+}, (err, dispatch) => {
+    console.log(err);
+    dispatch({
+        type: ACTION_TYPE.CHECKING_LOGIN,
+        payload: false
+    });
+    //navigation.navigate(ScreenNames.LOGIN);
 });
 
 export const login = ({email, password, navigation}) => catchAsync(async dispatch => {
@@ -66,20 +70,24 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
     const response = await accommodationRequest.post('/login', {
         email, password
     });
-
+    ToastAndroid.showWithGravity("Đăng nhập thành công", ToastAndroid.SHORT, ToastAndroid.CENTER);
     console.log('success');
     dispatch({
         type: ACTION_TYPE.USER_LOGIN,
         payload: {
             auth: true,
-            data: response.data.data,
-            token: response.data.token}
+            data: response.data.data
+        }
     });
 
-    navigation.navigate(ScreenNames.LOGIN_SUCCESS);
+    navigation.popToTop();
 }, (e) => {
-    console.log('error!');
-    console.log(e);
+    console.log('error login!');
+    console.log(e.response.data);
+    if(e.response.data.message == "Email hoặc mật khẩu không hợp lệ")
+        ToastAndroid.showWithGravity("Email hoặc mật khẩu không chính xác", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    else
+        ToastAndroid.showWithGravity('Kết nối bị lỗi', ToastAndroid.SHORT, ToastAndroid.CENTER)
 });
 
 export const logout = ({navigation}) => catchAsync(async dispatch => {
@@ -99,6 +107,104 @@ export const logout = ({navigation}) => catchAsync(async dispatch => {
 }, (e) => {
     console.log('error!');
     console.log(e);
+});
+
+export const signup = ({email, password, passwordConfirm, name, phoneNumber, photo, role, navigation}) => catchAsync(async dispatch => {
+    if(password != passwordConfirm)
+        return false;
+    console.log('getting Signup');
+
+    const formDataSignup = new FormData();
+    formDataSignup.append('email', email);
+    formDataSignup.append('password', password);
+    formDataSignup.append('passwordConfirm', passwordConfirm);
+    formDataSignup.append('name', name);
+    formDataSignup.append('phoneNumber', phoneNumber);
+    formDataSignup.append('role', role);
+    if(Object.keys(photo).length !== 0)
+        formDataSignup.append('photo', {
+            name: photo.fileName,
+            type: photo.type,
+            uri: photo.uri
+        });
+    console.log(formDataSignup);
+
+    const response = await accommodationRequest.post('/signup', formDataSignup, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    console.log('success Signup');
+    ToastAndroid.showWithGravity("Đăng ký thành công", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    dispatch({
+        type: ACTION_TYPE.SIGNUP_USER,
+        payload: {
+            auth: true,
+            data: response.data.data
+        }
+    });
+
+    navigation.popToTop();
+}, (e) => {
+    console.log('error Signup!');
+    console.log(e.response.data);
+    if(e.response.data.message.email.toString() == "Email này đã được sử dụng rồi")
+        ToastAndroid.showWithGravity("Email này đã được sử dụng", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    else
+        ToastAndroid.showWithGravity('Kết nối bị lỗi', ToastAndroid.SHORT, ToastAndroid.CENTER);
+
+});
+
+export const updateUserInformation = ({name, phoneNumber, photo, navigation}) =>catchAsync(async dispatch => {
+    const formDataUpdateUser = new FormData();
+    formDataUpdateUser.append('name', name);
+    formDataUpdateUser.append('phoneNumber', phoneNumber);
+    if(Object.keys(photo).length !== 0)
+        formDataUpdateUser.append('photo', {
+            name: photo.fileName,
+            type: photo.type,
+            uri: photo.uri
+        });
+    const response = await accommodationRequest.post('/profile/edit', formDataUpdateUser, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    navigation.goBack();
+
+    dispatch({
+        type: ACTION_TYPE.UPDATE_USER_INFORMATION,
+        payload:{
+            data: response.data.data
+        }
+    });
+}, (e) => {
+    console.log('error Update user information!');
+    console.log(e.response.data);
+});
+
+export const changePassword = ({user, currentPassword, password, passwordConfirm, navigation}) =>catchAsync(async dispatch =>{
+
+    const response = await accommodationRequest.patch('/updatePassword', { currentPassword, password, passwordConfirm }, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    ToastAndroid.showWithGravity("Đổi mật khẩu thành công", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    navigation.goBack();
+    dispatch({
+        type: ACTION_TYPE.CHANGE_PASSWORD,
+        payload:{
+            data: response.data.data
+        }
+    });
+}, (e) => {
+    console.log('error change password');
+    console.log(e.response.data);
+    if(e.response.data.message == "Mật khẩu không chính xác")
+        ToastAndroid.showWithGravity("Mật khẩu cũ không chính xác", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    else
+        ToastAndroid.showWithGravity('Kết nối bị lỗi', ToastAndroid.SHORT, ToastAndroid.CENTER);
 });
 
 /**
@@ -414,6 +520,24 @@ export const updateApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
         type: ACTION_TYPE.UPDATING_APARTMENT,
         payload: true
     });
+});
+
+
+export const changeApartmentStatus = data => catchAsync(async dispatch => {
+    
+    const { id, status } = data;
+    let request = null;
+    if (status === APARTMENT_STATUS.AVAILABLE) {
+        request = accommodationRequest.patch(`/apartments/${id}/activate`);
+    } else {
+        request = accommodationRequest.patch(`/apartments/${id}/deactivate`);
+    }
+
+    await request;
+
+    
+}, (err, dispatch) => {
+
 });
 
 export const createComment = data => catchAsync(async dispatch => {

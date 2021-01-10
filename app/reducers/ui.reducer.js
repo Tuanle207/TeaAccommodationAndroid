@@ -7,6 +7,7 @@ const INIT = {
     creatingApartment: false,
     updatingApartment: false,
     reloadMyApartment: false,
+    checkingLogin: false,
     openingApp: true
 };
 
@@ -24,6 +25,8 @@ const ui = (state = INIT, action) => {
             return {...state, updatingApartment: action.payload};
         case ACTION_TYPE.MY_APARTMENTS_RELOADING:
             return {...state, reloadMyApartment: action.payload};
+        case ACTION_TYPE.CHECKING_LOGIN:
+            return {...state, checkingLogin: action.payload};
         default:
             return state;
     }
