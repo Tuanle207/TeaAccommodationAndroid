@@ -1,0 +1,55 @@
+[
+    {
+        "count": 1,
+        "title": "CHO THUÊ PHÒNG TRỌ MỚI XÂY TIỆN NGHI - CÓ GÁC - BẾP -Q.11 -HỒNG BÀNG",
+        "description": "Cho thuê Phòng trọ tiện nghi có bếp, gác mới xây 100% Trung Tâm Quận 11, giáp Quận 10, Q. 5, Q. 6.\nGiá phòng: 3.2tr - 3.8tr.\nDiện tích: 20-30m2\nĐiện: 3.500d/kw.\nNước: 100k/ người/ tháng.\nNet: 100k /phòng/tháng.",
+        "rent": 3200000,
+        "area": 30,
+        "facilities": ["wifi", "máy giặt"],
+        "address": {
+            "street": "8 Đường Hồng Bàng",
+            "ward": "Phường 16",
+            "district": "Quận 11",
+            "city": "Thành Phố Hồ Chí Minh"
+        },
+        "photos": [
+
+        ]
+    },
+    {
+        "count": 2,
+        "title": "PHÒNG FULL TIỆN NGHI MỚI XÂY, THANG MÁY, CÓ GÁC, 25M, ĐỐI DIỆN ETOWN CỘNG HÒA",
+        "description": "Phòng trọ full tiện nghi có gác full nội thất mới 100% chính chủ, không chung chủ. Đang hoàn thiện đưa nội thất vào ngày 30/11 vào ở luôn.\nĐịa chỉ: 49 Mai Lão Bạng, P.13, quận Tân Bình - 5 phút đến Bibo Mart Cộng Hòa, gần Etown, ngã tư Hoàng Hoa thám, Ngô Bệ giao Cộng Hòa. Trước nhà là trường THPT Nguyễn Khuyến",
+        "rent": 3500000,
+        "area": 25,
+        "facilities": ["wifi", "máy giặt", "tủ lạnh"],
+        "address": {
+            "street": "12 Đường Mai Lão Bạng",
+            "ward": "Phường 13",
+            "district": "Quận Tân Bình",
+            "city": "Thành Phố Hồ Chí Minh",
+            "latitude": 10,
+            "longitude": 10
+        },
+        "photos": [
+
+        ]
+    },
+    {
+        "count": 3,
+        "title": "CHO THUÊ PHÒNG TRỌ ĐƯỜNG GẦN CÔNG VIÊN PHẦN MỀM QUANG TRUNG, QUẬN 12",
+        "description": "Cho thuê phòng trọ đầy đủ tiện nghi Q12 .Diện tích: 20m2.\n- Giá phòng: 2.1tr/ tháng.   \n- Giữ xe: 100k/xe/tháng\n- Vị trí: Nằm ngay trung tâm Quận 12, giao giữa Nguyễn Văn Quá và QL1A\n* Kế Công Viên Phần Mềm Quang Trung (500m), gần trường đại học Đại Học FPT, cao đẳng Viễn Đông\n* Cách ngã Tư An Sương, Cầu Vượt Tân Thới Hiệp 1km",
+        "rent": 2100000,
+        "area": 20,
+        "facilities": ["wifi"],
+        "address": {
+            "street": "13 Đường Nguyễn Văn Quá",
+            "ward": "Phường Tân Thới Hiệp",
+            "district": "Quận 12",
+            "city": "Thành Phố Hồ Chí Minh"
+        },
+        "photos": [
+
+        ]
+    }
+]

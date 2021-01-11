@@ -1,23 +1,43 @@
-import React, {useEffect} from 'react';
-import { Text, View, Image, StyleSheet, ToastAndroid } from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import { Text, View, Image, StyleSheet, ToastAndroid, BackHandler } from 'react-native';
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { input, imageButton, navigationTittle} from '../styles/userFeature.style';
 import { connect } from 'react-redux';
 import { serverApi } from '../../../appsetting';
 import { checkLoggedIn, updateUserInformation} from '../../actions';
 import ImagePicker from 'react-native-image-picker';
-import Icon from 'react-native-vector-icons/AntDesign';
+import AntDesignIcon from 'react-native-vector-icons/AntDesign';
+import ConfirmPopup from '../defaults/ConfirmPopup';
+import { useFocusEffect } from '@react-navigation/native';
 
 const UpdateUserScreen = ({checkLoggedIn, navigation, user, ui, updateUserInformation}) => {
-    const [name, setName] = React.useState(user.data.name);
-    const [phoneNumber, setPhoneNumber] = React.useState(user.data.phoneNumber);
-    const [photo, setPhoto] = React.useState({});
+    const [name, setName] = useState(user.data.name);
+    const [phoneNumber, setPhoneNumber] = useState(user.data.phoneNumber);
+    const [photo, setPhoto] = useState({});
 
     //validation
-    const [requiredName, setRequiredName] = React.useState(false);
-    const [requiredPhoneNumber, setRequiredPhoneNumber] = React.useState(false);
-    const [mustPhoneNumber, setMustPhoneNumber] = React.useState(false);
+    const [requiredName, setRequiredName] = useState(false);
+    const [requiredPhoneNumber, setRequiredPhoneNumber] = useState(false);
+    const [mustPhoneNumber, setMustPhoneNumber] = useState(false);
     
+    const [popupExitVisibility, setPopupExitVisibility] = useState(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            };
+        }, [])
+    );
+    
+    const onBackPress = () => {
+        console.log('create apartmetn screen');
+        setPopupExitVisibility(true);
+        return true;
+    };
+
     const checkSourceImage = () =>{
         if(Object.keys(photo).length !== 0)
             return photo.uri;
@@ -66,11 +86,18 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, ui, updateUserInform
 
     return (
         <View>
+            <ConfirmPopup
+                text={'Có vẻ bạn đang chỉnh sửa thông tin. Bạn có chắc muốn trở lại không?'}
+                visible={popupExitVisibility}
+                setVisible={setPopupExitVisibility}
+                onFinish={ navigation.pop } 
+            />
             <View style={{backgroundColor: '#132833', height: 53, flexDirection:'row' ,justifyContent:'space-around', alignItems:'center'}}>
-                <Icon.Button name="close" color='#D9D9D9' backgroundColor='#132833' size={30} onPress={() => navigation.goBack()}></Icon.Button>
+                <TouchableOpacity   TouchableOpacity onPress={() => setPopupExitVisibility(true)}>
+                    <AntDesignIcon name="close" color='#D9D9D9' size={30}></AntDesignIcon>
+                </TouchableOpacity>
                 <Text style={navigationTittle.style}>Chỉnh sửa trang cá nhân</Text>
-                <Icon.Button name='check' color='#06BBD8' backgroundColor='#132833' size={30}
-                    onPress={() => {
+                <TouchableOpacity onPress={() => {
                         if (checkUpdateInformation(requiredName, requiredPhoneNumber, mustPhoneNumber))
                         {
                             updateUserInformation({ name, phoneNumber, photo, navigation });
@@ -78,7 +105,9 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, ui, updateUserInform
                         }
                         else 
                             ToastAndroid.showWithGravity("Vui lòng điền thông tin đầy đủ và hợp lệ", ToastAndroid.SHORT, ToastAndroid.CENTER);
-                    }} ></Icon.Button>
+                    }}>
+                    <AntDesignIcon name='check' color='#06BBD8' size={30}/>
+                </TouchableOpacity>
             </View>
             <ScrollView style={{ width: '100%', height: '100%', backgroundColor: '#204051', paddingHorizontal: 30 }}>
                 <View style={{ alignItems: "center", marginBottom: 28 }}>

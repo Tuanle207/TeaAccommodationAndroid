@@ -1,38 +1,71 @@
-import React, { useEffect} from 'react';
-import { Text, View, Image, StyleSheet,TextInput } from 'react-native';
+import React, { useCallback, useEffect} from 'react';
+import { Text, View, Image, StyleSheet,TextInput, BackHandler } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { topic, input } from '../styles/userFeature.style';
 import { checkLoggedIn, logout} from '../../actions';
 import { connect } from 'react-redux';
 import { serverApi } from '../../../appsetting';
 import { ScreenNames } from '../Navigation/NavigationConst';
+import { ROLE_TYPE } from '../../utils';
+import AnimatedLoader from 'react-native-animated-loader';
+import { useFocusEffect } from '@react-navigation/native';
 
-const UserScreen = ({ checkLoggedIn, logout, navigation, user, checkingLogin}) => {
+const UserScreen = ({ logout, navigation, user, checkingLogin}) => {
+
+    useFocusEffect(
+        useCallback(() => {
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            };
+        }, [])
+    );
+
+    const onBackPress = () => {
+        console.log('user screen');
+        return true;
+    };
+    
     const translateRoleUser = () => {
-        if(user.data.role === 'landlord')
+        if(user.data.role === ROLE_TYPE.LAND_LORD)
             return 'Cho thuê trọ';
         else
             return 'Tìm trọ';
     }
-    useEffect(() => {
-        if (user.auth === false)
-            checkLoggedIn({ navigation });
-    }, []);
 
-    console.log(user);
-
-    if (checkingLogin || user.auth === false) {
+    if (checkingLogin) {
         return (
-            <View>
-                <Text>Đang tải...</Text>
+            <View style={{ flex: 1 }}>
+                <AnimatedLoader
+                    visible={true}
+                    overlayColor='rgba(0,0,0,0.5)'
+                    source={require('../../assets/2166-dotted-loader.json')}
+                    animationStyle={{width: 100, height: 100}}
+                    speed={1}
+                />
             </View>
         )
+    }
+
+    if (user.auth === false) {
+        return (
+            <View>
+                <AnimatedLoader
+                    visible={true}
+                    overlayColor='rgba(0,0,0,0.5)'
+                    source={require('../../assets/2166-dotted-loader.json')}
+                    animationStyle={{width: 100, height: 100}}
+                    speed={1}
+                />
+            </View>
+        );
     }
 
     return (
         <View>
             <ScrollView style={{width: '100%', height: '100%', backgroundColor: '#214252', paddingHorizontal: 30}}>
-                <Text style={topic.style}>Trang cá nhân</Text>
+                {/* <Text style={topic.style}>Trang cá nhân</Text> */}
                 <Image style={styles.avatar} source={{uri:`${serverApi}/${user.data.photo}`}}/>
                 <Text style={input.label}>Họ và tên</Text>
                 <Text style={input.text}>{user.data.name}</Text>

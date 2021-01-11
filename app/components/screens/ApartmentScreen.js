@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
     Text,
     View,
@@ -15,6 +15,7 @@ import {
     Keyboard,
     StatusBar,
     LayoutAnimation,
+    BackHandler,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import {serverApi} from '../../../appsetting';
@@ -33,6 +34,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import Modal from 'react-native-modal';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import AnimatedLoader from 'react-native-animated-loader';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, apartmentComments, user, ui}) => {
@@ -49,6 +51,21 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
             getApartment({id});
         }
     },[]);
+
+    useFocusEffect(
+        useCallback(() => {
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            };
+        }, [])
+    );
+
+    const onBackPress = () => {
+        console.log('apartment screen');
+        return false;
+    };
 
     useEffect(() => {
         if (user.auth === true && apartmentDetails != null && apartmentDetails.findIndex(el => el.id === id) !== -1) {
@@ -148,7 +165,7 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
                     onPress={() => setPhotoView(true)}>
                     <Image
                         style={styles.image}
-                        source={{uri: `${serverApi}${photo}`}}
+                        source={{uri: `${serverApi}/${photo}`}}
                     />
                 </TouchableOpacity>
             );
@@ -251,7 +268,7 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
                     <ImageViewer
                         index={photoIndex}
                         imageUrls={detail.photos.map((el) => {
-                            return {url: `${serverApi}${el}`};
+                            return {url: `${serverApi}/${el}`};
                         })}
                     />
                 </Modal>

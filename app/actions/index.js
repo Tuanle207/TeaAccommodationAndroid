@@ -32,7 +32,7 @@ export const updateLoginInfo = data => {
     };
 };
 
-export const checkLoggedIn = ({navigation}) => catchAsync(async dispatch => {
+export const checkLoggedIn = () => catchAsync(async dispatch => {
 
     dispatch({
         type: ACTION_TYPE.CHECKING_LOGIN,
@@ -53,12 +53,14 @@ export const checkLoggedIn = ({navigation}) => catchAsync(async dispatch => {
         type: ACTION_TYPE.CHECKING_LOGIN,
         payload: false
     });
+    dispatch(getApartments());
 }, (err, dispatch) => {
     console.log(err);
     dispatch({
         type: ACTION_TYPE.CHECKING_LOGIN,
         payload: false
     });
+
     //navigation.navigate(ScreenNames.LOGIN);
 });
 
@@ -80,7 +82,7 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
         }
     });
 
-    navigation.popToTop();
+    navigation.navigate(ScreenNames.USER);
 }, (e) => {
     console.log('error login!');
     console.log(e.response.data);
@@ -144,7 +146,7 @@ export const signup = ({email, password, passwordConfirm, name, phoneNumber, pho
         }
     });
 
-    navigation.popToTop();
+    navigation.navigate(ScreenNames.USER)
 }, (e) => {
     console.log('error Signup!');
     console.log(e.response.data);
@@ -560,11 +562,34 @@ export const changeApartmentStatus = data => catchAsync(async dispatch => {
 }, (err, dispatch) => {
 
     console.log(err);
-    ToastAndroid.showWithGravity('Đã có lỗi xảy ra', ToastAndroid.LONG, ToastAndroid.CENTER);
+    ToastAndroid.showWithGravity('Đã có lỗi xảy ra!', ToastAndroid.LONG, ToastAndroid.CENTER);
     dispatch({
         type: ACTION_TYPE.CHANGING_APARTMENT_STATUS,
         payload: false
     })
+});
+
+export const deleteApartment = ({ id }) => catchAsync(async dispatch => {
+    dispatch({
+        type: ACTION_TYPE.DELETING_APARTMENT,
+        payload: true
+    });
+    await accommodationRequest.delete(`apartments/${id}`);
+    ToastAndroid.showWithGravity('Xóa phòng trọ thành công!', ToastAndroid.LONG, ToastAndroid.CENTER);
+
+    dispatch({
+        type: ACTION_TYPE.DELETING_APARTMENT,
+        payload: true
+    });
+
+    dispatch(getMyApartments());
+}, (err, dispatch) => {
+    console.log(err);
+    ToastAndroid.showWithGravity('Đã có lỗi xảy ra!', ToastAndroid.LONG, ToastAndroid.CENTER);
+    dispatch({
+        type: ACTION_TYPE.DELETING_APARTMENT,
+        payload: true
+    });
 });
 
 export const createComment = data => catchAsync(async dispatch => {

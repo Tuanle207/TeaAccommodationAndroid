@@ -1,5 +1,5 @@
 import CheckBox from '@react-native-community/checkbox';
-import React, { useState, useReducer, useEffect, useRef } from 'react';
+import React, { useState, useReducer, useEffect, useRef, useCallback } from 'react';
 import { 
     Image, 
     KeyboardAvoidingView, 
@@ -9,7 +9,8 @@ import {
     View, 
     ScrollView, 
     TextInput, 
-    TouchableOpacity
+    TouchableOpacity,
+    BackHandler
 } from 'react-native';
 
 import MapView, { Marker } from 'react-native-maps';
@@ -26,6 +27,8 @@ import addressRequest from '../../apis/addressRequest';
 import { bingMapApi, bingMapApiKey } from '../../apis/bingMapApi';
 import AnimatedLoader from 'react-native-animated-loader';
 import { serverApi } from '../../../appsetting';
+import ConfirmPopup from '../defaults/ConfirmPopup';
+import { useFocusEffect } from '@react-navigation/native';
 
 const photosReducer = (state, action) => {
     
@@ -87,6 +90,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
     const [wardsData, setWardsData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [streetInputFocus, setStreetInputFocus] = useState(false);
+    const [popupExitVisibility, setPopupExitVisibility] = useState(false);
 
     const mapViewRef = useRef(null);
 
@@ -96,6 +100,23 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 getApartment({id});
         }
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            };
+        }, [])
+    );
+    
+    const onBackPress = () => {
+        console.log('create apartmetn screen');
+        setPopupExitVisibility(true);
+        return true;
+    };
+    
 
     useEffect(() => {
         if (type === APARTMENT_MODIFICATION_TYPE.UPDATION) {
@@ -111,14 +132,14 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 setCity(detail.address.city);
                 dispatchPhotos({
                     type: 'init',
-                    payload: detail.photos.map(el => ({uri: serverApi + el}))
+                    payload: detail.photos.map(el => ({uri: serverApi + '/' + el}))
                 })
                 setPhoneContact(detail.phoneContact);
                 dispatchFacilities({
                     type: 'init',
                     payload: facilitiesData.map((el) => ({checked: detail.facilities.includes(el), value: el}))
                 });
-                console.log(detail.photos.map(el => ({uri: serverApi + el})));
+                console.log(detail.photos.map(el => ({uri: serverApi + '/' + el})));
                 // get districts and wards
                 addressRequest
                 .get(`district?province=79`)
@@ -354,6 +375,12 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                         speed={1}
                     />
                 }
+                <ConfirmPopup
+                    text={'Có vẻ như bạn đang nhập thông tin. Bạn có chắc muốn trở lại không?'}
+                    visible={popupExitVisibility}
+                    setVisible={setPopupExitVisibility}
+                    onFinish={ navigation.pop } 
+                />
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Tiêu đề</Text>
                     <TextInput value={title} onChangeText={txt => setTitle(txt)} style = {styles.textInput}/>
@@ -365,12 +392,12 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 </View>
 
                 <View style={styles.section}>
-                    <Text style = {styles.sectionTitle}>Diện tích (㎡)</Text>
+                    <Text style = {styles.sectionTitle}>Giá thuê (đồng/tháng)</Text>
                     <TextInput value={rent.toString()} onChangeText={txt => setRent(txt)} style = {styles.textInput} keyboardType = 'number-pad'/>
                 </View>
 
                 <View style={styles.section}>
-                    <Text style = {styles.sectionTitle}>Giá thuê (đồng/tháng)</Text>
+                    <Text style = {styles.sectionTitle}>Diện tích (㎡)</Text>
                     <TextInput value={area.toString()} onChangeText={txt => setArea(txt)} style = {styles.textInput} placeholder = 'Diện tích (m2)' keyboardType = 'number-pad'/>
                 </View>
                 
@@ -487,15 +514,15 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                     {
                         photos.length < 4 ?
                         <TouchableOpacity onPress={selectImage} style={{ alignItems: 'center', justifyContent: 'flex-end'}}>
-                            <AntDesignIcon name={'pluscircle'} size={40} color={'#6E16FE'} />
+                            <AntDesignIcon name={'pluscircle'} size={40} color={'#fff'} />
                         </TouchableOpacity>
                         :
                         null
                     }
                </View>
-               <TouchableOpacity onPress={submit} style={{alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20, backgroundColor: '#fff', width: 150, borderRadius: 100, marginBottom: MARGIN_MEDIUM, flexDirection: 'row', alignItems: 'center'}}>
-                   <IoniconsIcon name={'checkmark-circle-outline'} size={30} color={'#6E16FE'} />
-                   <Text style={{marginLeft: 20}}>Lưu</Text>
+               <TouchableOpacity onPress={submit} style={styles.saveBtn}>
+                   <IoniconsIcon name={'checkmark-circle-outline'} size={30} color={'#fff'} />
+                   <Text style={{marginLeft: 20, color: '#fff'}}>Lưu</Text>
                </TouchableOpacity>
             </ScrollView>
           </KeyboardAvoidingView>
@@ -586,5 +613,16 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       shadowOpacity: 0.4,
       shadowOffset: {width: 1, height: 1},
+    },
+    saveBtn: {
+        alignSelf: 'center', 
+        paddingVertical: 10, 
+        paddingHorizontal: 20, 
+        backgroundColor: '#06BBD8',
+        width: 150, 
+        borderRadius: 100, 
+        marginBottom: MARGIN_MEDIUM, 
+        flexDirection: 'row', 
+        alignItems: 'center'
     }
   });

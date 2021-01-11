@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, RefreshControl, ToastAndroid, Platform, UIManager, LayoutAnimation, ActivityIndicator, TouchableOpacity, StyleSheet} from 'react-native';
 import { connect } from 'react-redux';
-import { changeApartmentStatus, getMyApartments } from '../../actions';
+import { changeApartmentStatus, deleteApartment, getMyApartments } from '../../actions';
 import MyApartmentCard from '../defaults/MyApartmentCard';
 import Animated from 'react-native-reanimated';
 import AnimatedLoader from 'react-native-animated-loader';
@@ -22,7 +22,7 @@ import { ScreenNames } from '../Navigation/NavigationConst';
 
 const { SlideInMenu } = renderers;
 
-const MyApartmentScreen  = ({navigation, changeApartmentStatus, getMyApartments, myApartments, ui, user, errors}) => {
+const MyApartmentScreen  = ({navigation, changeApartmentStatus, deleteApartment, getMyApartments, myApartments, ui, user, errors}) => {
         
     const [refreshing, setRefreshing] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -119,7 +119,7 @@ const MyApartmentScreen  = ({navigation, changeApartmentStatus, getMyApartments,
 
     return (
         <View
-            style={{flex: 1, position: 'relative', backgroundColor: '#e8ffff'}}>
+            style={{flex: 1, position: 'relative', backgroundColor: '#fff'}}>
             {
                 (ui.fetchingApartments === true && ui.changingApartmentStatus === true) &&
                 <AnimatedLoader
@@ -144,6 +144,7 @@ const MyApartmentScreen  = ({navigation, changeApartmentStatus, getMyApartments,
             <ConfirmPopup 
                 visible={popupDeleteVisibility} 
                 setVisible={setPopupDeleteVisibility} 
+                onFinish={ () => deleteApartment({ id: currentApartmentId }) }
                 text={'Xác nhận xóa phòng trọ này?'}/>
 
             <Menu opened={menuVisibility} onBackdropPress={() => setMenuVisibility(false)} renderer={SlideInMenu}>
@@ -163,7 +164,7 @@ const MyApartmentScreen  = ({navigation, changeApartmentStatus, getMyApartments,
                     </TouchableOpacity>
                     <TouchableOpacity onPress={ onChangeStatusBtnPressHandler } style={styles.menu_row_item}>
                         {
-                            currentApartmentId === -1 ?
+                            currentApartmentId === -1 || myApartments.data.findIndex(el => el.id === currentApartmentId) === -1 ?
                             null :
                             myApartments.data.find(el => el.id === currentApartmentId).status === APARTMENT_STATUS.AVAILABLE ?
                             <FoundationIcon name={'battery-full'} size={24} color={'#ffc764'} /> : 
@@ -171,7 +172,7 @@ const MyApartmentScreen  = ({navigation, changeApartmentStatus, getMyApartments,
                         }
                         <View style={styles.menu_item_text_wrapper}>
                             {
-                                currentApartmentId === -1 ?
+                                currentApartmentId === -1 || myApartments.data.findIndex(el => el.id === currentApartmentId) === -1 ?
                                 null :
                                 myApartments.data.find(el => el.id === currentApartmentId).status === APARTMENT_STATUS.AVAILABLE ?
                                 <Text style={styles.menu_item_text}>Đã hết phòng trống</Text> : 
@@ -198,7 +199,7 @@ const MyApartmentScreen  = ({navigation, changeApartmentStatus, getMyApartments,
                     refreshControl={<RefreshControl refreshing={refreshing} 
                     onRefresh={getMyApartments} />}
                     onEndReached={loadMoreData}
-                    onEndReachedThreshold={0.5}
+                    onEndReachedThreshold={0.1}
                     ListFooterComponent={renderFooter}
                     onScroll={e => setYPostion(e.nativeEvent.contentOffset.y)} /> :
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -215,8 +216,23 @@ const MyApartmentScreen  = ({navigation, changeApartmentStatus, getMyApartments,
                 </TouchableOpacity>
                 :
                 <TouchableOpacity onPress={() => navigation.push(ScreenNames.CREATE_APARTMENT, {id: null, type: APARTMENT_MODIFICATION_TYPE.CREATION})} 
-                    style={{position: 'absolute', bottom: 20, right: 20, padding: 5, borderRadius: 100, borderWidth: 2, borderColor: '#fc8621', backgroundColor: '#f4eeed'}}>
-                    <EntypoIcon name='plus' size={24} color={'#fc8621'} />
+                    style={[
+                        {position: 'absolute', bottom: 20, right: 10, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 12, borderRadius: 5, borderWidth: 2, borderColor: '#fc8621', backgroundColor: '#f4eeed'},
+                        {
+                            // transform: [{ rotate: '-90deg' }]
+                        }
+                    ]}>
+                    {/* <AntDesignIcon name='pluscircleo' size={24} color={'#fc8621'} /> */}
+                    <Text style={[
+                        {
+                            fontSize: 12,
+                            fontWeight: 'bold',
+                            color: '#fc8621',
+                        },
+                        {
+                            // transform: [{ rotate: '180deg' }]
+                        }
+                    ]}>Đăng phòng trọ mới ?</Text>
                 </TouchableOpacity>
             }
           
@@ -234,7 +250,7 @@ const mapStateToProps = state => {
 };
 
 
-export default connect(mapStateToProps, { getMyApartments, changeApartmentStatus })(MyApartmentScreen);
+export default connect(mapStateToProps, { getMyApartments, changeApartmentStatus, deleteApartment })(MyApartmentScreen);
 
 const styles = StyleSheet.create({
     menu: {
