@@ -53,7 +53,7 @@ export const checkLoggedIn = () => catchAsync(async dispatch => {
         type: ACTION_TYPE.CHECKING_LOGIN,
         payload: false
     });
-    dispatch(getApartments());
+    // dispatch(getApartments());
 }, (err, dispatch) => {
     console.log(err);
     dispatch({
@@ -638,6 +638,7 @@ export const getParams = () => catchAsync(async dispatch => {
     console.log(e);
     console.log('error');
 });
+
 
 /**
  ** UI animation action
