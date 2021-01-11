@@ -642,3 +642,10 @@ export const getParams = () => catchAsync(async dispatch => {
 /**
  ** UI animation action
  */
+
+export const openedApp = () => dispatch => {
+    dispatch({
+        type: ACTION_TYPE.OPENED_APP,
+        payload: false
+    })
+}

@@ -14,7 +14,7 @@ import ApartmentListScreen from '../screens/ApartmentListScreen';
 import ApartmentScreen from '../screens/ApartmentScreen';
 import CreateOrUpdateApartmentScreen from '../screens/CreateOrUpdateApartmentScreen';
 import MyApartmentScreen from '../screens/MyApartmentScreen';
-import { checkLoggedIn, getParams } from '../../actions';
+import { checkLoggedIn, getParams, openedApp } from '../../actions';
 import { connect } from 'react-redux';
 import { ScreenNames, TabNames } from './NavigationConst';
 import SignUpScreen from '../screens/SignUpScreen';
@@ -22,6 +22,7 @@ import UpdateUserScreen from '../screens/UpdateUserScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import UserScreen from '../screens/UserScreen';
 import { ROLE_TYPE } from '../../utils';
+import SplashScreen from 'react-native-splash-screen';
 
 
 const Stack = createStackNavigator();
@@ -167,12 +168,18 @@ const BottomTabNavigatorForOthers = () => {
     );
 }
 
-const Navigation = ({ getParams, checkLoggedIn, user, ui }) => {
+const Navigation = ({ getParams, checkLoggedIn, openedApp, user, ui }) => {
 
     useEffect(() => {
         getParams();
         checkLoggedIn();
+        openedApp();
     }, []);
+
+    useEffect(() => {
+        if (ui.openedApp === false)
+            SplashScreen.hide();
+    }, [ui]);
 
     if (ui.checkingLogin === true) {
         <View style={{ flex: 1 }}>
@@ -197,4 +204,4 @@ const mapStateToProps = state => ({
     ui: state.ui
 });
 
-export default connect(mapStateToProps, { getParams, checkLoggedIn })(Navigation);
+export default connect(mapStateToProps, { getParams, checkLoggedIn, openedApp })(Navigation);

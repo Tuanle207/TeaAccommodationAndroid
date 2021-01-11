@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect} from 'react';
 import { Text, View, Image, StyleSheet,TextInput, BackHandler } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-import { topic, input } from '../styles/userFeature.style';
+import { input } from '../styles/userFeature.style';
 import { checkLoggedIn, logout} from '../../actions';
 import { connect } from 'react-redux';
 import { serverApi } from '../../../appsetting';

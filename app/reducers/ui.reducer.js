@@ -10,7 +10,7 @@ const INIT = {
     checkingLogin: false,
     changingApartmentStatus: false,
     deletingApartment: false,
-    openingApp: true
+    openedApp: true
 };
 
 const ui = (state = INIT, action) => {
@@ -33,6 +33,8 @@ const ui = (state = INIT, action) => {
             return {...state, changingApartmentStatus: action.payload};
         case ACTION_TYPE.DELETING_APARTMENT:
             return {...state, deletingApartment: action.payload};
+        case ACTION_TYPE.OPENED_APP:
+            return {...state, openedApp: action.payload};
         default:
             return state;
     }
