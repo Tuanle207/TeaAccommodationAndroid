@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, RefreshControl, ToastAndroid, Pressable, Platform, UIManager, LayoutAnimation, ActivityIndicator, TouchableOpacity} from 'react-native';
 import { connect } from 'react-redux';
 import { getApartments } from '../../../actions';
@@ -27,26 +27,13 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
     const [modalVisible5, setModalVisible5] = useState(false);
 
     
-    const scroll = React.createRef();
+    const scroll = useRef(null);
 
     useEffect(()=> {
-        console.log('getting apartments');
         getApartments(apartmentFilter);
         if (Platform.OS === 'android')
             UIManager.setLayoutAnimationEnabledExperimental(true);
     }, [apartmentFilter]);
-
-    useEffect(() => {
-        // let fetchNeeded = true;
-
-        // Object.keys(apartmentFilter).forEach(key => {
-        //     if (!isEmpty(apartmentFilter[key]))
-        //         fetchNeeded = true;
-        // });
-
-        // if (fetchNeeded)
-        //     getApartments(apartmentFilter);
-    }, [apartmentFilter, apartments]);
 
     const renderFooter = () => {
         return (
@@ -114,7 +101,7 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
                 modalVisible={modalVisible5}
                 setModalVisible={setModalVisible5}
                 />
-            <FlatList style={{padding: 10}}
+            <FlatList style={{padding: 10, backgroundColor: '#fff'}}
                 ref={scroll}
                 data={apartments.data}
                 renderItem={renderItem}
@@ -131,7 +118,7 @@ const ApartmentListScreen  = ({navigation, getApartments, apartments, apartmentF
                 refreshControl={<RefreshControl refreshing={refreshing} 
                 onRefresh={getApartments} />}
                 onEndReached={loadMoreData}
-                onEndReachedThreshold={0.5}
+                onEndReachedThreshold={0.1}
                 ListFooterComponent={renderFooter}
                 onScroll={e => setYPostion(e.nativeEvent.contentOffset.y)}
            />
@@ -158,4 +145,4 @@ const mapStateToProps = state => {
 };
 
 
-export default connect(mapStateToProps, {getApartments})(ApartmentListScreen);
+export default connect(mapStateToProps, { getApartments })(ApartmentListScreen);

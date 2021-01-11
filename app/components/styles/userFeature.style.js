@@ -37,7 +37,7 @@ const input = StyleSheet.create({
         borderColor: "#204051",
         marginBottom: 5,
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        // justifyContent: 'space-between',
     },
     textPassword:{
         paddingLeft: 0, 

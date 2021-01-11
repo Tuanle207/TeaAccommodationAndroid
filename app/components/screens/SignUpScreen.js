@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ToastAndroid, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ToastAndroid, KeyboardAvoidingView, Platform, BackHandler } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import RadioForm from 'react-native-simple-radio-button';
 import { topic, input, mainButton, imageButton } from '../styles/userFeature.style';
@@ -7,6 +7,8 @@ import { signup } from '../../actions/index';
 import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
+import { useFocusEffect } from '@react-navigation/native';
+import ConfirmPopup from '../defaults/ConfirmPopup';
 
 var radio_props = [
     { label: 'Cho thuê trọ', value: 0 },
@@ -14,27 +16,44 @@ var radio_props = [
 ];
 
 const SignUpScreen = ({ navigation, signup }) => {
-    const [name, setName] = React.useState('');
-    const [phoneNumber, setPhoneNumber] = React.useState('');
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [passwordConfirm, setPasswordConfirm] = React.useState('');
-    const [role, setRole] = React.useState('landlord');
-    const [photo, setPhoto] = React.useState({});
+    const [name, setName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [passwordConfirm, setPasswordConfirm] = useState('');
+    const [role, setRole] = useState('landlord');
+    const [photo, setPhoto] = useState({});
     //To show and unshow password
-    const [isPasswordHidden, setIsPasswordHidden] = React.useState(true);
+    const [isPasswordHidden, setIsPasswordHidden] = useState(true);
     //To show and unshow confirmPassword
-    const [isPasswordConfirmHidden, setIsPasswordConfirmHidden] = React.useState(true);
+    const [isPasswordConfirmHidden, setIsPasswordConfirmHidden] = useState(true);
 
     //Validation
-    const [requiredName, setRequiredName] = React.useState(false);
-    const [requiredPhoneNumber, setRequiredPhoneNumber] = React.useState(false);
-    const [mustPhoneNumber, setMustPhoneNumber] = React.useState(false);
-    const [requiredEmail, setRequiredEmail] = React.useState(false);
-    const [formEmail, setFormEmail] = React.useState(false);
-    const [requiredPassword, setRequiredPassword] = React.useState(false);
-    const [requiredConfirmPassword, setRequiredConfirmPassword] = React.useState(false);
-    const [confirmPasswordMustLikePassword, setConfirmPasswordMustLikePassword] = React.useState(false);
+    const [requiredName, setRequiredName] = useState(false);
+    const [requiredPhoneNumber, setRequiredPhoneNumber] = useState(false);
+    const [mustPhoneNumber, setMustPhoneNumber] = useState(false);
+    const [requiredEmail, setRequiredEmail] = useState(false);
+    const [formEmail, setFormEmail] = useState(false);
+    const [requiredPassword, setRequiredPassword] = useState(false);
+    const [requiredConfirmPassword, setRequiredConfirmPassword] = useState(false);
+    const [confirmPasswordMustLikePassword, setConfirmPasswordMustLikePassword] = useState(false);
+
+    const [popupExitVisibility, setPopupExitVisibility] = useState(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            };
+        }, [])
+    );
+
+    const onBackPress = () => {
+        setPopupExitVisibility(true);
+        return true;
+    };
 
     //Select image from storage
     const selectFile = () => {
@@ -95,8 +114,14 @@ const SignUpScreen = ({ navigation, signup }) => {
     return (
         <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"}  style = {{flex:1}}>
             <ScrollView>
+                <ConfirmPopup
+                    text={'Có vẻ như bạn đang nhập thông tin. Bạn có chắc muốn trở lại không?'}
+                    visible={popupExitVisibility}
+                    setVisible={setPopupExitVisibility}
+                    onFinish={ navigation.pop } 
+                />
                 <View style={styles.container}>
-                    <Text style={topic.style}>Đăng ký</Text>
+                    {/* <Text style={topic.style}>Đăng ký</Text> */}
                     <View style={styles.mainScreen}>
                         <Text style={input.label}>Họ và tên</Text>
                         <TextInput

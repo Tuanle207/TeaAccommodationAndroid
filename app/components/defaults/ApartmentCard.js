@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     },
     info: {
         padding: 10,
-        backgroundColor: 'rgba(0,88,122,0.5)',
+        backgroundColor: 'rgba(0,88,122,0.7)',
         marginTop: 'auto',
         color: '#fff'
     },
