@@ -96,8 +96,8 @@ const ChangePasswordScreen = ({checkLoggedIn, user, navigation, changePassword})
                             checkAndShowValidationDefault(currentPassword, password, passwordConfirm,
                                 setRequiredCurrentPassword, setRequiredNewPassword, setRequiredNewConfirmPassword)
                         }
-                    }}>
-                    <AntDesignIcon name='check' color='#06BBD8' size={30}/>
+                    }}  style={{ padding: 10 }} >
+                    <AntDesignIcon name='check' color='#06BBD8' size={28}/>
                 </TouchableOpacity>
                 
             </View>
@@ -118,7 +118,7 @@ const ChangePasswordScreen = ({checkLoggedIn, user, navigation, changePassword})
                                 setIsCurrentPasswordHidden(false);
                             else
                                 setIsCurrentPasswordHidden(true);
-                        }} >
+                        }}  style={{ padding: 10 }}>
                         <AntDesignIcon name="eye" size={16} color={'#fff'} />
                     </TouchableOpacity>
                     

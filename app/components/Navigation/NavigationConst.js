@@ -10,7 +10,7 @@ export const ScreenNames = {
     // user
     LOGIN: 'Đăng nhập',
     LOGIN_SUCCESS: 'Đăng nhập thành công',
-    USER: 'Tài khoản của tôi',
+    USER: 'Trang cá nhân của tôi',
     SIGNUP: 'Đăng kí tài khoản',
     UPDATE_USER: 'Cập nhật thông tin tài khoản',
     CHANGE_PASSWORD: 'Thay đổi mật khẩu tài khoản'

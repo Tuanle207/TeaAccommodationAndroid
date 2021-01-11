@@ -74,16 +74,16 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
     const { type, id } = route.params;
 
     const [photos, dispatchPhotos] = useReducer(photosReducer, []);
-    const [title, setTitle] = useState('Phòng trọ xịn xò');
-    const [description, setDescription] = useState('Phòng xò xịn nhất Việt Name');
-    const [rent, setRent] = useState('2500000');
-    const [area, setArea] = useState('30');
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [rent, setRent] = useState('');
+    const [area, setArea] = useState('');
     const [coordinate, setCoordinate] = useState({latitude: 10.88015919427308, longitude: 106.80892746895552}); 
-    const [street, setStreet] = useState('20A Linh Trung');
+    const [street, setStreet] = useState('');
     const [ward, setWard] = useState(null);
     const [district, setDistrict] = useState(null);
     const [city, setCity] = useState(null);
-    const [phoneContact, setPhoneContact] = useState('01224578226');
+    const [phoneContact, setPhoneContact] = useState('');
     const [facilities, dispatchFacilities] = useReducer(facilitiesReducer, facilitiesData.map((el) => ({checked: false, value: el})));
 
     const [districtsData, setDistrictsData] = useState([]);
@@ -398,7 +398,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
 
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Diện tích (㎡)</Text>
-                    <TextInput value={area.toString()} onChangeText={txt => setArea(txt)} style = {styles.textInput} placeholder = 'Diện tích (m2)' keyboardType = 'number-pad'/>
+                    <TextInput value={area.toString()} onChangeText={txt => setArea(txt)} style = {styles.textInput} keyboardType = 'number-pad'/>
                 </View>
                 
                 <View style={styles.section}>

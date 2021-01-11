@@ -1,16 +1,15 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import { Text, View, Image, StyleSheet, ToastAndroid, BackHandler } from 'react-native';
-import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { Text, View, Image, StyleSheet, ToastAndroid, BackHandler, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { input, imageButton, navigationTittle} from '../styles/userFeature.style';
 import { connect } from 'react-redux';
 import { serverApi } from '../../../appsetting';
-import { checkLoggedIn, updateUserInformation} from '../../actions';
+import { updateUserInformation} from '../../actions';
 import ImagePicker from 'react-native-image-picker';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import ConfirmPopup from '../defaults/ConfirmPopup';
 import { useFocusEffect } from '@react-navigation/native';
 
-const UpdateUserScreen = ({checkLoggedIn, navigation, user, ui, updateUserInformation}) => {
+const UpdateUserScreen = ({ navigation, user, ui, updateUserInformation}) => {
     const [name, setName] = useState(user.data.name);
     const [phoneNumber, setPhoneNumber] = useState(user.data.phoneNumber);
     const [photo, setPhoto] = useState({});
@@ -93,8 +92,8 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, ui, updateUserInform
                 onFinish={ navigation.pop } 
             />
             <View style={{backgroundColor: '#132833', height: 53, flexDirection:'row' ,justifyContent:'space-around', alignItems:'center'}}>
-                <TouchableOpacity   TouchableOpacity onPress={() => setPopupExitVisibility(true)}>
-                    <AntDesignIcon name="close" color='#D9D9D9' size={30}></AntDesignIcon>
+                <TouchableOpacity  TouchableOpacity onPress={() => setPopupExitVisibility(true)} style={{ padding: 10 }}>
+                    <AntDesignIcon name="close" color='#D9D9D9' size={28}></AntDesignIcon>
                 </TouchableOpacity>
                 <Text style={navigationTittle.style}>Chỉnh sửa trang cá nhân</Text>
                 <TouchableOpacity onPress={() => {
@@ -105,8 +104,8 @@ const UpdateUserScreen = ({checkLoggedIn, navigation, user, ui, updateUserInform
                         }
                         else 
                             ToastAndroid.showWithGravity("Vui lòng điền thông tin đầy đủ và hợp lệ", ToastAndroid.SHORT, ToastAndroid.CENTER);
-                    }}>
-                    <AntDesignIcon name='check' color='#06BBD8' size={30}/>
+                    }}  style={{ padding: 10 }}>
+                    <AntDesignIcon name='check' color='#06BBD8' size={28}/>
                 </TouchableOpacity>
             </View>
             <ScrollView style={{ width: '100%', height: '100%', backgroundColor: '#204051', paddingHorizontal: 30 }}>
@@ -151,7 +150,7 @@ export default connect(
         user: state.user,
         ui: state.ui
     }),
-    { checkLoggedIn, updateUserInformation})(UpdateUserScreen);
+    { updateUserInformation})(UpdateUserScreen);
 
 const styles = StyleSheet.create({
     avatar: {
