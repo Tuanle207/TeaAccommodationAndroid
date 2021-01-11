@@ -25,4 +25,4 @@ TeaAccommodation is written in PHP, Laravel, HTML, CSS, Sass, Javascript...
 
 ## Author
 - 18521597 - Lê Anh Tuấn
-- 18521585 - Nguyễn Thanh Tuấn
+- 18521604 - Nguyễn Thanh Tuấn
