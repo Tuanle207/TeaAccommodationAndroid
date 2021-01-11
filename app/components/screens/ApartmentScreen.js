@@ -28,7 +28,7 @@ import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import MapView, {Circle, Marker} from 'react-native-maps';
-import {calculateTime, formatDatetime, isEmpty, shortenMoneyAmount, shortenText, sortArrayOfObjectByDate} from '../../utils';
+import {calculateTime, formatDatetime, isEmpty, shortenMoneyAmount, sortArrayOfObjectByDate} from '../../utils';
 import serverRequest from '../../apis/serverRequest';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Modal from 'react-native-modal';
@@ -315,7 +315,7 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
                         color='#000'
                     />
                     <Text style={styles.detail_row_text}>Người đăng: </Text>
-                    <Image style={styles.detail_row_user} source={{uri: `${serverApi}${detail.postedBy.photo}`}} />
+                    <Image style={styles.detail_row_user} source={{uri: `${serverApi}/${detail.postedBy.photo}`}} />
                     <Text>
                         {detail.postedBy.name}
                     </Text>

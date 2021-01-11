@@ -270,7 +270,7 @@ export const getApartments = query => catchAsync(async dispatch => {
 
 
 export const getMyApartments = query => catchAsync(async (dispatch, getState) => {
-
+    console.log('getting my apartment');
     dispatch({
         type: ACTION_TYPE.FETCHING_APARTMENTS,
         payload: true
@@ -490,8 +490,7 @@ export const updateApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
         });
     }
     
-
-    console.log(formDataBody);
+    console.log('formDataBody');
 
     const response = await accommodationRequest.post(`/apartments/${apartmentInfos.id}`, formDataBody, {
         headers: {
@@ -518,12 +517,13 @@ export const updateApartment = ({apartmentInfos, navigation}) => catchAsync(asyn
     dispatch(getMyApartments());
 
 }, (err, dispatch) => {
-    console.log(err.response.data);
+    console.log(err);
+    console.log(err.response);
     console.log('error');
     ToastAndroid.show('Đã có lỗi xảy ra', ToastAndroid.SHORT);
     dispatch({
         type: ACTION_TYPE.UPDATING_APARTMENT,
-        payload: true
+        payload: false
     });
 });
 

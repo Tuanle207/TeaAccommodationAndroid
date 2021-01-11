@@ -28,8 +28,6 @@ export const calculateTime = time => {
     const date = new Date(time.split(' ')[0]);
     const diff = new Date().getTime() - date.getTime();
     const days = diff / (1000 * 3600 * 24);
-    console.log(time);
-    console.log(new Date());
     
     if (Math.floor(days / 365) >= 1)            return `${Math.floor(days / 30)} năm trước`;
     if (Math.floor(days / 30) >= 1)             return `${Math.floor(days / 30)} tháng trước`;
@@ -64,6 +62,19 @@ const compareDate = (commentA, commentB) => {
 export const sortArrayOfObjectByDate = arr => {
     return arr.sort(compareDate)
 };
+
+// try parse a string to an integer, otherwise, return null
+export const tryParseInt = (str, defaultValue = null) => {
+    var retValue = defaultValue;
+    if(str !== null) {
+        if(str.length > 0) {
+            if (!isNaN(str)) {
+                retValue = parseInt(str);
+            }
+        }
+    }
+    return retValue;
+}
 
 export const ROLE_TYPE = {
     NORMAL_USER: 'user',

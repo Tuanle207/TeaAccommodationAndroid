@@ -10,7 +10,8 @@ import {
     ScrollView, 
     TextInput, 
     TouchableOpacity,
-    BackHandler
+    BackHandler,
+    ToastAndroid
 } from 'react-native';
 
 import MapView, { Marker } from 'react-native-maps';
@@ -19,7 +20,7 @@ import {Picker} from '@react-native-picker/picker'
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
-import { APARTMENT_MODIFICATION_TYPE, isEmpty, ROLE_TYPE } from '../../utils';
+import { APARTMENT_MODIFICATION_TYPE, isEmpty } from '../../utils';
 import { createApartment, getApartment, updateApartment } from '../../actions';
 import { MARGIN_MEDIUM } from '../styles/default.value';
 import { connect } from 'react-redux';
@@ -29,6 +30,7 @@ import AnimatedLoader from 'react-native-animated-loader';
 import { serverApi } from '../../../appsetting';
 import ConfirmPopup from '../defaults/ConfirmPopup';
 import { useFocusEffect } from '@react-navigation/native';
+import { mustBeANumberRule, mustNotBeEmpty, mustNotBeEmptyStringRule, mustReachNumber, validate } from '../../utils/validation';
 
 const photosReducer = (state, action) => {
     
@@ -92,7 +94,97 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
     const [streetInputFocus, setStreetInputFocus] = useState(false);
     const [popupExitVisibility, setPopupExitVisibility] = useState(false);
 
+    // Validation
+    const [firstTimeValidation, setFirstTimeValidation] = useState(true);
+
+    const [titleValidated, setTitleValidated] = useState(null);
+    const [descriptionValidated, setDescriptionValidated] = useState(null);
+    const [rentValidated, setRentValidated] = useState(null);
+    const [areaValidated, setAreaValidated] = useState(null);
+    const [cityValidated, setCityValidated] = useState(null);
+    const [districtValidated, setDistrictValidated] = useState(null);
+    const [wardValidated, setWardValidated] = useState(null);
+    const [streetValidated, setStreetValidated] = useState(null);
+    const [phoneContactValidated, setPhoneContactValidated] = useState(null);
+    const [photosValidated, setPhotosValidated] = useState(null);
+
     const mapViewRef = useRef(null);
+
+    const titleRules = [
+        mustNotBeEmptyStringRule('Tiêu đề')
+    ];
+    const descriptionRules = [
+        mustNotBeEmptyStringRule('Mô tả')
+    ];
+    const rentRules = [
+        mustNotBeEmptyStringRule('Giá thuê'),
+        mustBeANumberRule('Giá thuê')
+    ];
+    const areaRules = [
+        mustNotBeEmptyStringRule('Diện tích'),
+        mustBeANumberRule('Diện tích')
+    ];
+    const cityRules = [
+        mustNotBeEmpty('Tên thành phố/tỉnh')
+    ];
+    const districtRules = [
+        mustNotBeEmpty('Tên quận/huyện')
+    ];
+    const wardRules = [
+        mustNotBeEmpty('Tên phường/xã')
+    ];
+    const streetRules =[
+        mustNotBeEmptyStringRule('Số nhà, đường')
+    ];
+    const phoneContactRules = [
+        mustNotBeEmptyStringRule('Số điện thoại')
+    ];
+    const photosRules = [
+        mustReachNumber('hình ảnh về phòng trọ', 4)
+    ];
+    
+    const validateAll = () => {
+        validate(title, titleRules, setTitleValidated);
+        validate(description, descriptionRules, setDescriptionValidated);
+        validate(rent, rentRules, setRentValidated);
+        validate(area, areaRules, setAreaValidated);
+        validate(street, streetRules, setStreetValidated);
+        validate(ward, wardRules, setDistrictValidated);
+        validate(district, districtRules, setWardValidated);
+        validate(city, cityRules, setCityValidated);
+        validate(phoneContact, phoneContactRules, setPhoneContactValidated);
+        validate(photos.length, photosRules, setPhotosValidated);
+    };
+
+    const checkAllValidation = () => {
+        return  titleValidated === null &&
+                descriptionValidated === null &&
+                rentValidated === null &&
+                areaValidated === null &&
+                cityValidated === null &&
+                districtValidated === null &&
+                wardValidated === null &&
+                streetValidated === null &&
+                phoneContactValidated === null &&
+                photosValidated === null;
+    }
+
+    // useEffect(() => {
+    //     if (checkAllValidation()(true);
+    // }, [titleValidated,
+    //     descriptionValidated,
+    //     rentValidated,
+    //     areaValidated,
+    //     cityValidated,
+    //     districtValidated,
+    //     wardValidated,
+    //     streetValidated,
+    //     phoneContactValidated,
+    //     photosValidated]);
+
+    // useEffect(() => {
+    //     console.log(validated);
+    // }, [validated]);
 
     useEffect(() => {
         if (type === APARTMENT_MODIFICATION_TYPE.UPDATION) {
@@ -122,11 +214,11 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
         if (type === APARTMENT_MODIFICATION_TYPE.UPDATION) {
             if (apartmentDetails.findIndex(el => el.id === id) !== -1) {
                 const detail = apartmentDetails.find(el => el.id === id);
-
+                console.log(detail);
                 setTitle(detail.title);
                 setDescription(detail.description);
-                setRent(detail.rent);
-                setArea(detail.area);
+                setRent(detail.rent.toString());
+                setArea(detail.area.toString());
                 setCoordinate({ latitude: detail.address.latitude, longitude: detail.address.longitude });
                 setStreet(detail.address.street);
                 setCity(detail.address.city);
@@ -139,7 +231,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                     type: 'init',
                     payload: facilitiesData.map((el) => ({checked: detail.facilities.includes(el), value: el}))
                 });
-                console.log(detail.photos.map(el => ({uri: serverApi + '/' + el})));
+                
                 // get districts and wards
                 addressRequest
                 .get(`district?province=79`)
@@ -233,6 +325,16 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
     }, 1);
 
     const submit = () => {
+
+        console.log(checkAllValidation());
+        if (type === APARTMENT_MODIFICATION_TYPE.CREATION && firstTimeValidation === true) {
+            setFirstTimeValidation(false);
+            ToastAndroid.showWithGravity('Vui lòng nhập đầy đủ thông tin hợp lệ,', ToastAndroid.LONG, ToastAndroid.CENTER);
+            return validateAll();
+        }
+        if (!checkAllValidation())
+            return ToastAndroid.showWithGravity('Vui lòng nhập đầy đủ thông tin hợp lệ,', ToastAndroid.LONG, ToastAndroid.CENTER);
+
         const apartmentInfos = {
             title,
             description,
@@ -255,8 +357,14 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 apartmentInfos.facilities.push(el.value);
         });
         
+        if (type === APARTMENT_MODIFICATION_TYPE.UPDATION && photos[0].name === undefined) {
+            apartmentInfos.photos = [];
+        }
+        
         console.log(apartmentInfos);
         console.log(type);
+        console.log('OK, POSSIBLE TO CONTINUE');
+
         if (id !== null) apartmentInfos.id = id;
         if (type === APARTMENT_MODIFICATION_TYPE.CREATION)
             createApartment({apartmentInfos, navigation});
@@ -291,6 +399,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                     const wards = results.map(el => el.name);
                     setWardsData(wards);
                     setWard(wards[0]);
+                    setWardValidated(null);
                 });
         }
     };
@@ -310,6 +419,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
             } else if (res.error) {
                 console.log('ImagePicker Error: ', res.error);
             } else {
+                validate(photos.length + 1, photosRules, setPhotosValidated);
                 dispatchPhotos({
                     type: 'add',
                     payload: res
@@ -352,7 +462,13 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 <View style={styles.imageWrapper} key={index}>
                     {
                         type === APARTMENT_MODIFICATION_TYPE.CREATION ?
-                        <TouchableOpacity onPress={() => dispatchPhotos({type: 'remove', payload: {id: index}})} style={styles.removeImgBtn} >
+                        <TouchableOpacity 
+                            style={styles.removeImgBtn} 
+                            onPress={() => { 
+                                validate(photos.length - 1, photosRules, setPhotosValidated);
+                                dispatchPhotos({type: 'remove', payload: {id: index}});
+                            }} 
+                            >
                             <EntypoIcon name={'circle-with-cross'} size={30} color={'#6E16FE'} />
                         </TouchableOpacity>
                         : null
@@ -363,7 +479,7 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
     }
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"} style = {{flex:1}}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={50} style = {{flex: 1 }}>
             <ScrollView style = {{paddingVertical: 10, paddingHorizontal: 20, backgroundColor: '#204051'}}>
                 {
                     (loading === true || ui.creatingApartment === true || ui.fetchingApartment || ui.updatingApartment) &&
@@ -383,22 +499,54 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 />
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Tiêu đề</Text>
-                    <TextInput value={title} onChangeText={txt => setTitle(txt)} style = {styles.textInput}/>
+                    <TextInput value={title} style = {styles.textInput}
+                        onChangeText={ txt => setTitle(txt) }
+                        onBlur={ () => validate(title, titleRules, setTitleValidated) }
+                        />
+                    {
+                        titleValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12 }}>{titleValidated}</Text> :
+                        null
+                    }
                 </View>
 
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Thông tin mô tả</Text>
-                    <TextInput value={description} onChangeText={txt => setDescription(txt)} style = {styles.textInputMul} textAlignVertical='top' multiline = {true}/>
+                    <TextInput value={description} style = {styles.textInputMul} textAlignVertical='top' multiline = {true}
+                        onChangeText={txt => setDescription(txt)}
+                        onBlur={ () => validate(description, descriptionRules, setDescriptionValidated) }
+                        />
+                    {
+                        descriptionValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12 }}>{descriptionValidated}</Text> :
+                        null
+                    }
                 </View>
 
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Giá thuê (đồng/tháng)</Text>
-                    <TextInput value={rent.toString()} onChangeText={txt => setRent(txt)} style = {styles.textInput} keyboardType = 'number-pad'/>
+                    <TextInput value={rent.toString()} style = {styles.textInput} keyboardType = 'number-pad'
+                        onChangeText={txt => setRent(txt)}
+                        onBlur={ () => validate(rent, rentRules, setRentValidated) }
+                        />
+                    {
+                        rentValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12 }}>{rentValidated}</Text> :
+                        null
+                    }
                 </View>
 
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Diện tích (㎡)</Text>
-                    <TextInput value={area.toString()} onChangeText={txt => setArea(txt)} style = {styles.textInput} keyboardType = 'number-pad'/>
+                    <TextInput value={area.toString()} style = {styles.textInput} keyboardType = 'number-pad'
+                        onChangeText={txt => setArea(txt)}
+                        onBlur={ () => validate(area, areaRules, setAreaValidated) }
+                        />
+                    {
+                        areaValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12 }}>{areaValidated}</Text> :
+                        null
+                    }
                 </View>
                 
                 <View style={styles.section}>
@@ -411,22 +559,40 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Tỉnh/Thành phố</Text>
                     <View style={{borderBottomWidth: 1, borderColor: '#fff'}}>
-                        <Picker style={{color: '#fff'}} selectedValue={city} onValueChange={txt => handleCityChange(txt)} dropdownIconColor={'white'} >
+                        <Picker style={{color: '#fff'}}
+                            dropdownIconColor={'white'} 
+                            selectedValue={city}  
+                            onValueChange={txt => {
+                                handleCityChange(txt);
+                                validate(txt, cityRules, setCityValidated);
+                            }} >
                             {
-                                city === null && <Picker.Item label='Chọn tỉnh/thành phố' value='' />
+                                city === null && <Picker.Item label='Chọn tỉnh/thành phố' value={null} />
                             }
                             <Picker.Item label='Thành Phố Hồ Chí Minh' value='Hồ Chí Minh' />
                         </Picker>
                     </View>
+                    {
+                        cityValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12, marginTop: 5 }}>{cityValidated}</Text> :
+                        null
+                    }
                 </View>
                     
 
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Quận/Huyện</Text>
                     <View style={{borderBottomWidth: 1, borderColor: '#fff'}}>
-                        <Picker style={{color: '#fff'}} selectedValue={district?.name} onValueChange={txt => handleDistrictChange(txt)} dropdownIconColor={'white'}>
+                        <Picker style={{color: '#fff'}} 
+                            dropdownIconColor={'white'}
+                            selectedValue={district?.name} 
+                            onValueChange={value => { 
+                                handleDistrictChange(value);
+                                validate(value, districtRules, setDistrictValidated);
+                            }}
+                            >
                             {
-                                district === null && <Picker.Item label='Chọn quận/huyện' value='' />
+                                district === null && <Picker.Item label='Chọn quận/huyện' value={null} />
                             }
                             {
                                 districtsData.map(el => {
@@ -437,14 +603,26 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                             }
                         </Picker>
                     </View>
+                    {
+                        districtValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12, marginTop: 5 }}>{districtValidated}</Text> :
+                        null
+                    }
                 </View>
 
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Phường/Xã</Text>
                     <View style={{borderBottomWidth: 1, borderColor: '#fff'}}>
-                        <Picker style={{color: '#fff'}} selectedValue={ward}  onValueChange={txt => setWard(txt)} dropdownIconColor={'white'}>
+                        <Picker style={{color: '#fff'}} 
+                            dropdownIconColor={'white'}
+                            selectedValue={ward}  
+                            onValueChange={txt => {
+                                setWard(txt);
+                                validate(txt, wardRules, setWardValidated);
+                            }} 
+                            >
                             {
-                                ward === null && <Picker.Item label='Chọn phường/xã' value='' />
+                                ward === null && <Picker.Item label='Chọn phường/xã' value={null} />
                             }
                             {
                                 wardsData.map(el => {
@@ -455,16 +633,29 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                             }
                         </Picker>
                     </View>
+                    {
+                        wardValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12, marginTop: 5 }}>{wardValidated}</Text> :
+                        null
+                    }
                 </View>
 
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Số nhà, đường</Text>
                     <TextInput value={street} 
-                        onBlur={() => {console.log('out'); setStreetInputFocus(false); } } 
-                        onFocus={() => {console.log('in'); setStreetInputFocus(true); } } 
-                        onChangeText={txt => setStreet(txt)} 
                         style = {{...styles.textInput, paddingLeft: 10}} 
+                        onChangeText={txt => setStreet(txt)} 
+                        onFocus={() => {console.log('in'); setStreetInputFocus(true); } }
+                        onBlur={() => {
+                            setStreetInputFocus(false); 
+                            validate(street, streetRules, setStreetValidated);
+                        }}  
                         />
+                    {
+                        streetValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12, marginTop: 5 }}>{streetValidated}</Text> :
+                        null
+                    }
                 </View>
 
                     
@@ -487,7 +678,15 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                 </View>
                 <View style={styles.section}>
                     <Text style = {styles.sectionTitle}>Số điện thoại liên hệ</Text>
-                    <TextInput value={phoneContact} onChangeText={txt => setPhoneContact(txt)} style = {styles.textInput} />
+                    <TextInput value={phoneContact} style = {styles.textInput}
+                        onChangeText={txt => setPhoneContact(txt)}
+                        onBlur={ () => validate(phoneContact, phoneContactRules, setPhoneContactValidated) }
+                        />
+                    {
+                        phoneContactValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12 }}>{phoneContactValidated}</Text> :
+                        null
+                    }
                 </View>
                
                <View style={styles.section}>
@@ -510,6 +709,11 @@ const CreateOrUpdateApartmentScreen = ({ route, navigation, createApartment, upd
                             <Text style={{ color: '#fca652'}}> cho phòng trọ?</Text>
                         </TouchableOpacity>
                         : null
+                    }
+                    {
+                        photosValidated !== null ?
+                        <Text style={{ color: 'red', fontSize: 12, alignSelf: 'center', marginVertical: 10 }}>{photosValidated}</Text> :
+                        null
                     }
                     {
                         photos.length < 4 ?
