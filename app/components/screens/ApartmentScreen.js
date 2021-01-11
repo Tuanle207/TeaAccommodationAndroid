@@ -328,10 +328,16 @@ const ApartmentScreen = ({route, getApartment, createComment, apartmentDetails, 
                         color='#000'
                     />
                     <Text style={styles.detail_row_text}>Xếp hạng: </Text>
-                    <Text style={styles.detail_row_value}> {detail.rating ? detail.rating : 'Chưa được xếp hạng'} </Text>
+                    <Text style={styles.detail_row_value}> {detail.rating.rating ? detail.rating.rating : 'Chưa được xếp hạng'} </Text>
                     {
-                        detail.rating &&
-                        <FoundationIcon name='star' size={14} color='#F0A500' />
+                        detail.rating.rating && (
+                            <FoundationIcon name='star' size={14} color='#F0A500' />
+                        )
+                    }
+                    {
+                        detail.rating.rating && (
+                            <Text>{` (${detail.rating.ratingCount} lượt đánh giá)` }</Text>
+                        )
                     }
                 </View>
 
