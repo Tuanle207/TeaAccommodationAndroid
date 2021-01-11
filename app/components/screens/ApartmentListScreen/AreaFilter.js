@@ -5,6 +5,7 @@ import Modal from './../../defaults/Modal';
 import { filterApartment } from '../../../actions';
 import { connect } from 'react-redux';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import SliderMaker from '../../defaults/SliderMaker';
 
 
 const AreaFilter = ({ modalVisible, setModalVisible, filterApartment }) => {
@@ -31,7 +32,7 @@ const AreaFilter = ({ modalVisible, setModalVisible, filterApartment }) => {
             
 
             <View style={styles.range_input}>
-                <View style={{marginRight: 10, alignItems: 'center'}}>
+                <View style={{marginRight: 15, alignItems: 'center'}}>
                     <Text style={styles.text_value}>0</Text>
                     <Text>㎡</Text>
                 </View>
@@ -41,10 +42,14 @@ const AreaFilter = ({ modalVisible, setModalVisible, filterApartment }) => {
                     min={0}
                     max={200}
                     step={10}
+                    isMarkersSeparated={true}
+                    customMarkerLeft={e => (<SliderMaker color={'#db6400'} />)}
+                    customMarkerRight={e => (<SliderMaker color={'#5aa469'} />)}
+                    customMarker={e => (<SliderMaker />)}
                     values={[area.min, area.max]}
                     onValuesChange={numbers => setArea({min: numbers[0], max: numbers[1]}) }
                 />
-                <View style={{marginLeft: 10, alignItems: 'center'}}>
+                <View style={{marginLeft: 15, alignItems: 'center'}}>
                     <Text style={styles.text_value}>200</Text>
                     <Text>㎡</Text>
                 </View>

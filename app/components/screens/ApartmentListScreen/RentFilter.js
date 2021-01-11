@@ -5,6 +5,7 @@ import Modal from './../../defaults/Modal';
 import { filterApartment } from '../../../actions';
 import { connect } from 'react-redux';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import SliderMaker from '../../defaults/SliderMaker';
 
 
 const RentFilter = ({ modalVisible, setModalVisible, filterApartment }) => {
@@ -41,6 +42,9 @@ const RentFilter = ({ modalVisible, setModalVisible, filterApartment }) => {
                     min={0}
                     max={20}
                     step={1}
+                    isMarkersSeparated={true}
+                    customMarkerLeft={e => (<SliderMaker color={'#db6400'} />)}
+                    customMarkerRight={e => (<SliderMaker color={'#5aa469'} />)}
                     values={[rent.min, rent.max]}
                     onValuesChange={numbers => setRent({min: numbers[0], max: numbers[1]}) }
                 />
