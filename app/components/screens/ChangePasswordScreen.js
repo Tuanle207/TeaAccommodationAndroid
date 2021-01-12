@@ -118,7 +118,7 @@ const ChangePasswordScreen = ({checkLoggedIn, user, navigation, changePassword})
                                 setIsCurrentPasswordHidden(false);
                             else
                                 setIsCurrentPasswordHidden(true);
-                        }}  style={{ padding: 10 }}>
+                        }}>
                         <AntDesignIcon name="eye" size={16} color={'#fff'} />
                     </TouchableOpacity>
                     
