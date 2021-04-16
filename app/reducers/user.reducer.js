@@ -2,6 +2,7 @@ import ACTION_TYPE from '../actions/type';
 
 const INIT = {
     auth: false,
+    token: '',
     data: null
 }
 const userReducer = (state = INIT, action) => {

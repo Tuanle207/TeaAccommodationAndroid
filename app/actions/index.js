@@ -78,6 +78,7 @@ export const login = ({email, password, navigation}) => catchAsync(async dispatc
         type: ACTION_TYPE.USER_LOGIN,
         payload: {
             auth: true,
+            token: response.data.token,
             data: response.data.data
         }
     });
@@ -255,7 +256,7 @@ export const getApartments = query => catchAsync(async dispatch => {
     });
 }, (err, dispatch) => {
     if (err.message = 'Network Error') {
-        console.log('loi mang!!!!!!!!!!!!!!1');
+        console.log('loi mang!!!!!!!!!!!!!!');
         dispatch({
             type: ACTION_TYPE.ERROR_OCCURRING,
             payload: "Lỗi kết nối mạng"
